@@ -12,6 +12,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends Activity {
     private static final int FILE_CHOOSER_REQUEST = 7012;
 
@@ -39,7 +46,7 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " MyDaysAndroid/1.7.4");
+        settings.setUserAgentString(settings.getUserAgentString() + " MyDaysAndroid/1.7.5");
 
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient() {
@@ -56,17 +63,10 @@ public class MainActivity extends Activity {
                 filePathCallback = callback;
 
                 Intent intent;
-                try {
-                    intent = params.createIntent();
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                    intent.setType("image/*");
-                } catch (Exception e) {
-                    intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                    intent.setType("image/*");
-                }
+                intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                intent.setType("image/*");
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
 
@@ -94,19 +94,95 @@ public class MainActivity extends Activity {
         Uri[] results = null;
 
         if (resultCode == RESULT_OK && data != null) {
+            List<Uri> selectedUris = new ArrayList<>();
+
             if (data.getClipData() != null) {
                 int count = data.getClipData().getItemCount();
-                results = new Uri[count];
                 for (int i = 0; i < count; i++) {
-                    results[i] = data.getClipData().getItemAt(i).getUri();
+                    selectedUris.add(data.getClipData().getItemAt(i).getUri());
                 }
             } else if (data.getData() != null) {
-                results = new Uri[] { data.getData() };
+                selectedUris.add(data.getData());
+            }
+
+            if (!selectedUris.isEmpty()) {
+                results = copyPickedImagesToCache(selectedUris);
             }
         }
 
         filePathCallback.onReceiveValue(results);
         filePathCallback = null;
+    }
+
+    private Uri[] copyPickedImagesToCache(List<Uri> sourceUris) {
+        List<Uri> cacheUris = new ArrayList<>();
+        File uploadDir = new File(getCacheDir(), "mydays_photo_uploads");
+
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        File[] staleFiles = uploadDir.listFiles();
+        if (staleFiles != null) {
+            for (File staleFile : staleFiles) {
+                staleFile.delete();
+            }
+        }
+
+        for (int i = 0; i < sourceUris.size(); i++) {
+            Uri sourceUri = sourceUris.get(i);
+
+            try {
+                getContentResolver().takePersistableUriPermission(
+                        sourceUri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                );
+            } catch (Exception ignored) {
+                // Some providers do not allow persistable grants. Cache copy below is enough.
+            }
+
+            String extension = getImageExtension(sourceUri);
+            File targetFile = new File(uploadDir, "mydays_photo_" + System.currentTimeMillis() + "_" + i + extension);
+
+            try (
+                    InputStream inputStream = getContentResolver().openInputStream(sourceUri);
+                    OutputStream outputStream = new FileOutputStream(targetFile)
+            ) {
+                if (inputStream == null) {
+                    continue;
+                }
+
+                byte[] buffer = new byte[8192];
+                int length;
+                while ((length = inputStream.read(buffer)) > 0) {
+                    outputStream.write(buffer, 0, length);
+                }
+
+                cacheUris.add(Uri.fromFile(targetFile));
+            } catch (Exception copyError) {
+                copyError.printStackTrace();
+            }
+        }
+
+        return cacheUris.toArray(new Uri[0]);
+    }
+
+    private String getImageExtension(Uri uri) {
+        String mimeType = getContentResolver().getType(uri);
+
+        if ("image/png".equals(mimeType)) {
+            return ".png";
+        }
+
+        if ("image/webp".equals(mimeType)) {
+            return ".webp";
+        }
+
+        if ("image/heic".equals(mimeType) || "image/heif".equals(mimeType)) {
+            return ".heic";
+        }
+
+        return ".jpg";
     }
 
     @Override

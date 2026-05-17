@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.7.5 (2026-05-17)
+- **Description**: Fixed Android WebView PHOTO attachment permission failures by caching selected gallery files inside the app before JavaScript reads them.
+- **Changes**:
+  - Modified [android/app/src/main/java/com/mydays/app/MainActivity.java](file:///d:/AI/project/my_days/android/app/src/main/java/com/mydays/app/MainActivity.java) to always use `ACTION_OPEN_DOCUMENT`, copy selected image URIs into app-owned cache files, and return cache file URIs to the WebView file input.
+  - Bumped Android APK metadata to version `1.7.5`.
+
 ## v1.7.4 (2026-05-17)
 - **Description**: Fixed the welcome CTA line break and replaced Android PHOTO publishing `undefined` alerts with clear, human-readable error messages.
 - **Changes**:
