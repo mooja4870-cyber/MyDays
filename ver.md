@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.7.2 (2026-05-17)
+- **Description**: Built the first proper MyDays Android APK shell with native WebView file chooser support, mobile layout hardening, PC server URL storage, and the user-provided pink flower launcher icon.
+- **Changes**:
+  - Added a native Android project under [android](file:///d:/AI/project/my_days/android) with app name `MyDays`, package `com.mydays.app`, version `1.7.2`, WebView loading local renderer assets, and `WebChromeClient.onShowFileChooser` for Android photo attachment.
+  - Modified [src/renderer/index.html](file:///d:/AI/project/my_days/src/renderer/index.html), [src/renderer/styles.css](file:///d:/AI/project/my_days/src/renderer/styles.css), and [src/renderer/app.js](file:///d:/AI/project/my_days/src/renderer/app.js) to keep settings inputs full-width on mobile, make the photo picker directly touchable, and route APK API calls to a saved PC server URL.
+  - Added [build-android-apk.ps1](file:///d:/AI/project/my_days/build-android-apk.ps1) and published the built debug APK at [src/renderer/MyDays.apk](file:///d:/AI/project/my_days/src/renderer/MyDays.apk).
+  - Replaced the renderer/app launcher icon with the supplied flower image and generated Android density icons.
+
 ## v1.7.1 (2026-05-17)
 - **Description**: Resolved the Naver Blog "Private" posting bug by postponing category, privacy, and tags setting execution until the publish settings popup layer popover is completely loaded, and implemented a robust multi-strategy selector to bypass styled-invisible radio buttons.
 - **Changes**:

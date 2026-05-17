@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.7.1)
+## 🚀 Current Status (v1.7.2)
+- **📱 MyDays Android APK Shell (v1.7.2)**: Added a real Android WebView APK project with app label `MyDays`, package `com.mydays.app`, flower launcher icon, native Android `onShowFileChooser` photo picker support, mobile settings layout hardening, and PC server URL storage for calling the existing Electron/Node automation server from the phone app. Built debug APK is published as `src/renderer/MyDays.apk`.
 - **🔒 Flawless Privacy Settings (v1.7.1)**: Solved a critical Naver Blog automation timing issue where category, privacy (public/private), and tags setting methods were called before the settings dropdown layer popover actually opened. These methods are now seamlessly executed inside the `publishPost` routine after the layer animation completes, and `setPrivacy` has been empowered with a robust multi-strategy selector (CSS + XPath labels/spans) to ensure 100% reliable Private posting even when radio buttons are styled invisible.
 - **Active Dev Server**: Built-in HTTP server listening on Port `3333` directly inside the Electron main process.
   - Serves frontend static files cleanly to local browsers.
