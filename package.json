@@ -37,5 +37,8 @@
   "bugs": {
     "url": "https://github.com/cuj2090/coupang_naver/issues"
   },
-  "homepage": "https://github.com/cuj2090/coupang_naver#readme"
+  "homepage": "https://github.com/cuj2090/coupang_naver#readme",
+  "devDependencies": {
+    "electron": "^42.1.0"
+  }
 }
