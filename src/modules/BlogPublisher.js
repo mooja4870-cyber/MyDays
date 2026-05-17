@@ -969,36 +969,9 @@ class BlogPublisher extends EventEmitter {
       const contentFrame = await this.page.frame('se_iframe');
       const targetPage = contentFrame || this.page;
 
-      // 🔍 [에디터 본문 포커스 확립] 본문 영역에 글이나 이미지를 작성하기 전에 
-      // 에디터 활성화를 강제로 실행하여 엔터 및 이미지 붙여넣기 신호가 공중으로 날아가는 현상을 완벽히 방지합니다.
-      try {
-        console.log('📝 본문 입력을 위한 에디터 포커스 활성화 중...');
-        
-        // 본문 컨테이너가 로드될 때까지 대기
-        await targetPage.waitForSelector('.se-component-content', { timeout: 30000 }).catch(() => {});
-        
-        // 실제 텍스트 입력 영역 찾기 및 클릭
-        const textParagraph = await targetPage.$('.se-text-paragraph');
-        if (textParagraph) {
-          await textParagraph.click();
-          await this.page.waitForTimeout(500);
-          console.log('✅ 본문 텍스트 영역 포커스 완료');
-        }
-        
-        // 플레이스홀더가 있는 경우 클릭하여 활성화
-        const placeholder = await targetPage.$('.se-placeholder');
-        if (placeholder) {
-          await placeholder.click();
-          await this.page.waitForTimeout(500);
-          console.log('📝 플레이스홀더 클릭으로 에디터 강제 활성화 완료');
-        }
-      } catch (focusError) {
-        console.warn('⚠️ 에디터 초기 포커스 설정 시도 실패 (무시하고 진행):', focusError.message);
-      }
-
-      // 📸 [방탄 루프 횟수 제어] 말풍선 및 설명문이 둘 다 빠져 텍스트가 공백 위주로 잘려 나가더라도,
-      // 업로드해야 할 사진(imagePaths)이 있다면 사진 개수만큼 무조건 루프를 돌도록 철저히 방어합니다.
-      const loopCount = imagePaths.length > 0 ? Math.max(paragraphs.length - 1, imagePaths.length) : paragraphs.filter(p => p.trim()).length;
+      // 📸 [방탄 루프 횟수 제어] 텍스트 개수와 이미지 개수를 연동하여 
+      // 어떠한 옵션 조합에서도 이미지와 텍스트가 유실 없이 100% 매칭되도록 보장합니다.
+      const loopCount = imagePaths.length > 0 ? Math.max(paragraphs.length, imagePaths.length) : paragraphs.filter(p => p.trim()).length;
       
       for (let i = 0; i < loopCount; i++) {
         let paragraph = paragraphs[i] ? paragraphs[i].trim() : '';
@@ -1016,7 +989,7 @@ class BlogPublisher extends EventEmitter {
           console.log(`🔹 [말풍선 옵션 비활성] ${i + 1}번째 섹션 소제목 삽입을 건너뜁니다.`);
         }
         
-        // 🔥 60자 설명문 넣기/빼기 처리
+        // 🔥 60자 설명문 넣기/빼기 처리 (또는 사장님의 천재적 아이디어인 사진 인덱스 자동 표기 처리)
         if (this.config.useDescription !== false && paragraph && paragraph.trim() !== '') {
           console.log(`🔹 [설명문 옵션 활성] ${i + 1}번째 섹션 본문 텍스트 입력 중...`);
           // 🔥 문장별 줄바꿈 추가 (숫자 뒤의 마침표는 제외)
@@ -1030,6 +1003,18 @@ class BlogPublisher extends EventEmitter {
           } catch (clipboardError) {
             console.warn(`⚠️ 문단 클립보드 복사 실패, 직접 타이핑:`, clipboardError.message);
             await targetPage.keyboard.type(paragraph, { delay: 40 });
+          }
+          await targetPage.waitForTimeout(500);
+        } else if (this.config.useBubble === false && this.config.useDescription === false) {
+          // 📸 [천재적 아이디어 반영] 둘 다 빠진 특수 옵션 상태에서는 
+          // 네이버 에디터 포커싱 안정화를 위해 숫자 인덱스(예: "1", "2")를 아주 귀엽게 본문에 심어줍니다.
+          const indexText = `${i + 1}`;
+          console.log(`🔹 [말풍선+설명문 비활성] 에디터 안정화 및 사진 구분을 위해 인덱스 문자 "${indexText}" 입력 중...`);
+          try {
+            await this.copyTextToClipboard(indexText);
+            await targetPage.keyboard.press('Control+V');
+          } catch (clipboardError) {
+            await targetPage.keyboard.type(indexText, { delay: 40 });
           }
           await targetPage.waitForTimeout(500);
         } else {

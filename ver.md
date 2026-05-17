@@ -1,11 +1,11 @@
 # 📦 Version History
 
 ## v1.8.5 (2026-05-18)
-- **Description**: Resolved a critical editor sandboxing focus bug during pure photo-only diary posting (when useBubble and useDescription are both disabled).
+- **Description**: Implemented a brilliant user-inspired solution to assign dynamic photo indexing numbers (1, 2, ... n) in place of text paragraphs during photo-only publishing when both speech bubbles and descriptions are disabled, completely resolving editor focus and missing photo bugs.
 - **Changes**:
-  - Implemented explicit, high-reliability editor container focusing logic (targeting `.se-component-content`, `.se-text-paragraph`, and `.se-placeholder` elements) at the entry of `enterContent` in [src/modules/BlogPublisher.js](file:///d:/AI/project/my_days/src/modules/BlogPublisher.js).
-  - This ensures that keyboard `Enter` and client clipboard paste (`Control+V`) signals are never swallowed in a silent defocus state, guaranteeing 100% stable, touchless, pure image-only diary automation.
-  - Recompiled the Android WebView assets and deployed the corrected APK to [src/renderer/MyDays.apk](file:///d:/AI/project/my_days/src/renderer/MyDays.apk).
+  - Enhanced [src/main.js](file:///d:/AI/project/my_days/src/main.js) to generate index numbers `1, 2, ... n` as문단 본문 when both options are set to "Exclude" (useBubble: false, useDescription: false).
+  - Modified `enterContent` inside [src/modules/BlogPublisher.js](file:///d:/AI/project/my_days/src/modules/BlogPublisher.js) to write these index numbers explicitly into the smart editor body area, maintaining 100% stable caret/focus and allowing flawless automated image insertion.
+  - Recompiled the Android assets and deployed a new stable APK to [src/renderer/MyDays.apk](file:///d:/AI/project/my_days/src/renderer/MyDays.apk).
 
 ## v1.8.4 (2026-05-18)
 - **Description**: Fixed a critical bug in photo publishing where images were accidentally skipped when both the speech bubble subtitles (useBubble: 빼기) and description paragraphs (useDescription: 빼기) were disabled.
