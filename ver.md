@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.8.3 (2026-05-17)
+- **Description**: Hardened mobile API network failure error handling by providing interactive system diagnostic guidelines inside the client logs, and rebuilt the Android WebView APK.
+- **Changes**:
+  - Enhanced `ErrorMessageHelper.getMessage` inside [src/renderer/app.js](file:///d:/AI/project/my_days/src/renderer/app.js) to catch network connection errors (`Failed to fetch`, `NetworkError`) and supply structured, user-friendly troubleshooting step logs (checking if PC automation server is running, verifying same Wi-Fi connection, and double-checking IP addresses).
+  - Re-compiled the Android WebView assets and generated a new stable [src/renderer/MyDays.apk](file:///d:/AI/project/my_days/src/renderer/MyDays.apk).
+
 ## v1.8.2 (2026-05-17)
 - **Description**: Rebuilt and stabilized the Android WebView APK (`MyDays.apk`) to resolve potential corrupted or incomplete download issues, ensuring robust performance.
 - **Changes**:

@@ -3535,27 +3535,35 @@ class ErrorMessageHelper {
             return fallback;
         }
 
+        let msg = '';
         if (typeof error === 'string') {
-            return error;
+            msg = error;
+        } else if (error.message) {
+            msg = error.message;
+        } else if (error.target && error.target.error && error.target.error.message) {
+            msg = error.target.error.message;
+        } else if (error.type) {
+            msg = `${fallback} (${error.type})`;
+        } else {
+            try {
+                msg = JSON.stringify(error);
+            } catch (jsonError) {
+                msg = fallback;
+            }
         }
 
-        if (error.message) {
-            return error.message;
+        // 📡 네트워크 연결 실패(Failed to fetch) 시스템적 안내 강화
+        if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('network') || msg.includes('Failed to connect') || msg.includes('connect')) {
+            const savedUrl = (localStorage.getItem('mydays-server-url') || 'http://172.30.1.41:3333').trim();
+            return `PC 서버 연결 실패 (Failed to fetch)\n` +
+                   `👉 조치 방법:\n` +
+                   `1. PC에서 Electron 자동화 프로그램이 켜져 있는지 확인해 주세요.\n` +
+                   `2. 휴대폰과 PC가 반드시 '같은 Wi-Fi(공유기)'에 연결되어 있어야 합니다.\n` +
+                   `3. 모바일 [설정] 탭의 PC 서버 주소가 PC의 실제 IP와 일치하는지 확인해 주세요.\n` +
+                   ` (현재 시도 주소: ${savedUrl})`;
         }
 
-        if (error.target && error.target.error && error.target.error.message) {
-            return error.target.error.message;
-        }
-
-        if (error.type) {
-            return `${fallback} (${error.type})`;
-        }
-
-        try {
-            return JSON.stringify(error);
-        } catch (jsonError) {
-            return fallback;
-        }
+        return msg;
     }
 }
 
