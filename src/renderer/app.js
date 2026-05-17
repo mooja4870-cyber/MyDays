@@ -3820,7 +3820,7 @@ class PhotoAutomationManager {
         const totalPendingCount = this.selectedFiles.length + uniqueNewFiles.length;
         if (totalPendingCount > 10) {
             // 팝업 경고 메시지 띄우기
-            Utils.showDialog('warning', 'PHOTO 한도 초과', '블로그 PHOTO 발행은 하루 최대 10장까지만 가능합니다. 10장을 초과한 PHOTO는 자동으로 제외됩니다.');
+            Utils.showDialog('warning', 'PHOTO 한도 초과', '블로그 PHOTO 발행은 1회 최대 10장까지만 가능합니다. 10장을 초과한 PHOTO는 자동으로 제외됩니다.');
             
             // 10장까지만 잘라내서 추가
             const allowedSlots = 10 - this.selectedFiles.length;

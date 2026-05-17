@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.7.6)
+## 🚀 Current Status (v1.7.7)
+- **📊 Refined Photo Limit UX (v1.7.7)**: Corrected the photo picker warning message from "daily limit" to "per-post limit" (1회 최대 10장), explicitly allowing unlimited daily photo postings as long as each individual automated blog post contains up to 10 photos.
 - **🛡️ Android Photo Provider Bridge (v1.7.6)**: Resolved the Android WebView PHOTO attachment `NotFoundError` by replacing raw `file://` cache URIs (which are strictly blocked by Android 10+ Chromium security sandboxes) with secure `content://` URIs served dynamically via a custom, lightweight native `MyDaysFileProvider` ContentProvider, ensuring 100% stable, offline-compatible image uploads.
 - **📷 Android Photo Cache Bridge (v1.7.5)**: Fixed Android WebView `FileReader` permission failures by copying selected gallery/photo URIs into app-owned cache files before handing them back to the web file input, preventing `The requested file could not be read` after PHOTO attachment.
 - **🧯 Android Photo Error Clarity (v1.7.4)**: Split the welcome CTA into two lines and hardened Android PHOTO publishing error handling so file picker/read failures no longer surface as `undefined`; Android file chooser intents now include explicit read URI grants.

@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.7.7 (2026-05-17)
+- **Description**: Updated photo attachment limit UX logic from a misleading daily limit to a clear per-post limit, allowing unlimited daily uploads as long as each post contains up to 10 photos.
+- **Changes**:
+  - Modified [src/renderer/app.js](file:///d:/AI/project/my_days/src/renderer/app.js) to show `1회 최대 10장` instead of `하루 최대 10장` in the photo count limit dialog.
+  - Bumped Android APK metadata, build configuration, and user agent to version `1.7.7`.
+
 ## v1.7.6 (2026-05-17)
 - **Description**: Resolved Android WebView PHOTO attachment `NotFoundError` by replacing raw `file://` cache URIs with secure `content://` URIs served via a custom, lightweight, 100% offline-compatible native `MyDaysFileProvider`.
 - **Changes**:
