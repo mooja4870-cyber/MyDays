@@ -966,21 +966,25 @@ class BlogPublisher extends EventEmitter {
       this.emit('publish-progress', { step: '본문 내용 및 이미지 입력' });
       
       const paragraphs = content.split('\n\n');
-      const maxLen = Math.max(paragraphs.length, imagePaths ? imagePaths.length : 0);
-      
       const contentFrame = await this.page.frame('se_iframe');
       const targetPage = contentFrame || this.page;
 
-        for (let i = 0; i < maxLen; i++) {
-        let paragraph = (paragraphs[i] || '').trim();
-          const imageToInsert = imagePaths && imagePaths[i] && require('fs').existsSync(imagePaths[i]) ? imagePaths[i] : null;
-          
+      // 📸 [방탄 루프 횟수 제어] 말풍선 및 설명문이 둘 다 빠져 텍스트가 공백 위주로 잘려 나가더라도,
+      // 업로드해야 할 사진(imagePaths)이 있다면 사진 개수만큼 무조건 루프를 돌도록 철저히 방어합니다.
+      const loopCount = imagePaths.length > 0 ? Math.max(paragraphs.length - 1, imagePaths.length) : paragraphs.filter(p => p.trim()).length;
+      
+      for (let i = 0; i < loopCount; i++) {
+        let paragraph = paragraphs[i] ? paragraphs[i].trim() : '';
+        const imageToInsert = imagePaths && imagePaths[i] && require('fs').existsSync(imagePaths[i]) ? imagePaths[i] : null;
+        
         // 🔥 말풍선 소제목 넣기/빼기 처리
-        if (this.config.useBubble !== false && paragraph !== '') {
-          console.log(`🔹 [말풍선 옵션 활성] ${i + 1}번째 섹션 소제목 생성 및 삽입 중...`);
-          // 🔥 소제목 생성 (AI 기반)
-          const subtitle = await this.generateSubtitle(paragraph, productName, account);
-          await this.insertSubtitleWithQuotation(subtitle);
+        if (this.config.useBubble !== false) {
+          if (paragraph || imageToInsert) {
+            console.log(`🔹 [말풍선 옵션 활성] ${i + 1}번째 섹션 소제목 생성 및 삽입 중...`);
+            // 🔥 소제목 생성 (AI 기반)
+            const subtitle = await this.generateSubtitle(paragraph || '오늘의 순간', productName, account);
+            await this.insertSubtitleWithQuotation(subtitle);
+          }
         } else {
           console.log(`🔹 [말풍선 옵션 비활성] ${i + 1}번째 섹션 소제목 삽입을 건너뜁니다.`);
         }
@@ -1006,17 +1010,17 @@ class BlogPublisher extends EventEmitter {
         }
           
         // 이미지 삽입
-          if (imageToInsert) {
+        if (imageToInsert) {
           console.log(`📸 ${i + 1}번째 이미지 삽입`);
-            await this.page.keyboard.press('Enter');
-            await this.page.waitForTimeout(1000);
-              await this.insertSingleImage(imageToInsert);
-            await this.page.keyboard.press('Enter');
-            await this.page.waitForTimeout(1000);
-          } else {
-            await this.page.keyboard.press('Enter');
-            await this.page.keyboard.press('Enter');
-          }
+          await this.page.keyboard.press('Enter');
+          await this.page.waitForTimeout(1000);
+          await this.insertSingleImage(imageToInsert);
+          await this.page.keyboard.press('Enter');
+          await this.page.waitForTimeout(1000);
+        } else {
+          await this.page.keyboard.press('Enter');
+          await this.page.keyboard.press('Enter');
+        }
         await this.page.waitForTimeout(1500);
       }
       
