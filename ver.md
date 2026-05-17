@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.7.8 (2026-05-17)
+- **Description**: Added a premium interactive "External Access Help" modal dialog in the mobile settings page, giving users on-device instructions and copyable CLI commands for ngrok tunnel setup to easily enable posting from outside networks.
+- **Changes**:
+  - Modified [src/renderer/index.html](file:///d:/AI/project/my_days/src/renderer/index.html) to place a clickable help link next to the PC Server URL label, and added the overlay `#help-dialog` modal markup containing step-by-step instructions.
+  - Modified [src/renderer/app.js](file:///d:/AI/project/my_days/src/renderer/app.js) to export global `showHelpDialog()` and `closeHelpDialog()` control functions.
+  - Bumped Android APK metadata, build configuration, and user agent to version `1.7.8`.
+
 ## v1.7.7 (2026-05-17)
 - **Description**: Updated photo attachment limit UX logic from a misleading daily limit to a clear per-post limit, allowing unlimited daily uploads as long as each post contains up to 10 photos.
 - **Changes**:

@@ -4099,3 +4099,17 @@ class PhotoAutomationManager {
         }
     }
 }
+
+function showHelpDialog() {
+    const dialog = document.getElementById('help-dialog');
+    if (dialog) {
+        dialog.style.display = 'flex';
+    }
+}
+
+function closeHelpDialog() {
+    const dialog = document.getElementById('help-dialog');
+    if (dialog) {
+        dialog.style.display = 'none';
+    }
+}
