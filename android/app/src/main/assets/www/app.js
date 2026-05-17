@@ -3484,9 +3484,12 @@ function closeConfirmDialog(confirmed) {
 
 // Mobile API bridge helper
 class MobileApiBridge {
+    static DEFAULT_SERVER_URL = 'http://172.30.1.41:3333';
+
     static init() {
         if (this.isAndroidShell()) {
             document.body.classList.add('mydays-android');
+            this.ensureDefaultServerUrl();
         }
     }
 
@@ -3495,7 +3498,7 @@ class MobileApiBridge {
     }
 
     static getApiBaseUrl(required = false) {
-        const savedUrl = (localStorage.getItem('mydays-server-url') || '').trim().replace(/\/+$/, '');
+        const savedUrl = (localStorage.getItem('mydays-server-url') || this.DEFAULT_SERVER_URL).trim().replace(/\/+$/, '');
 
         if (savedUrl) {
             return savedUrl;
@@ -3510,6 +3513,14 @@ class MobileApiBridge {
         }
 
         return '';
+    }
+
+    static ensureDefaultServerUrl() {
+        const savedUrl = (localStorage.getItem('mydays-server-url') || '').trim();
+
+        if (!savedUrl) {
+            localStorage.setItem('mydays-server-url', this.DEFAULT_SERVER_URL);
+        }
     }
 
     static apiUrl(path, required = false) {
@@ -3840,7 +3851,7 @@ class PhotoAutomationManager {
         const naverPassword = localStorage.getItem('test-naver-password') || '';
         const blogId = localStorage.getItem('test-blog-id') || '';
         const geminiKey = localStorage.getItem('test-gemini-key') || '';
-        const serverUrl = localStorage.getItem('mydays-server-url') || '';
+        const serverUrl = localStorage.getItem('mydays-server-url') || MobileApiBridge.DEFAULT_SERVER_URL;
 
         const elId = document.getElementById('mobile-naver-id');
         const elPw = document.getElementById('mobile-naver-password');
@@ -3866,7 +3877,7 @@ class PhotoAutomationManager {
         const naverPassword = elPw ? elPw.value.trim() : '';
         const blogId = elBlog ? elBlog.value.trim() : '';
         const geminiKey = elGemini ? elGemini.value.trim() : '';
-        const serverUrl = elServerUrl ? elServerUrl.value.trim().replace(/\/+$/, '') : '';
+        const serverUrl = elServerUrl ? (elServerUrl.value.trim().replace(/\/+$/, '') || MobileApiBridge.DEFAULT_SERVER_URL) : MobileApiBridge.DEFAULT_SERVER_URL;
 
         if (!naverId || !naverPassword || !blogId) {
             alert('네이버 ID, 비밀번호, 블로그 ID는 필수 입력 사항입니다.');
@@ -3879,11 +3890,7 @@ class PhotoAutomationManager {
         if (geminiKey) {
             localStorage.setItem('test-gemini-key', geminiKey);
         }
-        if (serverUrl) {
-            localStorage.setItem('mydays-server-url', serverUrl);
-        } else {
-            localStorage.removeItem('mydays-server-url');
-        }
+        localStorage.setItem('mydays-server-url', serverUrl);
 
         // 동기화
         const tId = document.getElementById('test-naver-id');

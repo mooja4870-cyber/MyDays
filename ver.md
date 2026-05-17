@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.7.3 (2026-05-17)
+- **Description**: Embedded the current PC automation server URL as the mobile app default so the Android APK can auto-save and reuse `http://172.30.1.41:3333`.
+- **Changes**:
+  - Modified [src/renderer/app.js](file:///d:/AI/project/my_days/src/renderer/app.js) to define `MobileApiBridge.DEFAULT_SERVER_URL`, auto-persist it on Android launch, and fall back to it whenever the saved URL is empty.
+  - Modified [src/renderer/index.html](file:///d:/AI/project/my_days/src/renderer/index.html) to show `http://172.30.1.41:3333` as the server URL placeholder.
+  - Bumped Android APK metadata to version `1.7.3` in [android/app/build.gradle](file:///d:/AI/project/my_days/android/app/build.gradle) and the MyDays Android WebView user agent.
+
 ## v1.7.2 (2026-05-17)
 - **Description**: Built the first proper MyDays Android APK shell with native WebView file chooser support, mobile layout hardening, PC server URL storage, and the user-provided pink flower launcher icon.
 - **Changes**:
