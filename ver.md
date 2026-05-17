@@ -1,5 +1,14 @@
 # 📦 Version History
 
+## v1.8.0 (2026-05-17)
+- **Description**: Upgraded the maximum image attachment limit from 10 to 30 photos and introduced customizable layout controls to select whether to include speech bubble subtitles and 60-character description paragraphs.
+- **Changes**:
+  - Upgraded file selection limit parameters, warnings, and guidelines inside [src/renderer/index.html](file:///d:/AI/project/my_days/src/renderer/index.html) and [src/renderer/app.js](file:///d:/AI/project/my_days/src/renderer/app.js) from 10 to 30 photos.
+  - Implemented 2 new premium UI radio button groups under post settings: `'섹션 속 섹션 말풍선'` (useBubble: 넣기/빼기) and `'섹션 속 60자 설명문'` (useDescription: 넣기/빼기).
+  - Propagated options via electron API IPC payload in `app.js` to [src/main.js](file:///d:/AI/project/my_days/src/main.js), which dynamically styles `formattedContent` and forwards options to the blog publisher config.
+  - Modified [src/modules/BlogPublisher.js](file:///d:/AI/project/my_days/src/modules/BlogPublisher.js) to conditionally query and insert speech bubble subtitles and body paragraphs during automation, allowing 4 distinct layouts.
+  - Bumped Android APK metadata and user agent to version `1.8.0`.
+
 ## v1.7.9 (2026-05-17)
 - **Description**: Implemented a double-layered bulletproof image upload mechanism to completely eliminate the Android WebView `NotFoundError` ("A requested file or directory could not be found") during automated publishing.
 - **Changes**:

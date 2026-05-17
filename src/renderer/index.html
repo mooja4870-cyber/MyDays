@@ -499,16 +499,15 @@
                             📸 스마트폰 PHOTO 포스팅
                         </div>
                         <button type="button" class="btn btn-secondary" id="btn-welcome-back" style="min-height: 32px; padding: 0.25rem 0.75rem; font-size: 0.8rem; border-radius: var(--radius-md);">
-                            🏠 홈으로
+                            🏠 홈
                         </button>
                     </div>
                     
                     <div class="alert alert-info" style="margin-bottom: 1.5rem;">
                         <div class="alert-icon">ℹ️</div>
                         <div class="alert-content">
-
                             <div class="alert-message">
-                                스마트폰에서 촬영한 일상 PHOTO를 최대 10장 첨부하면, 고품격 블로그 포스팅을 자동 구성 및 발행합니다.
+                                스마트폰에서 촬영한 일상 PHOTO를 최대 30장 첨부하면, 고품격 블로그 포스팅을 자동 구성 및 발행합니다.
                             </div>
                         </div>
                     </div>
@@ -516,11 +515,11 @@
                     <form class="account-form" id="photo-automation-form" onsubmit="event.preventDefault();">
                         <!-- 드래그 앤 드롭 파일 선택기 -->
                         <div class="form-group">
-                            <label class="form-label">오늘의 일상 PHOTO (최대 10장)</label>
+                            <label class="form-label">오늘의 일상 PHOTO (최대 30장)</label>
                             <div class="photo-upload-zone" id="photo-upload-zone">
                                 <div class="upload-zone-icon">📷</div>
                                 <div class="upload-zone-text">여기를 터치하여 스마트폰 PHOTO 첨부</div>
-                                <div class="upload-zone-sub">최대 10장까지 선택 가능 (초과 시 자동 절삭)</div>
+                                <div class="upload-zone-sub">최대 30장까지 선택 가능 (초과 시 자동 절삭)</div>
                                 <input type="file" id="photo-file-input" class="photo-file-input" multiple accept="image/*">
                             </div>
                             <!-- 선택된 사진 목록 미리보기 -->
@@ -549,6 +548,36 @@
                                 <label style="display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
                                     <input type="radio" name="photo-open-type" value="0" style="accent-color: var(--blue-500); width: 18px; height: 18px; cursor: pointer;">
                                     비공개
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 섹션 속 섹션 말풍선 설정 (동일 고급 핑크 스타일) -->
+                        <div class="form-group" style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; background: var(--bg-primary); padding: 0.75rem 1.25rem; border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
+                            <label class="form-label" style="margin-bottom: 0; font-weight: 700; color: var(--text-primary);">섹션 속 섹션 말풍선</label>
+                            <div style="display: flex; gap: 20px;">
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+                                    <input type="radio" name="photo-use-bubble" value="1" checked style="accent-color: var(--blue-500); width: 18px; height: 18px; cursor: pointer;">
+                                    넣기
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+                                    <input type="radio" name="photo-use-bubble" value="0" style="accent-color: var(--blue-500); width: 18px; height: 18px; cursor: pointer;">
+                                    빼기
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 섹션 속 60자 설명문 설정 (동일 고급 핑크 스타일) -->
+                        <div class="form-group" style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; background: var(--bg-primary); padding: 0.75rem 1.25rem; border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
+                            <label class="form-label" style="margin-bottom: 0; font-weight: 700; color: var(--text-primary);">섹션 속 60자 설명문</label>
+                            <div style="display: flex; gap: 20px;">
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+                                    <input type="radio" name="photo-use-description" value="1" checked style="accent-color: var(--blue-500); width: 18px; height: 18px; cursor: pointer;">
+                                    넣기
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+                                    <input type="radio" name="photo-use-description" value="0" style="accent-color: var(--blue-500); width: 18px; height: 18px; cursor: pointer;">
+                                    빼기
                                 </label>
                             </div>
                         </div>

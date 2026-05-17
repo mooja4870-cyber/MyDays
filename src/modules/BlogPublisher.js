@@ -974,24 +974,35 @@ class BlogPublisher extends EventEmitter {
         let paragraph = paragraphs[i].trim();
           const imageToInsert = imagePaths && imagePaths[i] && require('fs').existsSync(imagePaths[i]) ? imagePaths[i] : null;
           
-        // 🔥 소제목 생성 (AI 기반)
-        const subtitle = await this.generateSubtitle(paragraph, productName, account);
+        // 🔥 말풍선 소제목 넣기/빼기 처리
+        if (this.config.useBubble !== false) {
+          console.log(`🔹 [말풍선 옵션 활성] ${i + 1}번째 섹션 소제목 생성 및 삽입 중...`);
+          // 🔥 소제목 생성 (AI 기반)
+          const subtitle = await this.generateSubtitle(paragraph, productName, account);
+          await this.insertSubtitleWithQuotation(subtitle);
+        } else {
+          console.log(`🔹 [말풍선 옵션 비활성] ${i + 1}번째 섹션 소제목 삽입을 건너뜁니다.`);
+        }
         
-        await this.insertSubtitleWithQuotation(subtitle);
-        
-        // 🔥 문장별 줄바꿈 추가 (숫자 뒤의 마침표는 제외)
-        paragraph = paragraph.replace(/(?<!\d)[.!?]\s*/g, '$&\n').trim();
-        console.log(`📝 문단 내용 (줄바꿈 적용):\n${paragraph}`);
-          
-        // 문단 내용 입력
+        // 🔥 60자 설명문 넣기/빼기 처리
+        if (this.config.useDescription !== false && paragraph && paragraph.trim() !== '') {
+          console.log(`🔹 [설명문 옵션 활성] ${i + 1}번째 섹션 본문 텍스트 입력 중...`);
+          // 🔥 문장별 줄바꿈 추가 (숫자 뒤의 마침표는 제외)
+          paragraph = paragraph.replace(/(?<!\d)[.!?]\s*/g, '$&\n').trim();
+          console.log(`📝 문단 내용 (줄바꿈 적용):\n${paragraph}`);
+            
+          // 문단 내용 입력
           try {
             await this.copyTextToClipboard(paragraph);
-          await targetPage.keyboard.press('Control+V');
+            await targetPage.keyboard.press('Control+V');
           } catch (clipboardError) {
-          console.warn(`⚠️ 문단 클립보드 복사 실패, 직접 타이핑:`, clipboardError.message);
-          await targetPage.keyboard.type(paragraph, { delay: 40 });
+            console.warn(`⚠️ 문단 클립보드 복사 실패, 직접 타이핑:`, clipboardError.message);
+            await targetPage.keyboard.type(paragraph, { delay: 40 });
+          }
+          await targetPage.waitForTimeout(500);
+        } else {
+          console.log(`🔹 [설명문 옵션 비활성 또는 문단 없음] ${i + 1}번째 섹션 본문 입력을 건너뜁니다.`);
         }
-        await targetPage.waitForTimeout(500);
           
         // 이미지 삽입
           if (imageToInsert) {
