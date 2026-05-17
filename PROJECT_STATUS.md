@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.7.3)
+## 🚀 Current Status (v1.7.4)
+- **🧯 Android Photo Error Clarity (v1.7.4)**: Split the welcome CTA into two lines and hardened Android PHOTO publishing error handling so file picker/read failures no longer surface as `undefined`; Android file chooser intents now include explicit read URI grants.
 - **📡 Default Mobile Server Address (v1.7.3)**: Embedded `http://172.30.1.41:3333` as the Android shell's default PC automation server URL and auto-persists it into browser storage on first APK launch so users do not need to manually re-enter it after installation.
 - **📱 MyDays Android APK Shell (v1.7.2)**: Added a real Android WebView APK project with app label `MyDays`, package `com.mydays.app`, flower launcher icon, native Android `onShowFileChooser` photo picker support, mobile settings layout hardening, and PC server URL storage for calling the existing Electron/Node automation server from the phone app. Built debug APK is published as `src/renderer/MyDays.apk`.
 - **🔒 Flawless Privacy Settings (v1.7.1)**: Solved a critical Naver Blog automation timing issue where category, privacy (public/private), and tags setting methods were called before the settings dropdown layer popover actually opened. These methods are now seamlessly executed inside the `publishPost` routine after the layer animation completes, and `setPrivacy` has been empowered with a robust multi-strategy selector (CSS + XPath labels/spans) to ensure 100% reliable Private posting even when radio buttons are styled invisible.

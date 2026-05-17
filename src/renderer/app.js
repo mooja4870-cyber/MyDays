@@ -3529,6 +3529,36 @@ class MobileApiBridge {
     }
 }
 
+class ErrorMessageHelper {
+    static getMessage(error, fallback = '알 수 없는 오류가 발생했습니다.') {
+        if (!error) {
+            return fallback;
+        }
+
+        if (typeof error === 'string') {
+            return error;
+        }
+
+        if (error.message) {
+            return error.message;
+        }
+
+        if (error.target && error.target.error && error.target.error.message) {
+            return error.target.error.message;
+        }
+
+        if (error.type) {
+            return `${fallback} (${error.type})`;
+        }
+
+        try {
+            return JSON.stringify(error);
+        } catch (jsonError) {
+            return fallback;
+        }
+    }
+}
+
 // PHOTO 포스팅 이력 관리자
 class PostingHistoryManager {
     static init() {
@@ -3943,9 +3973,22 @@ class PhotoAutomationManager {
         try {
             const fileToBase64 = (file) => new Promise((resolve, reject) => {
                 const reader = new FileReader();
+                reader.onload = () => {
+                    if (typeof reader.result === 'string' && reader.result.startsWith('data:image/')) {
+                        resolve(reader.result);
+                        return;
+                    }
+
+                    reject(new Error(`${file.name || '선택한 PHOTO'} 파일을 이미지 데이터로 읽지 못했습니다.`));
+                };
+                reader.onerror = (error) => {
+                    const detail = ErrorMessageHelper.getMessage(reader.error || error, 'Android 사진 파일 읽기 권한 또는 파일 접근 오류');
+                    reject(new Error(`${file.name || '선택한 PHOTO'} 파일 읽기 실패: ${detail}`));
+                };
+                reader.onabort = () => {
+                    reject(new Error(`${file.name || '선택한 PHOTO'} 파일 읽기가 취소되었습니다.`));
+                };
                 reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
             });
 
             console.log('📤 이미지 파일 base64 변환 시작...');
@@ -4011,7 +4054,7 @@ class PhotoAutomationManager {
                     }
                 } catch (backgroundError) {
                     console.error('❌ 백그라운드 PHOTO 발행 중 오류 발생:', backgroundError);
-                    PostingHistoryManager.appendLog({ level: 'error', message: `❌ 포스팅 실패: ${backgroundError.message}` });
+                    PostingHistoryManager.appendLog({ level: 'error', message: `❌ 포스팅 실패: ${ErrorMessageHelper.getMessage(backgroundError)}` });
                 }
             })();
 
@@ -4049,7 +4092,7 @@ class PhotoAutomationManager {
 
         } catch (error) {
             console.error('❌ PHOTO 발행 중 오류 발생:', error);
-            alert(`❌ PHOTO 발행 중 오류 발생: ${error.message}`);
+            alert(`❌ PHOTO 발행 중 오류 발생: ${ErrorMessageHelper.getMessage(error)}`);
         } finally {
             btnPublish.disabled = false;
             btnPublish.textContent = '🚀 PHOTO 블로그 포스팅 시작';

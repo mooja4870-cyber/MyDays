@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.7.4 (2026-05-17)
+- **Description**: Fixed the welcome CTA line break and replaced Android PHOTO publishing `undefined` alerts with clear, human-readable error messages.
+- **Changes**:
+  - Modified [src/renderer/index.html](file:///d:/AI/project/my_days/src/renderer/index.html) to split `자, 이제 포스팅하러 가볼까요?` and `Let's Go! 🚀` onto separate lines.
+  - Modified [src/renderer/app.js](file:///d:/AI/project/my_days/src/renderer/app.js) to normalize unknown/empty error objects, add robust FileReader failure messages, and prevent `PHOTO 발행 중 오류 발생: undefined`.
+  - Modified [android/app/src/main/java/com/mydays/app/MainActivity.java](file:///d:/AI/project/my_days/android/app/src/main/java/com/mydays/app/MainActivity.java) to add explicit Android read URI grants for the native photo picker.
+  - Bumped Android APK metadata to version `1.7.4`.
+
 ## v1.7.3 (2026-05-17)
 - **Description**: Embedded the current PC automation server URL as the mobile app default so the Android APK can auto-save and reuse `http://172.30.1.41:3333`.
 - **Changes**:

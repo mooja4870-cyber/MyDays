@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " MyDaysAndroid/1.7.3");
+        settings.setUserAgentString(settings.getUserAgentString() + " MyDaysAndroid/1.7.4");
 
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient() {
@@ -62,11 +62,13 @@ public class MainActivity extends Activity {
                     intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                     intent.setType("image/*");
                 } catch (Exception e) {
-                    intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                     intent.setType("image/*");
                 }
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
 
                 try {
                     startActivityForResult(intent, FILE_CHOOSER_REQUEST);
