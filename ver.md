@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.7.6 (2026-05-17)
+- **Description**: Resolved Android WebView PHOTO attachment `NotFoundError` by replacing raw `file://` cache URIs with secure `content://` URIs served via a custom, lightweight, 100% offline-compatible native `MyDaysFileProvider`.
+- **Changes**:
+  - Created [android/app/src/main/java/com/mydays/app/MyDaysFileProvider.java](file:///d:/AI/project/my_days/android/app/src/main/java/com/mydays/app/MyDaysFileProvider.java) to dynamically resolve and stream cached photo uploads to the WebView as standard Android Content Provider URIs, bypassing Android 10+ Chromium file sandboxing.
+  - Modified [android/app/src/main/java/com/mydays/app/MainActivity.java](file:///d:/AI/project/my_days/android/app/src/main/java/com/mydays/app/MainActivity.java) to return secure `content://com.mydays.app.fileprovider` URIs instead of raw `file://` cache URIs.
+  - Modified [android/app/src/main/AndroidManifest.xml](file:///d:/AI/project/my_days/android/app/src/main/AndroidManifest.xml) to register `MyDaysFileProvider` under the `<application>` tag.
+  - Bumped Android APK metadata, build configuration, and user agent to version `1.7.6`.
+
 ## v1.7.5 (2026-05-17)
 - **Description**: Fixed Android WebView PHOTO attachment permission failures by caching selected gallery files inside the app before JavaScript reads them.
 - **Changes**:

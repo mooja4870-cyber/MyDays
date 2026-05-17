@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " MyDaysAndroid/1.7.5");
+        settings.setUserAgentString(settings.getUserAgentString() + " MyDaysAndroid/1.7.6");
 
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient() {
@@ -158,7 +158,11 @@ public class MainActivity extends Activity {
                     outputStream.write(buffer, 0, length);
                 }
 
-                cacheUris.add(Uri.fromFile(targetFile));
+                cacheUris.add(new Uri.Builder()
+                        .scheme("content")
+                        .authority("com.mydays.app.fileprovider")
+                        .path(targetFile.getName())
+                        .build());
             } catch (Exception copyError) {
                 copyError.printStackTrace();
             }
