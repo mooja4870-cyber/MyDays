@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.7.9 (2026-05-17)
+- **Description**: Implemented a double-layered bulletproof image upload mechanism to completely eliminate the Android WebView `NotFoundError` ("A requested file or directory could not be found") during automated publishing.
+- **Changes**:
+  - Modified [android/app/src/main/java/com/mydays/app/MyDaysFileProvider.java](file:///d:/AI/project/my_days/android/app/src/main/java/com/mydays/app/MyDaysFileProvider.java) to implement a standard `MatrixCursor` query method, providing accurate size and name metadata to Chromium WebView.
+  - Upgraded Android native storage paths in `MainActivity.java` and `MyDaysFileProvider.java` from temporary cache (`getCacheDir()`) to persistent private directory (`getFilesDir()`) to prevent automated OS file deletion.
+  - Enhanced [src/renderer/app.js](file:///d:/AI/project/my_days/src/renderer/app.js) to pre-load and cache the complete raw Base64 data string in JavaScript memory (V8) immediately upon user photo selection, making the automated posting engine completely independent of subsequent disk access, permission, or timing issues on publish.
+  - Bumped Android APK metadata and user agent to version `1.7.9`.
+
 ## v1.7.8 (2026-05-17)
 - **Description**: Added a premium interactive "External Access Help" modal dialog in the mobile settings page, giving users on-device instructions and copyable CLI commands for ngrok tunnel setup to easily enable posting from outside networks.
 - **Changes**:

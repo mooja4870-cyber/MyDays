@@ -3849,30 +3849,44 @@ class PhotoAutomationManager {
         previewGrid.style.display = 'grid';
         previewGrid.innerHTML = '';
 
-        this.selectedFiles.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const item = document.createElement('div');
-                item.className = 'photo-preview-item';
-                
-                const img = document.createElement('img');
-                img.className = 'photo-preview-img';
-                img.src = e.target.result;
-                
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'photo-preview-remove';
-                removeBtn.textContent = '×';
-                removeBtn.addEventListener('click', (ev) => {
-                    ev.stopPropagation();
-                    this.selectedFiles.splice(index, 1);
-                    this.renderPreviews();
-                });
+        const drawPreviewItem = (base64Data, index) => {
+            const item = document.createElement('div');
+            item.className = 'photo-preview-item';
+            
+            const img = document.createElement('img');
+            img.className = 'photo-preview-img';
+            img.src = base64Data;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'photo-preview-remove';
+            removeBtn.textContent = '×';
+            removeBtn.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                this.selectedFiles.splice(index, 1);
+                this.renderPreviews();
+            });
 
-                item.appendChild(img);
-                item.appendChild(removeBtn);
-                previewGrid.appendChild(item);
-            };
-            reader.readAsDataURL(file);
+            item.appendChild(img);
+            item.appendChild(removeBtn);
+            previewGrid.appendChild(item);
+        };
+
+        this.selectedFiles.forEach((file, index) => {
+            if (file.cachedBase64) {
+                // 이미 메모리 캐시가 완벽히 존재하면 디스크 리딩 생략
+                drawPreviewItem(file.cachedBase64, index);
+            } else {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const base64Data = e.target.result;
+                    file.cachedBase64 = base64Data; // 100% 방탄 메모리 캐시화
+                    drawPreviewItem(base64Data, index);
+                };
+                reader.onerror = () => {
+                    console.error(`Failed to preload file: ${file.name}`);
+                };
+                reader.readAsDataURL(file);
+            }
         });
     }
 
@@ -3972,9 +3986,17 @@ class PhotoAutomationManager {
 
         try {
             const fileToBase64 = (file) => new Promise((resolve, reject) => {
+                // 초강력 방탄 메모리 캐시 즉각 반환!
+                if (file.cachedBase64) {
+                    console.log(`⚡ [방탄 메모리 캐시 작동] ${file.name || '선택한 PHOTO'} 사진을 디바이스 디스크 접근 없이 즉시 획득했습니다.`);
+                    resolve(file.cachedBase64);
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.onload = () => {
                     if (typeof reader.result === 'string' && reader.result.startsWith('data:image/')) {
+                        file.cachedBase64 = reader.result; // 안전을 위해 한 번 더 캐시
                         resolve(reader.result);
                         return;
                     }

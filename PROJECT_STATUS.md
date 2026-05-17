@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.7.8)
+## 🚀 Current Status (v1.7.9)
+- **🛡️ Double-Layered Bulletproof Image Uploads (v1.7.9)**: Resolved Chromium WebView's `NotFoundError` completely by (1) implementing standard `MatrixCursor` query metadata resolution in `MyDaysFileProvider` so Android WebView can successfully read cached files, (2) upgrading native cache storage from temporary cache dir `getCacheDir()` to persistent private directory `getFilesDir()`, and (3) pre-loading and caching raw Base64 data strings inside V8 memory immediately when photos are selected, fully immunizing the publishing flow from any disk access, permission, or OS-deletion issues.
 - **🏠 External Connection Guide Modal (v1.7.8)**: Added a premium interactive "External Access Help" modal dialog right in the mobile settings page next to the PC Server URL label, detailing ngrok tunnel setup instructions and commands for users to easily establish remote posting tunnels from anywhere in the world.
 - **📊 Refined Photo Limit UX (v1.7.7)**: Corrected the photo picker warning message from "daily limit" to "per-post limit" (1회 최대 10장), explicitly allowing unlimited daily photo postings as long as each individual automated blog post contains up to 10 photos.
 - **🛡️ Android Photo Provider Bridge (v1.7.6)**: Resolved the Android WebView PHOTO attachment `NotFoundError` by replacing raw `file://` cache URIs (which are strictly blocked by Android 10+ Chromium security sandboxes) with secure `content://` URIs served dynamically via a custom, lightweight native `MyDaysFileProvider` ContentProvider, ensuring 100% stable, offline-compatible image uploads.

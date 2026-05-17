@@ -8,6 +8,9 @@ import android.os.ParcelFileDescriptor;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import android.database.MatrixCursor;
+import android.provider.OpenableColumns;
+
 public class MyDaysFileProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
@@ -31,7 +34,7 @@ public class MyDaysFileProvider extends ContentProvider {
             throw new FileNotFoundException("Security error: Invalid path segments");
         }
 
-        File uploadDir = new File(getContext().getCacheDir(), "mydays_photo_uploads");
+        File uploadDir = new File(getContext().getFilesDir(), "mydays_photo_uploads");
         File file = new File(uploadDir, path);
 
         if (!file.exists()) {
@@ -43,7 +46,37 @@ public class MyDaysFileProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return null;
+        String path = uri.getPath();
+        if (path == null) return null;
+
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+
+        File uploadDir = new File(getContext().getFilesDir(), "mydays_photo_uploads");
+        File file = new File(uploadDir, path);
+
+        if (!file.exists()) return null;
+
+        // Default to DISPLAY_NAME and SIZE if projection is not specified
+        String[] cols = projection != null ? projection : new String[] {
+                OpenableColumns.DISPLAY_NAME,
+                OpenableColumns.SIZE
+        };
+
+        MatrixCursor cursor = new MatrixCursor(cols);
+        Object[] row = new Object[cols.length];
+        for (int i = 0; i < cols.length; i++) {
+            if (OpenableColumns.DISPLAY_NAME.equals(cols[i])) {
+                row[i] = file.getName();
+            } else if (OpenableColumns.SIZE.equals(cols[i])) {
+                row[i] = file.length();
+            } else {
+                row[i] = null;
+            }
+        }
+        cursor.addRow(row);
+        return cursor;
     }
 
     @Override

@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " MyDaysAndroid/1.7.8");
+        settings.setUserAgentString(settings.getUserAgentString() + " MyDaysAndroid/1.7.9");
 
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient() {
@@ -116,7 +116,7 @@ public class MainActivity extends Activity {
 
     private Uri[] copyPickedImagesToCache(List<Uri> sourceUris) {
         List<Uri> cacheUris = new ArrayList<>();
-        File uploadDir = new File(getCacheDir(), "mydays_photo_uploads");
+        File uploadDir = new File(getFilesDir(), "mydays_photo_uploads");
 
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
