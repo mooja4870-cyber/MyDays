@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.8.2 (2026-05-17)
+- **Description**: Rebuilt and stabilized the Android WebView APK (`MyDays.apk`) to resolve potential corrupted or incomplete download issues, ensuring robust performance.
+- **Changes**:
+  - Re-executed the Android build workflow via [build-android-apk.ps1](file:///d:/AI/project/my_days/build-android-apk.ps1) with a fresh Gradle compilation.
+  - Deployed the latest fully compiled debug build target to [src/renderer/MyDays.apk](file:///d:/AI/project/my_days/src/renderer/MyDays.apk).
+  - Ensured correct staging and version tracking to facilitate reliable remote download from GitHub.
+
 ## v1.8.1 (2026-05-17)
 - **Description**: Enabled non-destructive cumulative photo uploads and robust duplicate prevention across multiple photo selections.
 - **Changes**:

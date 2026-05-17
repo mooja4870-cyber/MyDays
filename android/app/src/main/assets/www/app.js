@@ -3816,14 +3816,14 @@ class PhotoAutomationManager {
             console.log(`⚠️ 중복된 PHOTO ${duplicateCount}장이 자동으로 제외되었습니다.`);
         }
 
-        // 2. 10장 한도 초과 검사 및 팝업 메시지 출력
+        // 2. 30장 한도 초과 검사 및 팝업 메시지 출력
         const totalPendingCount = this.selectedFiles.length + uniqueNewFiles.length;
-        if (totalPendingCount > 10) {
+        if (totalPendingCount > 30) {
             // 팝업 경고 메시지 띄우기
-            Utils.showDialog('warning', 'PHOTO 한도 초과', '블로그 PHOTO 발행은 1회 최대 10장까지만 가능합니다. 10장을 초과한 PHOTO는 자동으로 제외됩니다.');
+            Utils.showDialog('warning', 'PHOTO 한도 초과', '블로그 PHOTO 발행은 1회 최대 30장까지만 가능합니다. 30장을 초과한 PHOTO는 자동으로 제외됩니다.');
             
-            // 10장까지만 잘라내서 추가
-            const allowedSlots = 10 - this.selectedFiles.length;
+            // 30장까지만 잘라내서 추가
+            const allowedSlots = 30 - this.selectedFiles.length;
             if (allowedSlots > 0) {
                 const slicedNewFiles = uniqueNewFiles.slice(0, allowedSlots);
                 this.selectedFiles = [...this.selectedFiles, ...slicedNewFiles];
@@ -3834,6 +3834,12 @@ class PhotoAutomationManager {
         }
 
         this.renderPreviews();
+
+        // 중요: 다음 첨부 클릭 시 동일한 파일명을 선택하더라도 change 이벤트가 항상 유발되도록 엘리먼트 값 리셋!
+        const fileInput = document.getElementById('photo-file-input');
+        if (fileInput) {
+            fileInput.value = '';
+        }
     }
 
     static renderPreviews() {
@@ -3981,6 +3987,13 @@ class PhotoAutomationManager {
         const openTypeEl = document.querySelector('input[name="photo-open-type"]:checked');
         const openType = openTypeEl ? parseInt(openTypeEl.value, 10) : 2;
 
+        // 섹션 속 말풍선 및 설명문 라디오 버튼 값 가져오기
+        const useBubbleEl = document.querySelector('input[name="photo-use-bubble"]:checked');
+        const useBubble = useBubbleEl ? useBubbleEl.value === '1' : true;
+
+        const useDescriptionEl = document.querySelector('input[name="photo-use-description"]:checked');
+        const useDescription = useDescriptionEl ? useDescriptionEl.value === '1' : true;
+
         btnPublish.disabled = true;
         btnPublish.textContent = '⏳ PHOTO 분석 및 자동 발행 진행 중...';
 
@@ -4036,7 +4049,9 @@ class PhotoAutomationManager {
                                 geminiApi,
                                 images: imagesBase64,
                                 context,
-                                openType
+                                openType,
+                                useBubble,
+                                useDescription
                             }
                         });
                     } else {
@@ -4053,7 +4068,9 @@ class PhotoAutomationManager {
                                     geminiApi,
                                     images: imagesBase64,
                                     context,
-                                    openType
+                                    openType,
+                                    useBubble,
+                                    useDescription
                                 }
                             })
                         });
