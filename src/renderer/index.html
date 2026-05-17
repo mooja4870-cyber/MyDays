@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>네파스</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">네파스</div>
+            <div class="sidebar-subtitle">네이버 블로그 쿠팡 파트너스</div>
+            <div class="sidebar-version" id="app-version">v0.0.0</div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-panel="photo-automation">
+                <span class="nav-icon">📸</span>
+                PHOTO 포스팅 자동화
+            </button>
+
+            <button class="nav-item" data-panel="accounts">
+                <span class="nav-icon">👤</span>
+                계정 관리
+            </button>
+            <button class="nav-item" data-panel="settings">
+                <span class="nav-icon">⚙️</span>
+                자동화 설정
+            </button>
+            <button class="nav-item" data-panel="url-automation">
+                <span class="nav-icon">🔗</span>
+                URL 쿠팡 자동화
+            </button>
+            <button class="nav-item" data-panel="api-automation">
+                <span class="nav-icon">🤖</span>
+                API 쿠팡 자동화
+            </button>
+            <button class="nav-item" data-panel="agoda-automation">
+                <span class="nav-icon">🏨</span>
+                아고다 자동화
+            </button>
+            <button class="nav-item" data-panel="naver-test">
+                <span class="nav-icon">📋</span>
+                PHOTO 포스팅 이력
+            </button>
+        </nav>
+        
+        <!-- 부업 링크 -->
+        <div class="sidebar-special-link">
+            <button class="special-link-btn" id="open-side-job-link">
+                <div class="special-link-content">
+                    <div class="special-link-icon">💰</div>
+                    <div class="special-link-text">
+                        <div class="special-link-title">부업으로 돈 벌기</div>
+                        <div class="special-link-subtitle">부업에 진심인 카페로 <br> 더 많은 부업 보러가기!</div>
+                    </div>
+                    <div class="special-link-arrow">→</div>
+                </div>
+            </button>
+        </div>
+        
+        <!-- 사용 설명서 링크 -->
+        <div class="sidebar-special-link">
+            <button class="special-link-btn" id="open-manual-link">
+                <div class="special-link-content">
+                    <div class="special-link-icon">📖</div>
+                    <div class="special-link-text">
+                        <div class="special-link-title">매뉴얼 GO!</div>
+                        <div class="special-link-subtitle">상세한 사용법과 <br> 팁을 확인해보세요!</div>
+                    </div>
+                    <div class="special-link-arrow">→</div>
+                </div>
+            </button>
+        </div>
+        
+        <!-- 버전 정보 -->
+        <!-- <div class="version-info">
+            <div class="version-text">
+                <span class="version-label">버전</span>
+                <span id="version-number">로딩 중...</span>
+            </div>
+        </div> -->
+        
+        <div class="status-indicator">
+            <span class="status-dot idle"></span>
+            <span id="status-text">대기 중</span>
+        </div>
+    </div>
+
+    <!-- 메인 콘텐츠 -->
+    <div class="main-content">
+        <header class="header">
+            <h1 class="header-title" id="header-title">📸 PHOTO 포스팅 자동화</h1>
+        </header>
+
+        <div class="content-area">
+
+            <!-- 계정 관리 패널 -->
+            <div class="content-panel" id="accounts-panel">
+                <div class="card">
+                    <div class="card-title">
+                        👤 새 계정 추가
+                    </div>
+                    
+                    <form class="account-form" id="account-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">네이버 ID</label>
+                                <input type="text" class="form-input" id="naver-id" placeholder="네이버 아이디" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">비밀번호</label>
+                                <input type="password" class="form-input" id="naver-password" placeholder="비밀번호" required>
+                            </div>
+                        
+                            <div class="form-group">
+                                <label class="form-label">블로그 ID</label>
+                                <input type="text" class="form-input" id="blog-id" placeholder="블로그 아이디" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">쿠팡 파트너스 ID</label>
+                                <input type="text" class="form-input" id="affiliate-id" placeholder="쿠팡 파트너스 ID" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">제미나이 API</label>
+                                <input type="text" class="form-input" id="gemini-api" placeholder="Google Gemini API 키" required>
+                            </div>
+                        
+                            <div class="form-group">
+                                <label class="form-label">카테고리 ID</label>
+                                <input type="text" class="form-input" id="category-id" placeholder="블로그 카테고리 ID" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">별명</label>
+                                <input type="text" class="form-input" id="nickname" placeholder="계정 별명 (선택사항)">
+                                <small class="form-help">계정을 구분하기 위한 별명을 입력하세요.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">링크 프라이스 CID</label>
+                                <input type="text" class="form-input" id="link-price-cid" placeholder="링크 프라이스 CID (선택사항)">
+                                <small class="form-help">아고다 자동화를 사용하려면 링크 프라이스 CID가 필요합니다.</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                ➕ 계정 추가
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        📋 등록된 계정 목록
+                    </div>
+                    <div class="account-list" id="account-list">
+                        <!-- 계정 목록이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 자동화 설정 패널 -->
+            <div class="content-panel" id="settings-panel">
+                <div class="card">
+                    <div class="card-title">
+                        ⚙️ 자동화 설정
+                    </div>
+                    
+                    <div class="settings-content">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-title">포스트당 대기시간</div>
+                                <div class="setting-description">각 포스트 작성 후 대기하는 시간 (분)</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="number" class="form-input" id="post-delay" min="10" max="60" value="10">
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <div class="setting-title">계정 별 일일 포스트 제한</div>
+                                <div class="setting-description">각 계정이 하루에 생성할 최대 포스트 수</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="number" class="form-input" id="daily-limit" min="1" max="20" value="3">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button class="btn btn-primary" id="save-settings">
+                            💾 설정 저장
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- URL 쿠팡 자동화 패널 -->
+            <div class="content-panel" id="url-automation-panel">
+                <!-- URL 파일 업로드 섹션 -->
+                <div class="card">
+                    <div class="card-title">
+                        📂 쿠팡 상품 URL 파일 업로드
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">쿠팡 상품 URL 목록 파일</label>
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <button class="btn btn-secondary" id="upload-url-file">
+                                📂 파일 선택
+                            </button>
+                            <span id="url-file-status" style="font-size: 0.875rem; color: var(--text-secondary);">
+                                쿠팡 상품 URL 목록이 포함된 텍스트 파일을 선택하세요
+                            </span>
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                            텍스트 파일에 한 줄씩 쿠팡 상품 URL을 입력해주세요
+                        </div>
+                    </div>
+
+                    <div class="card" id="url-preview-card" style="display: none; margin-top: 1rem; background: var(--blue-50);">
+                        <div style="margin-bottom: 1rem;">
+                            <span id="url-count-text" style="font-weight: 600; color: var(--blue-600);">0개 URL</span>
+                            <span style="margin-left: 1rem; font-size: 0.875rem; color: var(--text-secondary);">처음 5개 URL 미리보기</span>
+                        </div>
+                        <div id="url-preview-list" style="background: var(--bg-white); padding: 1rem; border-radius: var(--radius-md); font-family: monospace; font-size: 0.875rem; max-height: 200px; overflow-y: auto;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 자동화 실행 섹션 -->
+                <div class="card">
+                    <div class="card-title">
+                        🚀 자동화 실행
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">실행할 계정 선택</label>
+                        <div class="account-selector" id="account-selector">
+                            <!-- 계정 목록이 여기에 동적으로 추가됩니다 -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="automation-buttons">
+                            <button class="btn btn-primary" id="start-automation" disabled>
+                                <span>자동화 시작</span>
+                            </button>
+                            <button class="btn btn-danger" id="stop-automation" disabled>
+                                <span>🛑 중지</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar" id="progress-container" style="display: none;">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API 쿠팡 자동화 패널 -->
+            <div class="content-panel" id="api-automation-panel">
+                <div class="card">
+                    <div class="card-title">
+                        🤖 API 쿠팡 자동화
+                    </div>
+                    
+                    <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+                        <div class="alert-icon">ℹ️</div>
+                        <div class="alert-content">
+                            <div class="alert-title">쿠팡 API 안내</div>
+                            <div class="alert-message">
+                                이 기능은 쿠팡 파트너스 Open API를 받은 사용자만 이용 가능합니다.<br>
+                                쿠팡 파트너스에서 발급받은 API 키가 필요합니다.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Access Key</label>
+                        <input type="text" class="form-input" id="coupang-access-key" placeholder="쿠팡 API Access Key를 입력하세요">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Secret Key</label>
+                        <input type="password" class="form-input" id="coupang-secret-key" placeholder="쿠팡 API Secret Key를 입력하세요">
+                    </div>
+
+                    <div class="form-group">
+                        <button class="btn btn-secondary" id="save-coupang-api">
+                            💾 API 키 저장
+                        </button>
+                    </div>
+
+                    <div class="card" style="margin-top: 2rem;">
+                        <div class="card-title">
+                            📋 자동화 설정
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">실행할 계정 선택</label>
+                            <div class="account-selector" id="full-automation-account-selector">
+                                <!-- 계정 목록이 여기에 동적으로 추가됩니다 -->
+                            </div>
+                        </div>
+
+                        <div class="automation-buttons">
+                            <button class="btn btn-primary" id="start-full-automation" disabled>
+                                🚀 완전 자동화 시작
+                            </button>
+                            <button class="btn btn-danger" id="stop-full-automation" disabled>
+                                🛑 중지
+                            </button>
+                        </div>
+
+                        <div class="progress-bar" id="full-automation-progress-container" style="display: none;">
+                            <div class="progress-fill" id="full-automation-progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 아고다 자동화 패널 -->
+            <div class="content-panel" id="agoda-automation-panel">
+                <div class="card">
+                    <div class="card-title">
+                        🏨 아고다 자동화
+                    </div>
+                    
+                    <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+                        <div class="alert-icon">ℹ️</div>
+                        <div class="alert-content">
+                            <div class="alert-title">아고다 자동화 안내</div>
+                            <div class="alert-message">
+                                이 기능은 링크 프라이스 CID가 등록된 계정만 이용 가능합니다.<br>
+                                계정 관리에서 링크 프라이스 CID를 먼저 등록해주세요.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">국가 선택</label>
+                        <select class="form-select" id="agoda-country-select">
+                            <option value="">국가를 선택하세요</option>
+                            <option value="일본">일본</option>
+                            <option value="중국">중국</option>
+                            <option value="대만">대만</option>
+                            <option value="미국">미국</option>
+                            <option value="베트남">베트남</option>
+                            <option value="태국">태국</option>
+                            <option value="필리핀">필리핀</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">실행할 계정 선택</label>
+                        <div class="account-selector" id="agoda-account-selector">
+                            <!-- 링크 프라이스 CID가 있는 계정만 표시됩니다 -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="automation-buttons">
+                            <button class="btn btn-primary" id="start-agoda-automation" disabled>
+                                🚀 아고다 자동화 시작
+                            </button>
+                            <button class="btn btn-danger" id="stop-agoda-automation" disabled>
+                                🛑 중지
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar" id="agoda-progress-container" style="display: none;">
+                        <div class="progress-fill" id="agoda-progress-fill"></div>
+                    </div>
+                </div>
+                
+                <!-- 금칙어 관리 카드 -->
+                <div class="card">
+                    <div class="card-title">
+                        🚫 금칙어 관리
+                    </div>
+                    
+                    <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+                        <div class="alert-icon">ℹ️</div>
+                        <div class="alert-content">
+                            <div class="alert-title">금칙어 안내</div>
+                            <div class="alert-message">
+                                호텔 이름에 금칙어가 포함된 경우 자동으로 건너뛰고 다른 호텔을 크롤링합니다.<br>
+                                여러 금칙어는 세미콜론(;)으로 구분하여 입력하세요.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">금칙어 목록</label>
+                        <textarea class="form-input" id="banned-words-textarea" rows="4" 
+                                  placeholder="예: 아늑;오송815;오송 815;모텔;게스트하우스"
+                                  style="resize: vertical; min-height: 100px;"></textarea>
+                        <small class="form-help">
+                            기본값: 아늑, 오송815, 오송 815이 설정되어 있습니다.
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="automation-buttons">
+                            <button class="btn btn-secondary" id="save-banned-words">
+                                💾 금칙어 저장
+                            </button>
+                            <button class="btn btn-outline" id="reset-banned-words">
+                                🔄 기본값 복원
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">현재 금칙어 목록</label>
+                        <div class="banned-words-display" id="banned-words-display">
+                            <span class="banned-word-tag">로딩 중...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHOTO 포스팅 이력 패널 -->
+            <div class="content-panel" id="naver-test-panel">
+                <!-- 시스템 실시간 로그 -->
+                <div class="card" id="photo-log-card">
+                    <div class="card-title">
+                        📋 실시간 시스템 로그
+                    </div>
+                    <div class="update-log-container" id="test-log-container" style="background: #1e1e1e; color: #f8f8f2; font-family: monospace; padding: 1rem; border-radius: var(--radius-md); max-height: 250px; overflow-y: auto;">
+                        <div style="color: #6272a4;">대기 중...</div>
+                    </div>
+                </div>
+
+                <!-- PHOTO 포스팅 이력 -->
+                <div class="card" id="photo-history-card" style="margin-top: 1.5rem;">
+                    <div class="card-title">
+                        📋 PHOTO 포스팅 이력
+                    </div>
+                    
+                    <div class="history-list-container" id="photo-history-list" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- 이력 아이템들이 여기에 동적으로 렌더링됩니다 -->
+                        <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            아직 기록된 포스팅 이력이 없습니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PHOTO 포스팅 자동화 패널 (홈) -->
+            <div class="content-panel active" id="photo-automation-panel">
+                
+                <!-- 1. 웰컴 랜딩 뷰 -->
+                <div id="photo-welcome-view" class="card premium-card welcome-card" style="text-align: center; padding: 2.5rem 1.5rem; background: var(--bg-white);">
+                    <!-- 핑크빛 마이 데이즈 로고 -->
+                    <div class="welcome-logo" style="font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 8px rgba(255, 118, 172, 0.2)); letter-spacing: -0.02em; margin-bottom: 0.25rem;">My Days</div>
+                    <div class="welcome-logo-sub" style="font-size: 0.9rem; font-weight: 600; color: #ff7eb3; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.5rem;">Daily Photo Journal</div>
+                    
+                    <!-- 예쁜 아이콘 일러스트 -->
+                    <div class="welcome-illustration" style="position: relative; width: 120px; height: 120px; margin: 1.5rem auto; display: flex; align-items: center; justify-content: center;">
+                        <div class="welcome-pulse" style="position: absolute; width: 100px; height: 100px; background: radial-gradient(circle, rgba(255, 126, 179, 0.18) 0%, rgba(255, 126, 179, 0) 70%); border-radius: 50%;"></div>
+                        <div class="welcome-emoji" style="font-size: 4rem; z-index: 2; filter: drop-shadow(0 6px 12px rgba(255, 126, 179, 0.3));">🌸</div>
+                    </div>
+                    
+                    <!-- 감성 카피라이팅 -->
+                    <div class="welcome-copywriting" style="margin-top: 1rem; margin-bottom: 2rem;">
+                        <h4 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.75rem; letter-spacing: -0.01em;">소중한 일상, 더 가치 있게 간직하세요</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; margin: 0; word-break: keep-all;">
+                            매일 찍는 스마트폰 속 평범한 PHOTO 한 장.<br>
+                            간편하게 업로드하면 제미나이 AI가 계절과 일상을 분석해<br>
+                            언제 어디서나 꺼내 볼 수 있는 추억의 포스팅을 완성합니다.<br>
+                            안전하게 기록하고 보관하는 포스팅 라이프를 시작해보세요.
+                        </p>
+                    </div>
+                    
+                    <!-- 레츠고 버튼 -->
+                    <div class="welcome-actions">
+                        <button type="button" class="btn btn-primary btn-premium" id="btn-welcome-letsgotoposting" style="width: 100%; font-size: 1.05rem; padding: 0.85rem; border-radius: var(--radius-xl); box-shadow: 0 4px 14px rgba(201, 24, 74, 0.25);">
+                            자, 이제 포스팅하러 가볼까요? Let's Go! 🚀
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. 실제 사진 첨부 업로드 폼 뷰 (기본적으로 숨김) -->
+                <div id="photo-upload-view" class="card premium-card" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <div class="card-title" style="margin-bottom: 0; padding-bottom: 0;">
+                            📸 스마트폰 PHOTO 포스팅
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="btn-welcome-back" style="min-height: 32px; padding: 0.25rem 0.75rem; font-size: 0.8rem; border-radius: var(--radius-md);">
+                            🏠 홈으로
+                        </button>
+                    </div>
+                    
+                    <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+                        <div class="alert-icon">ℹ️</div>
+                        <div class="alert-content">
+
+                            <div class="alert-message">
+                                스마트폰에서 촬영한 일상 PHOTO를 최대 10장 첨부하면, 고품격 블로그 포스팅을 자동 구성 및 발행합니다.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form class="account-form" id="photo-automation-form" onsubmit="event.preventDefault();">
+                        <!-- 드래그 앤 드롭 파일 선택기 -->
+                        <div class="form-group">
+                            <label class="form-label">오늘의 일상 PHOTO (최대 10장)</label>
+                            <div class="photo-upload-zone" id="photo-upload-zone">
+                                <div class="upload-zone-icon">📷</div>
+                                <div class="upload-zone-text">여기를 터치하여 스마트폰 PHOTO 첨부</div>
+                                <div class="upload-zone-sub">최대 10장까지 선택 가능 (초과 시 자동 절삭)</div>
+                                <input type="file" id="photo-file-input" multiple accept="image/*" style="display: none;">
+                            </div>
+                            <!-- 선택된 사진 목록 미리보기 -->
+                            <div class="photo-preview-grid" id="photo-preview-grid" style="display: none; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 1rem;">
+                                <!-- 동적으로 채워짐 -->
+                            </div>
+                        </div>
+ 
+                        <!-- 선택 사항 입력란 -->
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <label class="form-label">[선택 사항]</label>
+                            <div class="optional-help-text" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; line-height: 1.4;">
+                                이 사진은 언제, 어디서, 누구와 어떻게 찍은 사진인지 간단하게라도 입력하면 보다 풍성한 포스팅으로 구성됩니다.
+                            </div>
+                            <textarea class="form-input" id="photo-context-input" rows="4" placeholder="예: 지난 주말 가족들과 다녀온 단풍 놀이 PHOTO야. 가을바람도 선선하고 참 행복했어."></textarea>
+                        </div>
+
+                        <!-- 공개/비공개 설정 (초고급 핑크 스타일) -->
+                        <div class="form-group" style="margin-top: 1.5rem; display: flex; align-items: center; justify-content: space-between; background: var(--bg-primary); padding: 0.75rem 1.25rem; border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
+                            <label class="form-label" style="margin-bottom: 0; font-weight: 700; color: var(--text-primary);">발행 공개 설정</label>
+                            <div style="display: flex; gap: 20px;">
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+                                    <input type="radio" name="photo-open-type" value="2" checked style="accent-color: var(--blue-500); width: 18px; height: 18px; cursor: pointer;">
+                                    공개
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); cursor: pointer;">
+                                    <input type="radio" name="photo-open-type" value="0" style="accent-color: var(--blue-500); width: 18px; height: 18px; cursor: pointer;">
+                                    비공개
+                                </label>
+                            </div>
+                        </div>
+ 
+                        <div class="form-group" style="margin-top: 2rem;">
+                            <button type="button" class="btn btn-primary btn-premium" id="btn-start-photo-publish" style="width: 100%; font-size: 1.1rem; padding: 0.75rem; border-radius: var(--radius-xl);">
+                                🚀 PHOTO 블로그 포스팅 시작
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 모바일 설정 패널 -->
+            <div class="content-panel" id="mobile-settings-panel">
+                <div class="card premium-card">
+                    <div class="card-title">
+                        ⚙️ 블로그 자동화 계정 설정
+                    </div>
+                    <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+                        <div class="alert-icon">🔒</div>
+                        <div class="alert-content">
+                            <div class="alert-title">보안 및 저장 안내</div>
+                            <div class="alert-message">
+                                입력하신 네이버 계정 정보와 제미나이 API 키는 스마트폰/브라우저 로컬 저장소에 암호화 보관되며, 외부 서버로 전송되지 않고 포스팅 시에만 안전하게 사용됩니다.
+                            </div>
+                        </div>
+                    </div>
+                    <form class="account-form" id="mobile-settings-form" onsubmit="event.preventDefault();">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">네이버 ID</label>
+                                <input type="text" class="form-input" id="mobile-naver-id" placeholder="네이버 아이디" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">비밀번호</label>
+                                <input type="password" class="form-input" id="mobile-naver-password" placeholder="비밀번호" required>
+                            </div>
+                        
+                            <div class="form-group">
+                                <label class="form-label">블로그 ID</label>
+                                <input type="text" class="form-input" id="mobile-blog-id" placeholder="네이버 블로그 ID" required>
+                            </div>
+
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label class="form-label">구글 제미나이 API 키</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="password" class="form-input" id="mobile-gemini-key" placeholder="Google Gemini API Key 입력" style="flex: 1;">
+                                    <button type="button" class="btn btn-secondary" onclick="window.open('https://aistudio.google.com/api-keys', '_blank')" style="white-space: nowrap; font-size: 0.85rem; padding: 0 12px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 4px; cursor: pointer; font-weight: 500;">
+                                        🔑 API Key 구하러 가기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <button type="button" class="btn btn-success" id="btn-save-mobile-settings" style="width: 100%; font-size: 1.1rem; padding: 0.75rem; border-radius: var(--radius-xl);">
+                                💾 설정 저장하기
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 계정 편집 모달 -->
+    <div class="modal" id="edit-account-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">계정 편집</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            
+            <form id="edit-account-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">네이버 ID</label>
+                        <input type="text" class="form-input" id="edit-naver-id" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">비밀번호</label>
+                        <input type="password" class="form-input" id="edit-naver-password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">블로그 ID</label>
+                        <input type="text" class="form-input" id="edit-blog-id" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">쿠팡 파트너스 ID</label>
+                        <input type="text" class="form-input" id="edit-affiliate-id" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">제미나이 API</label>
+                        <input type="text" class="form-input" id="edit-gemini-api" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">카테고리 ID</label>
+                        <input type="text" class="form-input" id="edit-category-id" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">별명</label>
+                        <input type="text" class="form-input" id="edit-nickname" placeholder="계정 별명 (선택사항)">
+                        <small class="form-help">계정을 구분하기 위한 별명을 입력하세요.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">링크 프라이스 CID</label>
+                        <input type="text" class="form-input" id="edit-link-price-cid" placeholder="링크 프라이스 CID (선택사항)">
+                        <small class="form-help">아고다 자동화를 사용하려면 링크 프라이스 CID가 필요합니다.</small>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">취소</button>
+                    <button type="submit" class="btn btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 메시지 다이얼로그 -->
+    <div class="dialog-overlay" id="message-dialog">
+        <div class="dialog-content">
+            <div class="dialog-header">
+                <div class="dialog-icon" id="dialog-icon"></div>
+                <h3 class="dialog-title" id="dialog-title">알림</h3>
+            </div>
+            <div class="dialog-message" id="dialog-message"></div>
+            <div class="dialog-actions">
+                <button class="btn btn-primary" id="dialog-ok-btn" onclick="closeDialog()">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 확인 다이얼로그 -->
+    <div class="dialog-overlay" id="confirm-dialog">
+        <div class="dialog-content">
+            <div class="dialog-header">
+                <div class="dialog-icon warning">❓</div>
+                <h3 class="dialog-title" id="confirm-title">확인</h3>
+            </div>
+            <div class="dialog-message" id="confirm-message"></div>
+            <div class="dialog-actions">
+                <button class="btn btn-secondary" id="confirm-cancel-btn" onclick="closeConfirmDialog(false)">취소</button>
+                <button class="btn btn-danger" id="confirm-ok-btn" onclick="closeConfirmDialog(true)">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 모바일 전용 하단 고정 네비게이션 바 -->
+    <div class="bottom-nav">
+        <button class="bottom-nav-item active" data-panel="photo-automation">
+            <span class="bottom-nav-icon">🏠</span>
+            <span class="bottom-nav-label">홈</span>
+        </button>
+        <button class="bottom-nav-item" data-panel="naver-test">
+            <span class="bottom-nav-icon">📋</span>
+            <span class="bottom-nav-label">History</span>
+        </button>
+        <button class="bottom-nav-item" data-panel="mobile-settings">
+            <span class="bottom-nav-icon">⚙️</span>
+            <span class="bottom-nav-label">설정</span>
+        </button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html> 

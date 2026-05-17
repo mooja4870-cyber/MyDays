@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Local App Data / Configurations
+userData/
+temp_images/
+temp/
+
+# Environment Variables
+.env
+.env*.local
+
+# OS Files
+.DS_Store
+Thumbs.db

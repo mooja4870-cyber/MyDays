@@ -1,0 +1,34 @@
+# Project Status - MyDays (Nepas)
+
+## 📌 Overview
+- **Project Name**: Nepas (네파스 - 네이버 블로그 쿠팡 파트너스 자동화 도구)
+- **Goal**: Automation of Coupang Partners products crawling, Gemini AI post content generation, and publishing on Naver Blog using Playwright browser automation.
+
+## 🛠️ Tech Stack
+- **Core**: Electron, Node.js, Playwright, Sharp
+- **Frontend**: HTML5, Vanilla CSS, Vanilla JS
+- **APIs**: Google Generative AI (Gemini), Coupang open APIs
+
+## 🚀 Current Status (v1.7.1)
+- **🔒 Flawless Privacy Settings (v1.7.1)**: Solved a critical Naver Blog automation timing issue where category, privacy (public/private), and tags setting methods were called before the settings dropdown layer popover actually opened. These methods are now seamlessly executed inside the `publishPost` routine after the layer animation completes, and `setPrivacy` has been empowered with a robust multi-strategy selector (CSS + XPath labels/spans) to ensure 100% reliable Private posting even when radio buttons are styled invisible.
+- **Active Dev Server**: Built-in HTTP server listening on Port `3333` directly inside the Electron main process.
+  - Serves frontend static files cleanly to local browsers.
+  - Exposes SSE endpoint (`/api/logs`) for real-time progress log streaming in standard web browsers.
+  - Exposes POST API endpoint (`/api/execute-automation-step`) to execute the automation suite in standard web browsers.
+- **🎀 Premium Multi-Pinky Theme Overhaul (v1.5.0)**: Completely removed all Mint elements. Redesigned the entire UI using a highly luxurious multi-shade pink palette: Soft Peach Blush canvas, Pearl Rose inactive backgrounds, Deep Velvet Berry Pink sidebar, and Vibrant Strawberry Pink primary actions with rose-tinted shadows.
+- **PHOTO Text Overhaul (v1.4.2 & v1.4.1)**: Replaced all occurrences of the Korean word `사진` and lowercase `photo` with the bold uppercase `PHOTO` throughout the interface and logging systems.
+- **🌸 My Days Landing Welcome Screen (v1.4.0)**: Deployed a gorgeous landing screen at the front of the Home tab. Illustrates a glowing pinkish "My Days" brand identity, a floating/pulsing cherry blossom (`🌸`) micro-illustration, nostalgic record-keeping copywriting, and a high-fidelity "Let's Go!" button sliding to the upload forms.
+- **🟢 Fresh & Vibrant Premium Light Theme (v1.3.0)**: Fully overhauled the UI variables to match `DESIGN.md` and the light mode screen requirements. Styled using a gorgeous Vibrant Mint (`#006b5b`) theme with Soft Pink (`#eddaea`) secondary backgrounds, Deep Coral (`#b32057`) highlights, Outfit + Noto Sans KR Google Fonts, and soft tinted ambient shadows.
+- **📸 Duplicate Photo Filter & 10-Photo Limit Alert (v1.2.0)**: Implemented advanced duplicate photo filtering (matching name and size) inside `handleFileSelection`. Added a premium alert popup dialog warning users if total selections exceed 10 photos, automatically slicing the upload array to keep exactly the first 10 files.
+- **📱 2030 Floating Pill Capsule Nav Bar (v1.1.0)**: Completely upgraded the bottom navigation bar to an ultra-trendy floating obsidian glass capsule. Active tabs get encased inside a modern pill backplate with soft, glowing cyan light and smooth transitions, matching modern premium iOS/Android UI standards.
+- **🛡️ Automated E2E Diagnostic Test Harness (v1.0.9)**: Implemented a robust self-testing suite in [tests/harness.js](file:///d:/AI/project/my_days/tests/harness.js). Executing `npm run test:harness` runs 4 extensive checks validating directory integrity, Node module loader stability, Sharp EXIF orientation image rotation calculations, and Playwright Chromium headless launch capabilities.
+- **Premium Mobile-Locked Layout (v1.0.7)**: Completely isolated the PC sidebar (`display: none`) and wrapped the entire layout inside a gorgeous, centered `480px` mobile viewport, deploying a frosted bottom navigation bar containing exactly 3 tabs: 홈 (🏠), 로그 (📋), 설정 (⚙️).
+- **🔑 Google AI Studio Helper Link (v1.0.8)**: Integrated an inline **[🔑 API Key 구하러 가기]** button adjacent to the Gemini Key field, styled in our elegant classic secondary theme, allowing users to go directly to Google AI Studio to fetch API keys.
+- **Locked Speech-Bubble Subheading (v1.0.5)**: Replaced quotation style randomization in `BlogPublisher` with a fixed configuration. All subheading quotation blocks are locked to the elegant grey speech-bubble box style (`quotation_bubble` / 인용구 3) you selected, ensuring 100% unified rendering.
+- **EXIF Orientation & Aspect Ratio Auto-Correction (v1.0.4)**: Integrated a high-fidelity image processing loop using `sharp` within the photo-publishing method. It reads smartphone camera metadata to physically rotate image pixels to the correct angle and preserves native aspect ratios, resolving rotated or squeezed image distortions in published posts.
+- **Conditional Advertisement Disclaimer (v1.0.4)**: Made the Coupang Partners disclaimer conditional inside `BlogPublisher`. It automatically skips appending the disclaimer on pure daily photo postings (`isPhotoPublish: true`), protecting the personal blog from spam flags.
+- **Type Safety for CATEGORY_ID**: Resolved a critical TypeError where `config.CATEGORY_ID.trim()` crashed when a numerical category ID (such as `1`) was passed. Enforced robust string casting.
+- **Debugging Persistence**: Saves input parameters (Naver ID, Password, Blog ID, Gemini API Key) in local browser storage (`localStorage`) automatically on execution, auto-populating them on page reloads to prevent tedious repetitive data entry.
+
+## 📋 Task History & Version Tracking
+- See [ver.md](file:///d:/AI/project/my_days/ver.md) for incremental version tags.

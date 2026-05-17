@@ -1,0 +1,41 @@
+{
+  "name": "nepas",
+  "version": "8.1.4",
+  "description": "네파스 - 네이버 블로그 쿠팡 파트너스 자동화 도구",
+  "main": "src/main.js",
+  "scripts": {
+    "test:harness": "node tests/harness.js"
+  },
+  "author": "네파스 개발자",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@mongodb-js/zstd": "^1.2.0",
+    "@noble/hashes": "^1.8.0",
+    "axios": "^1.6.2",
+    "clipboardy": "^4.0.0",
+    "dotenv": "^16.5.0",
+    "electron-log": "^5.0.1",
+    "electron-updater": "^6.1.7",
+    "fs-extra": "^11.2.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "node-cron": "^3.0.3",
+    "path": "^0.12.7",
+    "playwright": "^1.40.0",
+    "puppeteer": "^24.10.0",
+    "sharp": "^0.33.1",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cuj2090/coupang_naver.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cuj2090/coupang_naver/issues"
+  },
+  "homepage": "https://github.com/cuj2090/coupang_naver#readme"
+}
