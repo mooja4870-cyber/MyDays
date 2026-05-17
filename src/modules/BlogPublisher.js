@@ -969,6 +969,33 @@ class BlogPublisher extends EventEmitter {
       const contentFrame = await this.page.frame('se_iframe');
       const targetPage = contentFrame || this.page;
 
+      // 🔍 [에디터 본문 포커스 확립] 본문 영역에 글이나 이미지를 작성하기 전에 
+      // 에디터 활성화를 강제로 실행하여 엔터 및 이미지 붙여넣기 신호가 공중으로 날아가는 현상을 완벽히 방지합니다.
+      try {
+        console.log('📝 본문 입력을 위한 에디터 포커스 활성화 중...');
+        
+        // 본문 컨테이너가 로드될 때까지 대기
+        await targetPage.waitForSelector('.se-component-content', { timeout: 30000 }).catch(() => {});
+        
+        // 실제 텍스트 입력 영역 찾기 및 클릭
+        const textParagraph = await targetPage.$('.se-text-paragraph');
+        if (textParagraph) {
+          await textParagraph.click();
+          await this.page.waitForTimeout(500);
+          console.log('✅ 본문 텍스트 영역 포커스 완료');
+        }
+        
+        // 플레이스홀더가 있는 경우 클릭하여 활성화
+        const placeholder = await targetPage.$('.se-placeholder');
+        if (placeholder) {
+          await placeholder.click();
+          await this.page.waitForTimeout(500);
+          console.log('📝 플레이스홀더 클릭으로 에디터 강제 활성화 완료');
+        }
+      } catch (focusError) {
+        console.warn('⚠️ 에디터 초기 포커스 설정 시도 실패 (무시하고 진행):', focusError.message);
+      }
+
       // 📸 [방탄 루프 횟수 제어] 말풍선 및 설명문이 둘 다 빠져 텍스트가 공백 위주로 잘려 나가더라도,
       // 업로드해야 할 사진(imagePaths)이 있다면 사진 개수만큼 무조건 루프를 돌도록 철저히 방어합니다.
       const loopCount = imagePaths.length > 0 ? Math.max(paragraphs.length - 1, imagePaths.length) : paragraphs.filter(p => p.trim()).length;

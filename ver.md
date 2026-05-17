@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.8.5 (2026-05-18)
+- **Description**: Resolved a critical editor sandboxing focus bug during pure photo-only diary posting (when useBubble and useDescription are both disabled).
+- **Changes**:
+  - Implemented explicit, high-reliability editor container focusing logic (targeting `.se-component-content`, `.se-text-paragraph`, and `.se-placeholder` elements) at the entry of `enterContent` in [src/modules/BlogPublisher.js](file:///d:/AI/project/my_days/src/modules/BlogPublisher.js).
+  - This ensures that keyboard `Enter` and client clipboard paste (`Control+V`) signals are never swallowed in a silent defocus state, guaranteeing 100% stable, touchless, pure image-only diary automation.
+  - Recompiled the Android WebView assets and deployed the corrected APK to [src/renderer/MyDays.apk](file:///d:/AI/project/my_days/src/renderer/MyDays.apk).
+
 ## v1.8.4 (2026-05-18)
 - **Description**: Fixed a critical bug in photo publishing where images were accidentally skipped when both the speech bubble subtitles (useBubble: 빼기) and description paragraphs (useDescription: 빼기) were disabled.
 - **Changes**:

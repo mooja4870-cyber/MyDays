@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.8.4)
+## 🚀 Current Status (v1.8.5)
+- **⚡ Editor Focus Hardening for Pure Photo Posting (v1.8.5)**: Resolved a critical defocus sandboxing bug where Playwright keyboard events (Enter & Control+V paste) were swallowed in an inactive frame. Added active editor container focus matching (`.se-component-content`, `.se-text-paragraph`, `.se-placeholder`) directly to `BlogPublisher.enterContent()`, ensuring 100% stable, touchless, pure image-only diary publishing. Re-compiled the WebView APK.
 - **📸 Pure Photo-Only Publishing Fix (v1.8.4)**: Fixed a critical automation bug where images were accidentally ignored when both speech bubbles and description paragraphs were disabled (useBubble: 빼기, useDescription: 빼기). Enforced a bulletproof `loopCount` based on the maximum of paragraph parts and `imagePaths` length inside `BlogPublisher.enterContent()`, successfully enabling beautiful image-and-title-only publishing. Re-compiled the WebView APK.
 - **📡 Mobile API Network Diagnostics & APK Rebuild (v1.8.3)**: Enhanced `ErrorMessageHelper` to catch connection failure exceptions (`Failed to fetch`) and display clear step-by-step troubleshooting guidelines in logs and alerts (checking PC server, same Wi-Fi subnet, and IP configuration). Re-compiled the Android WebView APK asset.
 - **📱 Android WebView APK Rebuild & Deploy (v1.8.2)**: Recompiled the Android project from scratch and stabilized the final `MyDays.apk` asset. Solved previous user-reported issues where download files were corrupted, incomplete, or not matching the latest V8 Base64 memory cache and cumulative picker logic.
