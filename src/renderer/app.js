@@ -3834,6 +3834,12 @@ class PhotoAutomationManager {
         }
 
         this.renderPreviews();
+
+        // 중요: 다음 첨부 클릭 시 동일한 파일명을 선택하더라도 change 이벤트가 항상 유발되도록 엘리먼트 값 리셋!
+        const fileInput = document.getElementById('photo-file-input');
+        if (fileInput) {
+            fileInput.value = '';
+        }
     }
 
     static renderPreviews() {

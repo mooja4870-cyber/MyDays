@@ -30,6 +30,19 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // 앱 시작 시 이전 찌꺼기 이미지 파일 청소
+        try {
+            File uploadDir = new File(getFilesDir(), "mydays_photo_uploads");
+            if (uploadDir.exists()) {
+                File[] staleFiles = uploadDir.listFiles();
+                if (staleFiles != null) {
+                    for (File staleFile : staleFiles) {
+                        staleFile.delete();
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+
         webView = new WebView(this);
         webView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -46,7 +59,7 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " MyDaysAndroid/1.8.0");
+        settings.setUserAgentString(settings.getUserAgentString() + " MyDaysAndroid/1.8.1");
 
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient() {
@@ -114,19 +127,34 @@ public class MainActivity extends Activity {
         filePathCallback = null;
     }
 
+    private String getFileHash(Uri uri) {
+        try (InputStream is = getContentResolver().openInputStream(uri)) {
+            if (is == null) return String.valueOf(System.currentTimeMillis() + "_" + uri.hashCode());
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = is.read(buffer)) > 0) {
+                digest.update(buffer, 0, read);
+            }
+            byte[] hash = digest.digest();
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            return String.valueOf(System.currentTimeMillis() + "_" + uri.hashCode());
+        }
+    }
+
     private Uri[] copyPickedImagesToCache(List<Uri> sourceUris) {
         List<Uri> cacheUris = new ArrayList<>();
         File uploadDir = new File(getFilesDir(), "mydays_photo_uploads");
 
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
-        }
-
-        File[] staleFiles = uploadDir.listFiles();
-        if (staleFiles != null) {
-            for (File staleFile : staleFiles) {
-                staleFile.delete();
-            }
         }
 
         for (int i = 0; i < sourceUris.size(); i++) {
@@ -141,8 +169,9 @@ public class MainActivity extends Activity {
                 // Some providers do not allow persistable grants. Cache copy below is enough.
             }
 
+            String fileHash = getFileHash(sourceUri);
             String extension = getImageExtension(sourceUri);
-            File targetFile = new File(uploadDir, "mydays_photo_" + System.currentTimeMillis() + "_" + i + extension);
+            File targetFile = new File(uploadDir, "mydays_photo_" + fileHash + extension);
 
             try (
                     InputStream inputStream = getContentResolver().openInputStream(sourceUri);

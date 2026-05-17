@@ -1,5 +1,14 @@
 # 📦 Version History
 
+## v1.8.1 (2026-05-17)
+- **Description**: Enabled non-destructive cumulative photo uploads and robust duplicate prevention across multiple photo selections.
+- **Changes**:
+  - Isolated Android native photo cache deletion logic in [MainActivity.java](file:///d:/AI/project/my_days/android/app/src/main/java/com/mydays/app/MainActivity.java) to execute strictly once on application startup (`onCreate()`) instead of on every file pick, protecting previously selected files.
+  - Implemented stable naming scheme using MD5 file checksums in Java, copying cache files as `mydays_photo_[MD5].jpg`.
+  - Added value resetting `fileInput.value = ''` in [src/renderer/app.js](file:///d:/AI/project/my_days/src/renderer/app.js) to ensure browser change event triggers flawlessly every time.
+  - Re-verified 100% accurate frontend filename duplicate checks up to the 30-photo hard limit.
+  - Bumped Android APK metadata and user agent to version `1.8.1`.
+
 ## v1.8.0 (2026-05-17)
 - **Description**: Upgraded the maximum image attachment limit from 10 to 30 photos and introduced customizable layout controls to select whether to include speech bubble subtitles and 60-character description paragraphs.
 - **Changes**:
