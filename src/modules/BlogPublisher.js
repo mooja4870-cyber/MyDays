@@ -965,17 +965,18 @@ class BlogPublisher extends EventEmitter {
     try {
       this.emit('publish-progress', { step: '본문 내용 및 이미지 입력' });
       
-      const paragraphs = content.split('\n\n').filter(p => p.trim());
+      const paragraphs = content.split('\n\n');
+      const maxLen = Math.max(paragraphs.length, imagePaths ? imagePaths.length : 0);
       
       const contentFrame = await this.page.frame('se_iframe');
       const targetPage = contentFrame || this.page;
 
-        for (let i = 0; i < paragraphs.length; i++) {
-        let paragraph = paragraphs[i].trim();
+        for (let i = 0; i < maxLen; i++) {
+        let paragraph = (paragraphs[i] || '').trim();
           const imageToInsert = imagePaths && imagePaths[i] && require('fs').existsSync(imagePaths[i]) ? imagePaths[i] : null;
           
         // 🔥 말풍선 소제목 넣기/빼기 처리
-        if (this.config.useBubble !== false) {
+        if (this.config.useBubble !== false && paragraph !== '') {
           console.log(`🔹 [말풍선 옵션 활성] ${i + 1}번째 섹션 소제목 생성 및 삽입 중...`);
           // 🔥 소제목 생성 (AI 기반)
           const subtitle = await this.generateSubtitle(paragraph, productName, account);

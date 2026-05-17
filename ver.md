@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.8.4 (2026-05-17)
+- **Description**: Fixed a layout automation bug where disabling both speech bubbles (`useBubble: false`) and 60-character descriptions (`useDescription: false`) accidentally skipped photo uploads, and rebuilt the Android APK.
+- **Changes**:
+  - Re-engineered the content ingestion loop inside `enterContent` in [src/modules/BlogPublisher.js](file:///d:/AI/project/my_days/src/modules/BlogPublisher.js) to size iteration count by the maximum of paragraphs and image attachment lengths (`Math.max(paragraphs.length, imagePaths.length)`).
+  - Added safe guards to suppress bubble subtitles and descriptions on empty paragraph frames, successfully preserving all 30 photos with post title only (Pure Photo Diary layout).
+  - Re-compiled and deployed the updated Android WebView asset [src/renderer/MyDays.apk](file:///d:/AI/project/my_days/src/renderer/MyDays.apk).
+
 ## v1.8.3 (2026-05-17)
 - **Description**: Hardened mobile API network failure error handling by providing interactive system diagnostic guidelines inside the client logs, and rebuilt the Android WebView APK.
 - **Changes**:
