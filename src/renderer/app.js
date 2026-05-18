@@ -3530,6 +3530,31 @@ class MobileApiBridge {
 
     // 🔍 동일 Wi-Fi 대역 내 PC 자동화 서버(MyDays) 탐색 기능
     static async discoverPcServer(onProgress = null) {
+        // 0순위: 현재 브라우저가 접속해 있는 호스트 주소(Origin) 검사 (이미 올바른 IP로 접속했을 수 있음)
+        if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+            const currentOrigin = window.location.origin;
+            if (currentOrigin && !currentOrigin.includes('localhost') && !currentOrigin.includes('127.0.0.1')) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 350);
+                    const res = await fetch(`${currentOrigin}/api/health`, {
+                        signal: controller.signal,
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    clearTimeout(timeoutId);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && data.app === 'MyDays') {
+                            console.log('🎯 브라우저 접속 Origin에서 서버 발견:', currentOrigin);
+                            return currentOrigin;
+                        }
+                    }
+                } catch (e) {
+                    // 무시
+                }
+            }
+        }
+
         const subnets = ['172.30.1', '192.168.0', '192.168.1', '192.168.219', '192.168.35'];
         
         // 현재 설정되어 있는 주소가 있으면 그 서브넷을 1순위로 추가
