@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.8.6 (2026-05-18)
+- **Description**: Resolved the notorious 7-time recurring editor focus bug where description texts leaked into the post title field when the speech bubble option was disabled (useBubble: 빼기).
+- **Changes**:
+  - Implemented an explicit [Bulletproof Focus Shift] logic in `enterContent` inside [src/modules/BlogPublisher.js](file:///d:/AI/project/my_days/src/modules/BlogPublisher.js) that physically clicks the first empty paragraph (`.se-text-paragraph`) or the editable content container immediately after typing the post title.
+  - This ensures the editor cursor is 100% positioned inside the main post body prior to any paragraph typing/pasting, completely preventing description text leakage.
+
 ## v1.8.5 (2026-05-18)
 - **Description**: Implemented a brilliant user-inspired solution to assign dynamic photo indexing numbers (1, 2, ... n) in place of text paragraphs during photo-only publishing when both speech bubbles and descriptions are disabled, completely resolving editor focus and missing photo bugs.
 - **Changes**:
