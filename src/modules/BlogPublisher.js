@@ -969,6 +969,27 @@ class BlogPublisher extends EventEmitter {
       const contentFrame = await this.page.frame('se_iframe');
       const targetPage = contentFrame || this.page;
 
+      // 🎯 [Caret/Focus Fix] 커서가 제목(Title) 필드에 머물러 있을 때 본문 문단이 제목 란에 들어가는 현상을 완벽 차단합니다.
+      // 인용구 소제목이 비활성화(useBubble === false)되어 있을 때도 본문 영역에 포커싱되도록 강제 보장합니다.
+      try {
+        console.log('🎯 [커서 이동] 제목 필드에서 본문 에디터 영역으로 포커스 전환 중...');
+        // 본문 컨테이너 및 텍스트 문단 선택
+        await targetPage.waitForSelector('.se-text-paragraph', { timeout: 15000 });
+        const bodyParagraph = await targetPage.$('.se-text-paragraph');
+        if (bodyParagraph) {
+          await bodyParagraph.click();
+          await this.page.waitForTimeout(500);
+          console.log('✅ [커서 이동] 본문 에디터 영역 포커스 완료');
+        }
+      } catch (focusError) {
+        console.warn('⚠️ [커서 이동] 본문 선택기 클릭 실패, Enter 키 입력 우회 시도:', focusError.message);
+        // 대체 우회책: Escape를 눌러 툴팁 등을 날리고 Enter를 쳐서 본문으로 내려감
+        await this.page.keyboard.press('Escape');
+        await this.page.waitForTimeout(200);
+        await this.page.keyboard.press('Enter');
+        await this.page.waitForTimeout(500);
+      }
+
       // 📸 [방탄 루프 횟수 제어] 텍스트 개수와 이미지 개수를 연동하여 
       // 어떠한 옵션 조합에서도 이미지와 텍스트가 유실 없이 100% 매칭되도록 보장합니다.
       const loopCount = imagePaths.length > 0 ? Math.max(paragraphs.length, imagePaths.length) : paragraphs.filter(p => p.trim()).length;
