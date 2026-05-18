@@ -1005,11 +1005,19 @@ class BlogPublisher extends EventEmitter {
       const contentFrame = await this.page.frame('se_iframe');
       const targetPage = contentFrame || this.page;
 
-      // 🎯 [방탄 포커스 전환] 본문 작성 시작 전 제목 영역에서 본문 영역(.se-text-paragraph)으로 포커스를 전환하여,
+      // 🎯 [방탄 포커스 전환] 본문 작성 시작 전 제목 영역에서 본문 영역으로 포커스를 전환하여,
       // '말풍선 빼기' 등의 옵션 상태에서도 텍스트가 제목 칸으로 올라가는 현상을 완벽히 방지합니다.
       console.log('🎯 [포커스 전환] 본문 입력 영역으로 포커스를 이동합니다...');
       try {
-        // 1단계: 제목 입력 완료 후 네이티브 단축키(엔터 + 아래 방향키)로 본문 진입 유도
+        // 1단계: 에디터가 완전히 비어 플레이스홀더가 있는 경우, 플레이스홀더(.se-placeholder)를 먼저 클릭해 활성화합니다.
+        const placeholder = await targetPage.$('.se-placeholder');
+        if (placeholder) {
+          await placeholder.click();
+          await this.page.waitForTimeout(500);
+          console.log('✅ [포커스 전환] 플레이스홀더(.se-placeholder) 클릭으로 에디터 본문 활성화 완료');
+        }
+        
+        // 2단계: 제목 입력 완료 후 네이티브 단축키(엔터 + 아래 방향키)로 본문 진입 유도
         await this.page.keyboard.press('End');
         await this.page.waitForTimeout(100);
         await this.page.keyboard.press('Enter');
@@ -1017,7 +1025,7 @@ class BlogPublisher extends EventEmitter {
         await this.page.keyboard.press('ArrowDown');
         await this.page.waitForTimeout(200);
         
-        // 2단계: 본문 텍스트 영역을 직접 마우스로 더블 클릭하여 초점 100% 고정
+        // 3단계: 본문 텍스트 영역을 직접 마우스로 클릭하여 초점 100% 고정
         const textParagraph = await targetPage.$('.se-text-paragraph');
         if (textParagraph) {
           await textParagraph.click();
@@ -1108,14 +1116,26 @@ class BlogPublisher extends EventEmitter {
         // 이미지 삽입
         if (imageToInsert) {
           console.log(`📸 ${i + 1}번째 이미지 삽입`);
+          // 이미지 삽입 전 확실히 텍스트 줄로 내려가기 위해 ArrowDown 후 Enter
+          await this.page.keyboard.press('ArrowDown');
+          await this.page.waitForTimeout(200);
           await this.page.keyboard.press('Enter');
-          await this.page.waitForTimeout(1000);
+          await this.page.waitForTimeout(500);
+          
           await this.insertSingleImage(imageToInsert);
+          
+          // 이미지 삽입 후 이미지 컴포넌트 포커스를 탈출하기 위해 ArrowDown 후 Enter
+          await this.page.keyboard.press('ArrowDown');
+          await this.page.waitForTimeout(200);
           await this.page.keyboard.press('Enter');
-          await this.page.waitForTimeout(1000);
+          await this.page.waitForTimeout(500);
         } else {
+          await this.page.keyboard.press('ArrowDown');
+          await this.page.waitForTimeout(100);
           await this.page.keyboard.press('Enter');
+          await this.page.waitForTimeout(100);
           await this.page.keyboard.press('Enter');
+          await this.page.waitForTimeout(100);
         }
         await this.page.waitForTimeout(1500);
       }

@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.0 (2026-05-18)
+- **Description**: Upgraded the core focus engine with direct empty editor placeholder activation (.se-placeholder) and active component ArrowDown escapes to eliminate the remaining bubble-omitted leakage entirely.
+- **Changes**:
+  - Modified [src/modules/BlogPublisher.js](file:///d:/AI/project/my_days/src/modules/BlogPublisher.js) to first click `.se-placeholder` if it exists at the start of `enterContent`, activating the body for empty layouts.
+  - Implemented keyboard component escaping (`ArrowDown` -> `Enter`) before and after uploading images in `enterContent` to cleanly detach from active image card elements.
+
 ## v1.8.9 (2026-05-18)
 - **Description**: Resolved the core editor focus leak where layout combination [Bubble: Exclude, Description: Include] caused paragraph leakage into the title field. Deployed a Loop Focus Realignment bridge.
 - **Changes**:
