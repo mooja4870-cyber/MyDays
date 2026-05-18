@@ -4482,6 +4482,13 @@ function startLocalHttpServer(port = 3333) {
             return;
         }
 
+        // Health check endpoint: GET /api/health
+        if (req.method === 'GET' && req.url === '/api/health') {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'ok', app: 'MyDays' }));
+            return;
+        }
+
         // API endpoint: POST /api/execute-automation-step
         if (req.method === 'POST' && req.url === '/api/execute-automation-step') {
             let body = '';
@@ -4556,6 +4563,28 @@ function startLocalHttpServer(port = 3333) {
 
     httpServer.listen(port, () => {
         console.log(`🚀 [HTTP 서버 실행] http://localhost:${port} 에서 웹 서비스 중입니다.`);
+        
+        // PC의 모든 로컬 IPv4 인터페이스 검색 및 안내 출력
+        try {
+            const networkInterfaces = os.networkInterfaces();
+            const localIps = [];
+            for (const interfaceName in networkInterfaces) {
+                const interfaces = networkInterfaces[interfaceName];
+                for (const iface of interfaces) {
+                    if (iface.family === 'IPv4' && !iface.internal) {
+                        localIps.push(iface.address);
+                    }
+                }
+            }
+            if (localIps.length > 0) {
+                console.log('📡 모바일 기기 연결 가능 주소 (같은 Wi-Fi 공유기 필수):');
+                localIps.forEach(ip => {
+                    console.log(`   👉 http://${ip}:${port}`);
+                });
+            }
+        } catch (e) {
+            console.error('⚠️ 로컬 IP 목록 조회 실패:', e);
+        }
     });
     
     httpServer.on('error', (err) => {

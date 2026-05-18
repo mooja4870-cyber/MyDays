@@ -3527,6 +3527,81 @@ class MobileApiBridge {
         const baseUrl = this.getApiBaseUrl(required);
         return baseUrl ? `${baseUrl}${path}` : path;
     }
+
+    // 🔍 동일 Wi-Fi 대역 내 PC 자동화 서버(MyDays) 탐색 기능
+    static async discoverPcServer(onProgress = null) {
+        const subnets = ['172.30.1', '192.168.0', '192.168.1', '192.168.219', '192.168.35'];
+        
+        // 현재 설정되어 있는 주소가 있으면 그 서브넷을 1순위로 추가
+        const savedUrl = (localStorage.getItem('mydays-server-url') || '').trim();
+        const ipMatch = savedUrl.match(/https?:\/\/(\d{1,3}\.\d{1,3}\.\d{1,3})\.\d{1,3}/);
+        if (ipMatch) {
+            const currentSubnet = ipMatch[1];
+            if (!subnets.includes(currentSubnet)) {
+                subnets.unshift(currentSubnet);
+            } else {
+                const idx = subnets.indexOf(currentSubnet);
+                subnets.splice(idx, 1);
+                subnets.unshift(currentSubnet);
+            }
+        }
+
+        const port = 3333;
+        let foundUrl = null;
+        const totalSubnets = subnets.length;
+        
+        console.log('🔍 PC 서버 IP 자동 탐색 가동 - 탐색 서브넷:', subnets);
+
+        const pingIp = async (subnet, host) => {
+            const ip = `${subnet}.${host}`;
+            const url = `http://${ip}:${port}`;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 350); // 350ms 타임아웃
+            
+            try {
+                const res = await fetch(`${url}/api/health`, {
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.app === 'MyDays') {
+                        foundUrl = url;
+                        return true;
+                    }
+                }
+            } catch (err) {
+                // 무시
+            } finally {
+                clearTimeout(timeoutId);
+            }
+            return false;
+        };
+
+        for (let sIdx = 0; sIdx < subnets.length; sIdx++) {
+            if (foundUrl) break;
+            const subnet = subnets[sIdx];
+            
+            if (onProgress) {
+                onProgress(subnet, sIdx + 1, totalSubnets);
+            }
+            
+            const batchSize = 30;
+            for (let hostStart = 1; hostStart <= 254; hostStart += batchSize) {
+                if (foundUrl) break;
+                const promises = [];
+                const hostEnd = Math.min(hostStart + batchSize - 1, 254);
+                
+                for (let host = hostStart; host <= hostEnd; host++) {
+                    promises.push(pingIp(subnet, host));
+                }
+                
+                await Promise.all(promises);
+            }
+        }
+        
+        return foundUrl;
+    }
 }
 
 class ErrorMessageHelper {
@@ -3791,6 +3866,14 @@ class PhotoAutomationManager {
             });
         }
 
+        // PC IP 자동 검색 버튼 바인딩
+        const btnDiscover = document.getElementById('btn-discover-pc-server');
+        if (btnDiscover) {
+            btnDiscover.addEventListener('click', () => {
+                this.discoverPcServer();
+            });
+        }
+
         // 초기 설정 불러오기
         this.loadSettings();
     }
@@ -3964,6 +4047,55 @@ class PhotoAutomationManager {
         alert('💾 설정 정보가 브라우저에 안전하게 보관 및 동기화되었습니다!');
     }
 
+    // 🔍 PC 서버 IP 자동 탐색 및 저장 처리
+    static async discoverPcServer() {
+        const btnDiscover = document.getElementById('btn-discover-pc-server');
+        const elServerUrl = document.getElementById('mobile-server-url');
+        
+        if (!btnDiscover) return;
+        
+        btnDiscover.disabled = true;
+        btnDiscover.style.opacity = '0.7';
+        
+        try {
+            console.log('🔄 PC 서버 IP 자동 탐색 중...');
+            
+            const foundUrl = await MobileApiBridge.discoverPcServer((subnet, current, total) => {
+                btnDiscover.innerHTML = `⏳ 검색 중 (${current}/${total})...`;
+            });
+            
+            if (foundUrl) {
+                console.log(`🎉 PC 서버 탐색 성공: ${foundUrl}`);
+                if (elServerUrl) {
+                    elServerUrl.value = foundUrl;
+                }
+                localStorage.setItem('mydays-server-url', foundUrl);
+                
+                Utils.showDialog('success', 'PC 서버 검색 성공', 
+                    `동일 Wi-Fi 네트워크에서 PC 자동화 서버를 찾았습니다!\n\n` +
+                    `• 검색된 주소: ${foundUrl}\n` +
+                    `• 설정이 자동으로 입력되고 저장되었습니다.`
+                );
+            } else {
+                console.warn('❌ PC 서버를 찾지 못했습니다.');
+                Utils.showDialog('error', 'PC 서버 검색 실패', 
+                    `동일 Wi-Fi에서 가동 중인 PC 자동화 서버를 찾지 못했습니다.\n\n` +
+                    `👉 확인해 보세요:\n` +
+                    `1. PC에서 Electron 자동화 프로그램이 실제로 실행 중인지 확인하세요.\n` +
+                    `2. 휴대폰과 PC가 반드시 '같은 Wi-Fi 공유기'에 연결되어 있어야 합니다.\n` +
+                    `3. 공유기의 AP 격리(AP Isolation) 기능이 켜져 있으면 상호 접속이 안 될 수 있습니다.`
+                );
+            }
+        } catch (error) {
+            console.error('❌ PC 서버 탐색 중 치명적 오류:', error);
+            alert(`오류 발생: ${error.message}`);
+        } finally {
+            btnDiscover.disabled = false;
+            btnDiscover.style.opacity = '1';
+            btnDiscover.innerHTML = '🔍 PC IP 자동 검색';
+        }
+    }
+
     static async startPhotoPublish() {
         const naverId = localStorage.getItem('test-naver-id') || '';
         const naverPassword = localStorage.getItem('test-naver-password') || '';
@@ -4101,7 +4233,31 @@ class PhotoAutomationManager {
                     }
                 } catch (backgroundError) {
                     console.error('❌ 백그라운드 PHOTO 발행 중 오류 발생:', backgroundError);
-                    PostingHistoryManager.appendLog({ level: 'error', message: `❌ 포스팅 실패: ${ErrorMessageHelper.getMessage(backgroundError)}` });
+                    const errorDetail = ErrorMessageHelper.getMessage(backgroundError);
+                    PostingHistoryManager.appendLog({ level: 'error', message: `❌ 포스팅 실패: ${errorDetail}` });
+                    
+                    // 네트워크 연결 실패(Failed to fetch)일 경우 백그라운드에서 실시간 PC 서버 탐색 작동
+                    if (errorDetail.includes('PC 서버 연결 실패') || errorDetail.includes('fetch')) {
+                        PostingHistoryManager.appendLog({ level: 'warn', message: '🔍 연결 가능한 PC 서버를 찾기 위해 백그라운드 네트워크 탐색을 시작합니다...' });
+                        setTimeout(async () => {
+                            try {
+                                const foundUrl = await MobileApiBridge.discoverPcServer();
+                                if (foundUrl) {
+                                    PostingHistoryManager.appendLog({ 
+                                        level: 'success', 
+                                        message: `💡 [서버 자동 탐색 성공] 연결 가능한 PC 서버(${foundUrl})를 발견했습니다! 모바일 [설정] 탭의 [PC IP 자동 검색]을 클릭하시면 자동으로 연결 세팅이 완료됩니다!` 
+                                    });
+                                } else {
+                                    PostingHistoryManager.appendLog({ 
+                                        level: 'warn', 
+                                        message: '⚠️ 백그라운드 탐색 결과, 현재 공유기 네트워크에 켜져 있는 MyDays PC 서버를 찾지 못했습니다.' 
+                                    });
+                                }
+                            } catch (scanErr) {
+                                console.error('백그라운드 서버 탐색 오류:', scanErr);
+                            }
+                        }, 500);
+                    }
                 }
             })();
 

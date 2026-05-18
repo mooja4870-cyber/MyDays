@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.9.1 (2026-05-18)
+- **Description**: Deployed the Subnet Auto-Discovery IP Scan Engine on the mobile app to automatically detect the PC automation server within typical subnets, added the `/api/health` check endpoint inside the Electron HTTP server to safely authenticate the app target, and wired a background discovery task that auto-scans and suggests active servers if a connection failure is triggered during posting.
+- **Changes**:
+  - Modified [src/main.js](file:///d:/AI/project/my_days/src/main.js) to implement the GET `/api/health` check endpoint and display local IP addresses in startup logs.
+  - Modified [src/renderer/index.html](file:///d:/AI/project/my_days/src/renderer/index.html) to add the "PC IP 자동 검색" button adjacent to the PC server URL input.
+  - Modified [src/renderer/app.js](file:///d:/AI/project/my_days/src/renderer/app.js) to implement the concurrent subnet scanning algorithm `MobileApiBridge.discoverPcServer`, bind settings button clicks, and trigger background search alerts on connection failure.
+  - Updated [android/app/build.gradle](file:///d:/AI/project/my_days/android/app/build.gradle) and [package.json](file:///d:/AI/project/my_days/package.json) with updated release build version info.
+
 ## v1.9.0 (2026-05-18)
 - **Description**: Upgraded the core focus engine with direct empty editor placeholder activation (.se-placeholder) and active component ArrowDown escapes to eliminate the remaining bubble-omitted leakage entirely.
 - **Changes**:
