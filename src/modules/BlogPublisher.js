@@ -969,25 +969,26 @@ class BlogPublisher extends EventEmitter {
       const contentFrame = await this.page.frame('se_iframe');
       const targetPage = contentFrame || this.page;
 
-      // 🎯 [Caret/Focus Fix] 커서가 제목(Title) 필드에 머물러 있을 때 본문 문단이 제목 란에 들어가는 현상을 완벽 차단합니다.
-      // 인용구 소제목이 비활성화(useBubble === false)되어 있을 때도 본문 영역에 포커싱되도록 강제 보장합니다.
+      // 🎯 [방탄 포커스 전환] 본문 작성 시작 전 제목 영역에서 본문 영역(.se-text-paragraph)으로 포커스를 전환하여,
+      // '말풍선 빼기' 등의 옵션 상태에서도 텍스트가 제목 칸으로 올라가는 현상을 완벽히 방지합니다.
+      console.log('🎯 [포커스 전환] 본문 입력 영역으로 포커스를 이동합니다...');
       try {
-        console.log('🎯 [커서 이동] 제목 필드에서 본문 에디터 영역으로 포커스 전환 중...');
-        // 본문 컨테이너 및 텍스트 문단 선택
-        await targetPage.waitForSelector('.se-text-paragraph', { timeout: 15000 });
-        const bodyParagraph = await targetPage.$('.se-text-paragraph');
-        if (bodyParagraph) {
-          await bodyParagraph.click();
-          await this.page.waitForTimeout(500);
-          console.log('✅ [커서 이동] 본문 에디터 영역 포커스 완료');
+        const textParagraph = await targetPage.$('.se-text-paragraph');
+        if (textParagraph) {
+          await textParagraph.click();
+          await this.page.waitForTimeout(1000);
+          console.log('✅ [포커스 전환] 본문 텍스트 영역(.se-text-paragraph) 클릭 완료');
+        } else {
+          // 대체 셀렉터 시도
+          const editorBody = await targetPage.$('[contenteditable="true"]');
+          if (editorBody) {
+            await editorBody.click();
+            await this.page.waitForTimeout(1000);
+            console.log('✅ [포커스 전환] contenteditable 본문 영역 클릭 완료');
+          }
         }
       } catch (focusError) {
-        console.warn('⚠️ [커서 이동] 본문 선택기 클릭 실패, Enter 키 입력 우회 시도:', focusError.message);
-        // 대체 우회책: Escape를 눌러 툴팁 등을 날리고 Enter를 쳐서 본문으로 내려감
-        await this.page.keyboard.press('Escape');
-        await this.page.waitForTimeout(200);
-        await this.page.keyboard.press('Enter');
-        await this.page.waitForTimeout(500);
+        console.warn('⚠️ 본문 포커스 전환 실패 (무시하고 계속):', focusError.message);
       }
 
       // 📸 [방탄 루프 횟수 제어] 텍스트 개수와 이미지 개수를 연동하여 
