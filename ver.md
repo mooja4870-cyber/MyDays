@@ -1,5 +1,10 @@
 # 📦 Version History
 
+## v1.8.9 (2026-05-18)
+- **Description**: Resolved the core editor focus leak where layout combination [Bubble: Exclude, Description: Include] caused paragraph leakage into the title field. Deployed a Loop Focus Realignment bridge.
+- **Changes**:
+  - Upgraded `enterContent` inside [src/modules/BlogPublisher.js](file:///d:/AI/project/my_days/src/modules/BlogPublisher.js) to retrieve the active, newly-created `.se-text-paragraph` at the bottom of the editor at the start of each iteration `i > 0`, and physically click it. This guarantees that when speech bubble subtitles are disabled, the cursor never remains locked inside the previously uploaded image block nor jumps to the title container.
+
 ## v1.8.8 (2026-05-18)
 - **Description**: Updated the welcome copywriting headline text to include an exclamation mark, and incremented the package version.
 - **Changes**:

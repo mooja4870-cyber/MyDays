@@ -1044,6 +1044,23 @@ class BlogPublisher extends EventEmitter {
         let paragraph = paragraphs[i] ? paragraphs[i].trim() : '';
         const imageToInsert = imagePaths && imagePaths[i] && require('fs').existsSync(imagePaths[i]) ? imagePaths[i] : null;
         
+        // 🎯 [방탄 포커스 고정] 이전 루프에서 이미지가 삽입된 후 포커스가 이미지 블록에 갇히는 현상을 완벽히 차단합니다.
+        // 각 섹션 루프 시작 시점에 본문 최하단의 빈 문단(.se-text-paragraph)을 한 번 더 정밀 클릭하여 초점을 확실히 고정시킵니다.
+        if (i > 0) {
+          console.log(`🎯 [루프 포커스 재조정] ${i + 1}번째 섹션 시작 전 본문 최하단 문단에 초점을 맞춥니다...`);
+          try {
+            const textParagraphs = await targetPage.$$('.se-text-paragraph');
+            if (textParagraphs && textParagraphs.length > 0) {
+              const lastParagraph = textParagraphs[textParagraphs.length - 1];
+              await lastParagraph.click();
+              await this.page.waitForTimeout(500);
+              console.log('✅ [루프 포커스 재조정] 최하단 문단 클릭 완료');
+            }
+          } catch (e) {
+            console.warn('⚠️ 루프 포커스 재조정 실패:', e.message);
+          }
+        }
+        
         // 🔥 말풍선 소제목 넣기/빼기 처리
         if (this.config.useBubble !== false) {
           if (paragraph || imageToInsert) {
