@@ -4,7 +4,8 @@
   "description": "네파스 - 네이버 블로그 쿠팡 파트너스 자동화 도구",
   "main": "src/main.js",
   "scripts": {
-    "test:harness": "node tests/harness.js"
+    "test:harness": "node tests/harness.js",
+    "start": "node server.js"
   },
   "author": "네파스 개발자",
   "license": "MIT",
