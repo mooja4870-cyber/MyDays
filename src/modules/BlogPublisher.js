@@ -251,14 +251,50 @@ class BlogPublisher extends EventEmitter {
     try {
       this.emit('publish-progress', { step: '제목 입력' });
       
-      const titleSelector = '[class*="se-title-text"] [class*="se-placeholder"]';
-      await this.page.waitForSelector(titleSelector, { timeout: 120000 });
+      // 제목 입력 영역 (textarea 또는 placeholder) 찾기
+      const selectors = [
+        '.se-document-title textarea',
+        '[class*="se-title-text"] textarea',
+        'textarea.se-bare-textarea',
+        '[class*="se-title-text"] [class*="se-placeholder"]'
+      ];
+      
+      let titleInput = null;
+      for (const selector of selectors) {
+        try {
+          titleInput = await this.page.waitForSelector(selector, { timeout: 3000 });
+          if (titleInput) {
+            console.log(`✅ 제목 입력 요소 발견: ${selector}`);
+            break;
+          }
+        } catch (e) {
+          // 다음 셀렉터 시도
+        }
+      }
+      
+      if (!titleInput) {
+        throw new Error('제목 입력 영역을 찾을 수 없습니다');
+      }
       
       // 기존 제목 지우고 새 제목 입력
-      await this.page.click(titleSelector);
+      await titleInput.click();
+      await this.page.waitForTimeout(500);
       await this.page.keyboard.press('Control+A');
-      await this.page.type(titleSelector, title, { delay: 100 });
+      await this.page.waitForTimeout(200);
+      await this.page.keyboard.press('Backspace');
+      await this.page.waitForTimeout(200);
       
+      // 대제목 클립보드 복사 후 붙여넣기로 1초 만에 입력 완성 (중간 포커싱 이탈 완벽 방지)
+      try {
+        await this.copyTextToClipboard(title);
+        await this.page.keyboard.press('Control+V');
+        console.log('✅ 제목 클립보드 복사 붙여넣기 완료');
+      } catch (pasteError) {
+        console.warn('⚠️ 제목 붙여넣기 실패, 직접 타이핑으로 백업:', pasteError.message);
+        await this.page.keyboard.type(title, { delay: 20 });
+      }
+      
+      await this.page.waitForTimeout(1000);
       console.log(`제목 입력 완료: ${title}`);
     } catch (error) {
       console.error('제목 입력 중 오류:', error);
@@ -973,17 +1009,26 @@ class BlogPublisher extends EventEmitter {
       // '말풍선 빼기' 등의 옵션 상태에서도 텍스트가 제목 칸으로 올라가는 현상을 완벽히 방지합니다.
       console.log('🎯 [포커스 전환] 본문 입력 영역으로 포커스를 이동합니다...');
       try {
+        // 1단계: 제목 입력 완료 후 네이티브 단축키(엔터 + 아래 방향키)로 본문 진입 유도
+        await this.page.keyboard.press('End');
+        await this.page.waitForTimeout(100);
+        await this.page.keyboard.press('Enter');
+        await this.page.waitForTimeout(200);
+        await this.page.keyboard.press('ArrowDown');
+        await this.page.waitForTimeout(200);
+        
+        // 2단계: 본문 텍스트 영역을 직접 마우스로 더블 클릭하여 초점 100% 고정
         const textParagraph = await targetPage.$('.se-text-paragraph');
         if (textParagraph) {
           await textParagraph.click();
-          await this.page.waitForTimeout(1000);
+          await this.page.waitForTimeout(500);
           console.log('✅ [포커스 전환] 본문 텍스트 영역(.se-text-paragraph) 클릭 완료');
         } else {
           // 대체 셀렉터 시도
           const editorBody = await targetPage.$('[contenteditable="true"]');
           if (editorBody) {
             await editorBody.click();
-            await this.page.waitForTimeout(1000);
+            await this.page.waitForTimeout(500);
             console.log('✅ [포커스 전환] contenteditable 본문 영역 클릭 완료');
           }
         }

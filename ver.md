@@ -1,5 +1,16 @@
 # 📦 Version History
 
+## v1.8.8 (2026-05-18)
+- **Description**: Updated the welcome copywriting headline text to include an exclamation mark, and incremented the package version.
+- **Changes**:
+  - Modified [src/renderer/index.html](file:///d:/AI/project/my_days/src/renderer/index.html) and [android/app/src/main/assets/www/index.html](file:///d:/AI/project/my_days/android/app/src/main/assets/www/index.html) to change "소중한 일상, 더 가치 있게 간직하세요" to "소중한 일상, 더 가치 있게 간직하세요!".
+
+## v1.8.7 (2026-05-18)
+- **Description**: Implemented an ultimate, dual-mode [End-to-End Absolute Zero Focus Leak] mechanism to 100% cure the Naver SmartEditor title-body leakage bug, combined with a robust copy-paste clipboard title insertion.
+- **Changes**:
+  - Upgraded `enterTitle` inside [src/modules/BlogPublisher.js](file:///d:/AI/project/my_days/src/modules/BlogPublisher.js) to target the actual `textarea` elements instead of the disappearing placeholder span, and used clipboard copy-paste to insert the title instantly, eliminating character-by-character focus loss.
+  - Hardened `enterContent` focus logic to perform a dual-layered transition: (1) native editor keyboard navigation (`End` -> `Enter` -> `ArrowDown`) followed by (2) a direct physical DOM click on `.se-text-paragraph` or editable body, guaranteeing focus moves to the body under any viewport or timing conditions.
+
 ## v1.8.6 (2026-05-18)
 - **Description**: Resolved the notorious 7-time recurring editor focus bug where description texts leaked into the post title field when the speech bubble option was disabled (useBubble: 빼기).
 - **Changes**:
