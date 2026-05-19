@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.16 (2026-05-19)
+- **Description**: Resolved remaining 30~40 second delay under specific configurations where the cursor got trapped inside the image caption component (`.se-caption`), making the quotation toolbar button disabled and causing Playwright actionability retries.
+- **Changes**:
+  - Implemented browser-side 1-pass paragraph filtering (`evaluateHandle`) in `BlogPublisher.js` to target only pure body paragraphs, ignoring captions, titles, quotations, map components, etc.
+  - Enhanced post-image caret behavior: Added consecutive double `ArrowDown` keys after inserting an image to forcefully escape the image component and its caption area.
+
 ## v1.9.15 (2026-05-19)
 - **Description**: Added Exponential Backoff and Jitter to Gemini API requests to seamlessly handle transient network/server failures (such as `502 Bad Gateway` and `503 Service Unavailable`).
 - **Changes**:

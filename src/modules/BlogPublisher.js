@@ -1144,17 +1144,33 @@ class BlogPublisher extends EventEmitter {
         const imageToInsert = imagePaths && imagePaths[i] && require('fs').existsSync(imagePaths[i]) ? imagePaths[i] : null;
         
         // 🎯 [방탄 포커스 고정] 이전 루프에서 이미지가 삽입된 후 포커스가 이미지 블록에 갇히는 현상을 완벽히 차단합니다.
-        // 각 섹션 루프 시작 시점에 본문 최하단의 빈 문단(.se-text-paragraph)을 한 번 더 정밀 클릭하여 초점을 확실히 고정시킵니다.
+        // 각 섹션 루프 시작 시점에 본문 최하단의 순수 빈 문단을 정밀 클릭하여 초점을 확실히 고정시킵니다.
         if (i > 0) {
           console.log(`🎯 [루프 포커스 재조정] ${i + 1}번째 섹션 시작 전 본문 최하단 문단에 초점을 맞춥니다...`);
           try {
-            const textParagraphs = await targetPage.$$('.se-text-paragraph');
-            if (textParagraphs && textParagraphs.length > 0) {
-              const lastParagraph = textParagraphs[textParagraphs.length - 1];
-              await lastParagraph.click();
-              await this.page.waitForTimeout(500);
-              console.log('✅ [루프 포커스 재조정] 최하단 문단 클릭 완료');
+            // [v1.9.16 핵심 개선] 브라우저 내에서 직접 1회 연산하여 순수 본문 영역의 최하단 문단을 클릭합니다.
+            // Node.js와 크롬 간의 불필요한 루프 통신을 완전히 없애 렉을 예방하고, 이미지 캡션이나 인용구 내부가 아닌 진짜 본문 영역을 타겟팅합니다.
+            const lastPureParagraph = await targetPage.evaluateHandle(() => {
+              const paragraphs = Array.from(document.querySelectorAll('.se-text-paragraph'));
+              for (let j = paragraphs.length - 1; j >= 0; j--) {
+                const p = paragraphs[j];
+                // 캡션, 인용구, 이미지, 제목, 지도, 스티커 내부에 있지 않은 순수 텍스트 문단 검색
+                if (!p.closest('.se-quotation, .se-image, .se-document-title, .se-map, .se-sticker, .se-caption')) {
+                  return p;
+                }
+              }
+              return null;
+            });
+
+            if (lastPureParagraph) {
+              const el = lastPureParagraph.asElement();
+              if (el) {
+                await el.click();
+                console.log('✅ [루프 포커스 재조정] 순수 본문 최하단 문단 클릭 완료');
+              }
+              await lastPureParagraph.dispose();
             }
+            await this.page.waitForTimeout(200);
           } catch (e) {
             console.warn('⚠️ 루프 포커스 재조정 실패:', e.message);
           }
@@ -1215,17 +1231,16 @@ class BlogPublisher extends EventEmitter {
           
           await this.insertSingleImage(imageToInsert);
           
-          // [v1.9.14 핵심 수정] 이미지 삽입 직후 Escape로 이미지 편집 모드를 즉시 해제합니다.
-          // 이것이 없으면 에디터 툴바가 '이미지 편집 모드'에 잠겨 인용구 버튼이 클릭 차단되어
-          // Playwright가 actionability check을 11~12회 반복하며 30~40초를 낭비합니다.
+          // [v1.9.16 핵심 수정] 이미지 삽입 직후 Escape와 방향키 2회 다운으로 캡션 및 이미지 영역을 완전히 탈출합니다.
+          // 이를 통해 에디터 툴바가 이미지 모드에 묶이지 않으며 다음 섹션의 인용구/설명문이 딜레이 없이 0.1초 만에 즉시 반응합니다.
           await this.page.keyboard.press('Escape');
-          await this.page.waitForTimeout(200);
-          
-          // 이미지 편집 모드 해제 후 포커스 이탈
+          await this.page.waitForTimeout(100);
+          await this.page.keyboard.press('ArrowDown');
+          await this.page.waitForTimeout(50);
           await this.page.keyboard.press('ArrowDown');
           await this.page.waitForTimeout(50);
           await this.page.keyboard.press('Enter');
-          await this.page.waitForTimeout(100);
+          await this.page.waitForTimeout(150);
         } else {
           await this.page.keyboard.press('ArrowDown');
           await this.page.waitForTimeout(50);
