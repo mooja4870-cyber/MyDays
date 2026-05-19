@@ -921,56 +921,30 @@ class BlogPublisher extends EventEmitter {
     try {
       console.log(`📋 인용구를 사용한 소제목 입력 시작: ${subtitle}`);
       
-      // 1단계: ESC 키를 눌러 이미지 등 다른 컴포넌트 블록의 고착된 포커스 해제
+      // [v1.9.14 핵심 수정] 이미지 편집 모드 잔류 시 인용구 툴바가 클릭 차단되므로
+      // Escape로 에디터의 활성 컴포넌트 모드를 완전히 해제한 뒤 진입합니다.
       await this.page.keyboard.press('Escape');
-      await this.page.waitForTimeout(100);
-      
-      // 2단계: 이전 말풍선이나 이미지 내부가 아닌, 순수 본문 영역의 최하단 문단을 정밀 탐색하여 포커스
-      const contentFrame = await this.page.frame('se_iframe');
-      const targetPage = contentFrame || this.page;
-      const textParagraphs = await targetPage.$$('.se-text-paragraph');
-      let focused = false;
-      
-      for (let i = textParagraphs.length - 1; i >= 0; i--) {
-        const isInsideComponent = await textParagraphs[i].evaluate(node => {
-          return !!node.closest('.se-quotation, .se-image, .se-document-title, .se-map, .se-sticker');
-        });
-        if (!isInsideComponent) {
-          await textParagraphs[i].click();
-          await this.page.waitForTimeout(200);
-          focused = true;
-          console.log('🎯 [소제목 입력 포커스] 순수 본문 텍스트 문단 포커스 성공');
-          break;
-        }
-      }
-      
-      if (!focused && textParagraphs.length > 0) {
-        await textParagraphs[textParagraphs.length - 1].click();
-        await this.page.waitForTimeout(200);
-      }
-      
-      // 3단계: 줄 끝으로 커서를 이동 후 새로운 빈 엔터 라인 개설
-      await this.page.keyboard.press('End');
-      await this.page.waitForTimeout(50);
-      await this.page.keyboard.press('Enter');
       await this.page.waitForTimeout(150);
+      
+      await this.page.keyboard.press('Enter');
+      await this.page.waitForTimeout(100);
       
       // 인용구 스타일 선택 (포스트별로 통일성 유지)
       const quotationStyle = this.selectQuotationStyle();
       
       // 1단계: 인용구 선택 버튼 클릭
       console.log('🔹 1단계: 인용구 선택 버튼 클릭 중...');
-      const quotationButton = await this.page.waitForSelector('[data-name="quotation"]', { timeout: 5000 });
+      const quotationButton = await this.page.waitForSelector('[data-name="quotation"]', { timeout: 1500 });
       await quotationButton.click();
       console.log('✅ 1단계: 인용구 선택 버튼 클릭 완료');
-      await this.page.waitForTimeout(300); // 800 -> 300 단축
+      await this.page.waitForTimeout(300);
       
       // 2단계: 인용구 스타일 선택
       console.log(`🔹 2단계: 인용구 스타일 선택 중 (${quotationStyle})...`);
-      const quotationStyleButton = await this.page.waitForSelector(`[data-value="${quotationStyle}"]`, { timeout: 5000 });
+      const quotationStyleButton = await this.page.waitForSelector(`[data-value="${quotationStyle}"]`, { timeout: 1500 });
       await quotationStyleButton.click();
       console.log(`✅ 2단계: 인용구 스타일 선택 완료 (${quotationStyle})`);
-      await this.page.waitForTimeout(300); // 1000 -> 300 단축
+      await this.page.waitForTimeout(300);
       
       // 3단계: 소제목 입력
       console.log(`🔹 3단계: 소제목 입력 중 (${subtitle})...`);
@@ -1174,26 +1148,12 @@ class BlogPublisher extends EventEmitter {
         if (i > 0) {
           console.log(`🎯 [루프 포커스 재조정] ${i + 1}번째 섹션 시작 전 본문 최하단 문단에 초점을 맞춥니다...`);
           try {
-            await this.page.keyboard.press('Escape');
-            await this.page.waitForTimeout(100);
-            
             const textParagraphs = await targetPage.$$('.se-text-paragraph');
-            let clicked = false;
-            for (let k = textParagraphs.length - 1; k >= 0; k--) {
-              const isInsideComponent = await textParagraphs[k].evaluate(node => {
-                return !!node.closest('.se-quotation, .se-image, .se-document-title, .se-map, .se-sticker');
-              });
-              if (!isInsideComponent) {
-                await textParagraphs[k].click();
-                await this.page.waitForTimeout(300);
-                clicked = true;
-                console.log('✅ [루프 포커스 재조정] 순수 본문 최하단 문단 클릭 완료');
-                break;
-              }
-            }
-            if (!clicked && textParagraphs.length > 0) {
-              await textParagraphs[textParagraphs.length - 1].click();
-              await this.page.waitForTimeout(300);
+            if (textParagraphs && textParagraphs.length > 0) {
+              const lastParagraph = textParagraphs[textParagraphs.length - 1];
+              await lastParagraph.click();
+              await this.page.waitForTimeout(500);
+              console.log('✅ [루프 포커스 재조정] 최하단 문단 클릭 완료');
             }
           } catch (e) {
             console.warn('⚠️ 루프 포커스 재조정 실패:', e.message);
@@ -1255,7 +1215,13 @@ class BlogPublisher extends EventEmitter {
           
           await this.insertSingleImage(imageToInsert);
           
-          // 이미지 삽입 후 초고속 포커스 이탈
+          // [v1.9.14 핵심 수정] 이미지 삽입 직후 Escape로 이미지 편집 모드를 즉시 해제합니다.
+          // 이것이 없으면 에디터 툴바가 '이미지 편집 모드'에 잠겨 인용구 버튼이 클릭 차단되어
+          // Playwright가 actionability check을 11~12회 반복하며 30~40초를 낭비합니다.
+          await this.page.keyboard.press('Escape');
+          await this.page.waitForTimeout(200);
+          
+          // 이미지 편집 모드 해제 후 포커스 이탈
           await this.page.keyboard.press('ArrowDown');
           await this.page.waitForTimeout(50);
           await this.page.keyboard.press('Enter');

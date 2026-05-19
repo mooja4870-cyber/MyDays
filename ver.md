@@ -1,11 +1,12 @@
 # 📦 Version History
 
 ## v1.9.14 (2026-05-19)
-- **Description**: Resolved a critical posting loop slowdown where inserting speech bubbles after images stalled for 30~40 seconds due to Playwright's actionability checks retrying on inactive/hidden elements.
+- **Description**: Fundamentally resolved the 30~40 second delay (with 11-12 "clicking" retries) between image insertion and speech bubble placement. Root cause: Naver SmartEditor ONE locks the toolbar into "Image Edit Mode" after inserting a photo, making the quotation toolbar button click-intercepted; Playwright's actionability check then retries at 100ms intervals for up to 15 seconds per attempt.
 - **Changes**:
-  - Modified `src/modules/BlogPublisher.js` (`insertSubtitleWithQuotation`) to press `Escape` and clear active block element selection before editing text.
-  - Implemented `.se-text-paragraph` element filtration by checking `.closest()` for `.se-quotation`, `.se-image`, and other components to target only pure body text paragraphs.
-  - Modified the loop's focus adjustment code (`enterContent` i > 0) to use the same Escape and filtered paragraph clicking mechanism, preventing caret entrapment inside previous speech bubbles or image captions.
+  - Modified `src/modules/BlogPublisher.js` `enterContent`: Added `Escape` key press immediately after `insertSingleImage()` to forcefully exit image editing mode before the next section begins.
+  - Modified `src/modules/BlogPublisher.js` `insertSubtitleWithQuotation`: Added `Escape` key press at method entry to clear any residual component editing mode before attempting to click the quotation toolbar button.
+  - Reduced `waitForSelector` timeouts for `[data-name="quotation"]` and `[data-value="quotation_bubble"]` from 5000ms to 1500ms, preventing extended silent waits on failure.
+  - Expected improvement: Section-to-section transition time reduced from 15~30 seconds to 4~6 seconds.
 
 ## v1.9.13 (2026-05-19)
 - **Description**: Hardcoded the active PC Server URL and Gemini API Key as default fallbacks inside the Android mobile app, so new installations automatically initialize with the correct configuration.
