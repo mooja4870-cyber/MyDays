@@ -1175,7 +1175,18 @@ class BlogAutomation {
             
             const { naverId, naverPassword, blogId, geminiApi, images, context, openType, useBubble, useDescription } = payload;
             
-            if (!naverId || !naverPassword || !blogId || !geminiApi) {
+            let activeGeminiApi = geminiApi;
+            if (this.configManager) {
+                const localAccount = this.configManager.getAccounts().find(acc => 
+                    acc.username && acc.username.trim().toLowerCase() === naverId.trim().toLowerCase()
+                );
+                if (localAccount && localAccount.geminiApi) {
+                    console.log(`🔑 [서버 키 자동 대체] 모바일 수신 키 대신 PC 서버의 안전한 API 키를 적용합니다.`);
+                    activeGeminiApi = localAccount.geminiApi;
+                }
+            }
+            
+            if (!naverId || !naverPassword || !blogId || !activeGeminiApi) {
                 return {
                     success: false,
                     error: '네이버 계정 정보와 제미나이 API 키가 필요합니다.'
@@ -1235,7 +1246,7 @@ class BlogAutomation {
             
             const ContentGenerator = require('./modules/ContentGenerator');
             const generator = new ContentGenerator();
-            generator.setApiKey(geminiApi);
+            generator.setApiKey(activeGeminiApi);
             
             const fileToGenerativePart = (base64Data) => {
                 const matches = base64Data.match(/^data:(image\/[a-zA-Z0-9]+);base64,(.+)$/);
@@ -1362,7 +1373,7 @@ JSON 외에 다른 여담이나 설명 문구, 백틱(\`\`\`json 등)은 붙이�
                 password: naverPassword,
                 naverPassword: naverPassword,
                 blogId: blogId,
-                geminiApi: geminiApi
+                geminiApi: activeGeminiApi
             };
             
             // 5. 블로그 발행 시작
@@ -1372,7 +1383,7 @@ JSON 외에 다른 여담이나 설명 문구, 백틱(\`\`\`json 등)은 붙이�
                 BLOG_ID: blogId,
                 CATEGORY_ID: 1,
                 OPEN_TYPE: openType !== undefined ? parseInt(openType, 10) : 2,
-                geminiApi: geminiApi,
+                geminiApi: activeGeminiApi,
                 useBubble: useBubble !== false,
                 useDescription: useDescription !== false
             });
@@ -4521,9 +4532,9 @@ function startLocalHttpServer(port = 3333) {
                         }
                         result = await blogAutomation.executeNaverTestPublish(payload);
                     } else if (action === 'photo-publish') {
-                        if (!payload || !payload.naverId || !payload.naverPassword || !payload.blogId || !payload.geminiApi) {
+                        if (!payload || !payload.naverId || !payload.naverPassword || !payload.blogId) {
                             res.writeHead(400, { 'Content-Type': 'application/json' });
-                            res.end(JSON.stringify({ success: false, error: '필수 로그인 정보와 제미나이 API 키가 필요합니다.' }));
+                            res.end(JSON.stringify({ success: false, error: '필수 네이버 로그인 정보와 블로그 ID가 필요합니다.' }));
                             return;
                         }
                         result = await blogAutomation.executePhotoPublish(payload);

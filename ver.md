@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.22 (2026-05-19)
+- **Description**: Resolved key exposure risk and mismatch issues between mobile app and server configurations by implementing a server-side Gemini API key fallback logic.
+- **Changes**:
+  - Modified `src/main.js` to override the incoming payload key with the PC server's local safe, unexposed API key for the corresponding Naver account.
+  - Relaxed the client-side API requirement checks for the `/api/execute-automation-step` endpoint to allow optional mobile keys.
+
 ## v1.9.21 (2026-05-19)
 - **Description**: Resolved Google Gemini API Model 404 Deprecation issue by transitioning from the retired `gemini-2.0-flash` model to the newer `gemini-2.5-flash` model.
 - **Changes**:
