@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.5 (2026-05-19)
+- **Description**: Fixed a notorious "Title Intercept" bug where the description text was pasted into the title when the bubble option was disabled.
+- **Changes**:
+  - Rewrote the focus shifting logic inside `BlogPublisher.js` (`enterContent`).
+  - Implemented a 3-step bulletproof mechanism: Force click on `.se-text-paragraph`, explicit `document.activeElement` validation loop, and `Tab` keystroke fallback to guarantee escape from the Title textarea before pasting the body description.
+
 ## v1.9.4 (2026-05-19)
 - **Description**: Fixed `HTTP 404 Not Found` routing bug on PC HTTP Server when receiving mobile API requests.
 - **Changes**:

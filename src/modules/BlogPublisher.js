@@ -1009,37 +1009,49 @@ class BlogPublisher extends EventEmitter {
       // '말풍선 빼기' 등의 옵션 상태에서도 텍스트가 제목 칸으로 올라가는 현상을 완벽히 방지합니다.
       console.log('🎯 [포커스 전환] 본문 입력 영역으로 포커스를 이동합니다...');
       try {
-        // 1단계: 에디터가 완전히 비어 플레이스홀더가 있는 경우, 플레이스홀더(.se-placeholder)를 먼저 클릭해 활성화합니다.
-        const placeholder = await targetPage.$('.se-placeholder');
-        if (placeholder) {
-          await placeholder.click();
-          await this.page.waitForTimeout(500);
-          console.log('✅ [포커스 전환] 플레이스홀더(.se-placeholder) 클릭으로 에디터 본문 활성화 완료');
-        }
-        
-        // 2단계: 제목 입력 완료 후 네이티브 단축키(엔터 + 아래 방향키)로 본문 진입 유도
-        await this.page.keyboard.press('End');
-        await this.page.waitForTimeout(100);
-        await this.page.keyboard.press('Enter');
-        await this.page.waitForTimeout(200);
-        await this.page.keyboard.press('ArrowDown');
-        await this.page.waitForTimeout(200);
-        
-        // 3단계: 본문 텍스트 영역을 직접 마우스로 클릭하여 초점 100% 고정
-        const textParagraph = await targetPage.$('.se-text-paragraph');
+        // 1단계: 마우스 강제 클릭을 통한 1차 탈출 시도 (Primary Focus)
+        const textParagraph = await targetPage.$('.se-text-paragraph, [contenteditable="true"]');
         if (textParagraph) {
-          await textParagraph.click();
-          await this.page.waitForTimeout(500);
-          console.log('✅ [포커스 전환] 본문 텍스트 영역(.se-text-paragraph) 클릭 완료');
-        } else {
-          // 대체 셀렉터 시도
-          const editorBody = await targetPage.$('[contenteditable="true"]');
-          if (editorBody) {
-            await editorBody.click();
+          try {
+            await textParagraph.scrollIntoViewIfNeeded();
+            await textParagraph.click({ force: true });
             await this.page.waitForTimeout(500);
-            console.log('✅ [포커스 전환] contenteditable 본문 영역 클릭 완료');
+            console.log('✅ [포커스 전환] 1단계: 본문 텍스트 영역 클릭 완료');
+          } catch(e) {
+            console.warn('⚠️ 본문 클릭 중 오류:', e.message);
           }
         }
+        
+        // 2단계: 활성 요소(Active Element) 정밀 감시 및 Tab 키 강제 탈출 (Fallback)
+        // 네이버 스마트에디터의 구조적 한계(제목 칸 갇힘 현상)를 원천 차단합니다.
+        let escapeAttempts = 0;
+        let isStillInTitle = true;
+        
+        while (isStillInTitle && escapeAttempts < 3) {
+          isStillInTitle = await targetPage.evaluate(() => {
+            const active = document.activeElement;
+            if (!active) return false;
+            const className = typeof active.className === 'string' ? active.className : '';
+            return className.includes('se-document-title') || active.tagName === 'TEXTAREA' || active.placeholder === '제목';
+          });
+
+          if (isStillInTitle) {
+            console.warn(`⚠️ [포커스 경고] 커서가 아직 제목 칸에 갇혀 있습니다! Tab 키 강제 탈출 시도 (${escapeAttempts + 1}/3)`);
+            await this.page.keyboard.press('Tab');
+            await this.page.waitForTimeout(500);
+            escapeAttempts++;
+          } else {
+            console.log('✅ [포커스 전환] 2단계: 커서가 본문 영역에 안전하게 탈출했음을 확인했습니다.');
+          }
+        }
+        
+        // 3단계: 만약 Tab 키로도 탈출하지 못했다면 비상 수단으로 좌표 강제 클릭
+        if (isStillInTitle) {
+            console.warn('⚠️ [비상 탈출] 커서가 제목 칸에서 빠져나오지 못했습니다. 본문 좌표 강제 클릭 시도.');
+            await this.page.mouse.click(300, 500); // 화면 중앙 하단 임의 위치 클릭
+            await this.page.waitForTimeout(500);
+        }
+        
       } catch (focusError) {
         console.warn('⚠️ 본문 포커스 전환 실패 (무시하고 계속):', focusError.message);
       }
