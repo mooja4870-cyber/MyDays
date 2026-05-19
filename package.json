@@ -5,6 +5,7 @@
   "main": "src/main.js",
   "scripts": {
     "test:harness": "node tests/harness.js",
+    "test:comprehensive": "node tests/comprehensive_suite.js",
     "start": "node server.js"
   },
   "author": "네파스 개발자",
