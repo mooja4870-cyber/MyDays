@@ -1,5 +1,10 @@
 # 📦 Version History
 
+## v1.9.19 (2026-05-19)
+- **Description**: Formally integrated the runtime environment process validation (Anti-Zombie Rule) into the project's agent rules configuration.
+- **Changes**:
+  - Appended Rule 4 to `.antigravityrules` ensuring future agent sessions systematically kill zombie processes, inspect ports, and verify test suites before final reports.
+
 ## v1.9.18 (2026-05-19)
 - **Description**: Introduced a comprehensive multi-methodology test suite containing 10 distinct testing types (unit, integration, smoke, regression, static analysis, mock E2E, math bounds checking, and security formatting validation) to systematically verify system integrity and zero-retry performance.
 - **Changes**:

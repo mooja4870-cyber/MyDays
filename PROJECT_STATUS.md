@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.18)
+## 🚀 Current Status (v1.9.19)
+- **🛡️ Agent Anti-Zombie Rules Integration (v1.9.19)**: Formally embedded the runtime validation rules into the root `.antigravityrules` configuration to mandate that the agent kills conflicting zombie processes and verifies port conflicts before executing tests and releasing fixes.
 - **🧪 10-Methodology Test Suite (v1.9.18)**: Created a multi-methodology diagnostic test suite containing 10 categories of tests (unit folder structure, dependency loader, sharp image processing, playwright sandbox launch, DOM selector search, publisher instantiate, mouse coordinate mathematics, quotation style policy check, exponential backoff jitter calculations, and API key safety validation) to ensure 100% stable execution. Run via `npm run test:comprehensive`.
 - **🎯 Canvas Padding Mouse Click Focus (v1.9.17)**: Fully resolved the "image shifting left" issue caused by Playwright clicking the quotation button while the image's floating toolbar is physically overlapping it. By mouse-clicking the empty bottom padding area of `.se-content`/`.se-canvas` (`focusBottom`), we forcefully deselect the image block and open a clean text paragraph below it. This makes the quotation button immediately clickable with zero retries.
 - **🎯 Precision Pure-Body Text Paragraph Selector (v1.9.16)**: Fixed another critical cause of the 30~40 second delay. Loop focus adjustment was targeting `.se-text-paragraph` globally, which accidentally clicked image caption blocks or quotation bubble blocks, causing SmartEditor ONE to lock input toolbars and disable the quotation button. Changed selector to `.se-component.se-text .se-text-paragraph` to guarantee clicking only pure body text.
