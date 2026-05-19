@@ -470,7 +470,7 @@
                     <!-- 예쁜 아이콘 일러스트 -->
                     <div class="welcome-illustration" style="position: relative; width: 120px; height: 120px; margin: 1.5rem auto; display: flex; align-items: center; justify-content: center;">
                         <div class="welcome-pulse" style="position: absolute; width: 100px; height: 100px; background: radial-gradient(circle, rgba(255, 126, 179, 0.18) 0%, rgba(255, 126, 179, 0) 70%); border-radius: 50%;"></div>
-                        <div class="welcome-emoji" style="font-size: 4rem; z-index: 2; filter: drop-shadow(0 6px 12px rgba(255, 126, 179, 0.3));">🌸</div>
+                        <div class="welcome-emoji" style="font-size: 4rem; z-index: 2;">🌸</div>
                     </div>
                     
                     <!-- 감성 카피라이팅 -->
@@ -626,8 +626,8 @@
                             <div class="form-group">
                                 <label class="form-label">PC 서버 주소</label>
                                 <div style="display: flex; gap: 8px;">
-                                    <input type="url" class="form-input" id="mobile-server-url" placeholder="http://172.30.1.41:3333" style="flex: 1;">
-                                    <button type="button" class="btn btn-secondary" id="btn-discover-pc-server" style="white-space: nowrap; font-size: 0.85rem; padding: 0 12px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 4px; cursor: pointer; font-weight: 500;">
+                                    <input type="url" class="form-input" id="mobile-server-url" placeholder="http://172.30.1.41:3333" style="flex: 1; background-color: var(--bg-secondary, #f8f9fa); color: var(--text-secondary, #6c757d); cursor: not-allowed;" readonly>
+                                    <button type="button" class="btn btn-secondary" id="btn-discover-pc-server" style="display: none !important;">
                                         🔍 PC IP 자동 검색
                                     </button>
                                 </div>
@@ -636,8 +636,8 @@
                             <div class="form-group" style="grid-column: span 2;">
                                 <label class="form-label">구글 제미나이 API 키</label>
                                 <div class="mobile-api-key-row" style="display: flex; gap: 8px;">
-                                    <input type="password" class="form-input" id="mobile-gemini-key" placeholder="Google Gemini API Key 입력" style="flex: 1;">
-                                    <button type="button" class="btn btn-secondary" onclick="window.open('https://aistudio.google.com/api-keys', '_blank')" style="white-space: nowrap; font-size: 0.85rem; padding: 0 12px; border-radius: var(--radius-md); display: flex; align-items: center; gap: 4px; cursor: pointer; font-weight: 500;">
+                                    <input type="text" class="form-input" id="mobile-gemini-key" placeholder="Google Gemini API Key 입력" style="flex: 1; background-color: var(--bg-secondary, #f8f9fa); color: var(--text-secondary, #6c757d); cursor: not-allowed;" readonly>
+                                    <button type="button" class="btn btn-secondary" onclick="window.open('https://aistudio.google.com/api-keys', '_blank')" style="display: none !important;">
                                         🔑 API Key 구하러 가기
                                     </button>
                                 </div>

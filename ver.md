@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.9.8 (2026-05-19)
+- **Description**: Updated the mobile settings interface to lock fixed configuration values.
+- **Changes**:
+  - Modified `src/renderer/index.html` and `android/app/src/main/assets/www/index.html` to set PC Server URL and Google Gemini API Key fields to `readonly` with restricted styling.
+  - Changed Gemini API Key input type from `password` to `text` to display the actual value.
+  - Hid redundant discovery and URL help buttons for fixed configuration fields.
+  - Bumped Android APK build version to `1.9.4`.
+
 ## v1.9.7 (2026-05-19)
 - **Description**: Finally identified the TRUE root cause of the Title Intercept bug.
 - **Root Cause**: `enterTitle()` left the Playwright keyboard focus stuck in the title `<textarea>`. Previous fixes tried `page.evaluate(() => element.click())` which only fires DOM events but does NOT move Playwright's internal keyboard target. Only `ElementHandle.click()` (Playwright-native) actually moves the physical focus.
