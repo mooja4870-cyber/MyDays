@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.9.14 (2026-05-19)
+- **Description**: Resolved a critical posting loop slowdown where inserting speech bubbles after images stalled for 30~40 seconds due to Playwright's actionability checks retrying on inactive/hidden elements.
+- **Changes**:
+  - Modified `src/modules/BlogPublisher.js` (`insertSubtitleWithQuotation`) to press `Escape` and clear active block element selection before editing text.
+  - Implemented `.se-text-paragraph` element filtration by checking `.closest()` for `.se-quotation`, `.se-image`, and other components to target only pure body text paragraphs.
+  - Modified the loop's focus adjustment code (`enterContent` i > 0) to use the same Escape and filtered paragraph clicking mechanism, preventing caret entrapment inside previous speech bubbles or image captions.
+
 ## v1.9.13 (2026-05-19)
 - **Description**: Hardcoded the active PC Server URL and Gemini API Key as default fallbacks inside the Android mobile app, so new installations automatically initialize with the correct configuration.
 - **Changes**:
