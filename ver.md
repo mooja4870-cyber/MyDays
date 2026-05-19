@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.9.30 (2026-05-19)
+- **Description**: Synchronized Android project version configuration and WebView User Agent version to match the actual release version (v1.9.30).
+- **Changes**:
+  - Updated `versionCode` (10930) and `versionName` ('1.9.30') in `android/app/build.gradle`.
+  - Updated custom user agent string to `" MyDaysAndroid/1.9.30"` in `MainActivity.java`.
+  - Recompiled the Android APK to `MyDays.apk`.
+
 ## v1.9.29 (2026-05-19)
 - **Description**: Removed the client-side hard block that required a Gemini API Key on mobile startup of photo publishing, enabling smooth fallback to the PC server's local API key when left blank.
 - **Changes**:
