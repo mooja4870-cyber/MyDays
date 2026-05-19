@@ -1768,34 +1768,56 @@ class BlogPublisher extends EventEmitter {
         throw new Error('새로 로그인한 후에도 포스트 작성 페이지에서 로그인 폼이 감지되었습니다.');
       }
 
-      // 4. 제목 입력
-      if (postData.title) {
-        await this.enterTitle(postData.title);
-      }
-
-      // 5. 제휴마케팅 문구 추가 (아고다 또는 쿠팡 - 어필리에이트 URL이 있고 일상 사진 포스팅이 아닐 때만 추가)
-      const isAgoda = postData.tags && postData.tags.includes('아고다');
-      if (isAgoda) {
-        await this.addAgodaPartnershipNotice();
-      } else if (postData.affiliateUrl && !postData.isPhotoPublish) {
-        await this.addPartnershipNotice();
-      }
-
-      // 6. 어필리에이트 URL 추가 (파트너스 문구 바로 다음에)
-      if (postData.affiliateUrl) {
-        try {
-          await this.addAffiliateOGLink(postData.affiliateUrl);
-        } catch (ogLinkError) {
-          console.warn('⚠️ OG링크 추가 실패, 포스팅은 계속 진행:', ogLinkError.message);
+      // 🔥🔥🔥 [v1.9.8 근본 해결] 사진 포스팅: 본문+이미지를 먼저 입력 → 제목을 맨 마지막에 입력
+      // 제목 textarea에 커서가 갇히는 문제를 순서 변경으로 원천 차단합니다.
+      // (제목이 마지막이면 커서가 제목에 남아도 이후 타이핑할 것이 없으므로 절대 오염 불가)
+      if (postData.isPhotoPublish) {
+        // ── 사진 포스팅 전용 순서 (본문 먼저 → 제목 나중에) ──
+        console.log('📸 [사진 포스팅] 본문+이미지를 먼저 입력하고, 제목은 맨 마지막에 입력합니다.');
+        
+        // 4a. 본문 내용 및 이미지 입력 (먼저)
+        if (postData.content || postData.mainContent) {
+          const content = postData.content || postData.mainContent;
+          const images = postData.images || [];
+          const productName = postData.title || '';
+          await this.enterContent(content, images, productName, account);
         }
-      }
+        
+        // 4b. 제목 입력 (맨 마지막 - 커서가 제목에 남아도 무방)
+        if (postData.title) {
+          await this.enterTitle(postData.title);
+        }
+      } else {
+        // ── 기존 순서 유지 (쿠팡/아고다 등 비사진 포스팅) ──
+        // 4. 제목 입력
+        if (postData.title) {
+          await this.enterTitle(postData.title);
+        }
 
-      // 7. 본문 내용 및 이미지 입력
-      if (postData.content || postData.mainContent) {
-        const content = postData.content || postData.mainContent;
-        const images = postData.images || [];
-        const productName = postData.title || '';
-        await this.enterContent(content, images, productName, account);
+        // 5. 제휴마케팅 문구 추가 (아고다 또는 쿠팡)
+        const isAgoda = postData.tags && postData.tags.includes('아고다');
+        if (isAgoda) {
+          await this.addAgodaPartnershipNotice();
+        } else if (postData.affiliateUrl && !postData.isPhotoPublish) {
+          await this.addPartnershipNotice();
+        }
+
+        // 6. 어필리에이트 URL 추가 (파트너스 문구 바로 다음에)
+        if (postData.affiliateUrl) {
+          try {
+            await this.addAffiliateOGLink(postData.affiliateUrl);
+          } catch (ogLinkError) {
+            console.warn('⚠️ OG링크 추가 실패, 포스팅은 계속 진행:', ogLinkError.message);
+          }
+        }
+
+        // 7. 본문 내용 및 이미지 입력
+        if (postData.content || postData.mainContent) {
+          const content = postData.content || postData.mainContent;
+          const images = postData.images || [];
+          const productName = postData.title || '';
+          await this.enterContent(content, images, productName, account);
+        }
       }
 
       // 8-11. 포스트 발행 (공개 설정, 카테고리 설정, 태그 입력을 발행 레이어가 열린 후에 처리하도록 파라미터 전달)
