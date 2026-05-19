@@ -1248,6 +1248,13 @@ class BlogPublisher extends EventEmitter {
           await this.page.waitForTimeout(50);
         }
         await this.page.waitForTimeout(300); // 1500 -> 300 단축
+        
+        // [v1.9.17 핵심 수정] 한 섹션 마치고 다음 섹션으로 넘어가기 전 3~7초 랜덤 대기를 주어 사람처럼 보이도록 위장
+        if (i < loopCount - 1) {
+          const humanDelay = Math.floor(Math.random() * (7000 - 3000 + 1)) + 3000;
+          console.log(`🕵️ [인간 위장 대기] ${i + 1}번째 섹션 완료. ${humanDelay / 1000}초 간 자연스러운 휴식 대기 중...`);
+          await this.page.waitForTimeout(humanDelay);
+        }
       }
       
       console.log('✅ 모든 문단과 이미지 입력 완료');

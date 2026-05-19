@@ -1,5 +1,10 @@
 # 📦 Version History
 
+## v1.9.17 (2026-05-19)
+- **Description**: Added a random delay of 3 to 7 seconds between sections to mimic human typing/pausing behavior and prevent Naver's automated bot detection systems from identifying mechanical posting patterns.
+- **Changes**:
+  - Modified `BlogPublisher.js` loop to calculate and apply dynamic pause: `Math.floor(Math.random() * (7000 - 3000 + 1)) + 3000` (ms) at the end of each section.
+
 ## v1.9.16 (2026-05-19)
 - **Description**: Resolved remaining 30~40 second delay under specific configurations where the cursor got trapped inside the image caption component (`.se-caption`), making the quotation toolbar button disabled and causing Playwright actionability retries.
 - **Changes**:
