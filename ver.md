@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.2 (2026-05-19)
+- **Description**: Integrated the 3 latest Antigravity vibe coding skills into the project.
+- **Changes**:
+  - Created `.antigravityrules` specifying Artifact-based Verification, MCP Local Tool Integration, and Semantic Codebase Sanitization.
+  - Updated `PROJECT_STATUS.md` and `ver.md` to reflect the new project rule sets.
+
 ## v1.9.1 (2026-05-18)
 - **Description**: Deployed the Subnet Auto-Discovery IP Scan Engine on the mobile app to automatically detect the PC automation server within typical subnets, added the `/api/health` check endpoint inside the Electron HTTP server to safely authenticate the app target, and wired a background discovery task that auto-scans and suggests active servers if a connection failure is triggered during posting.
 - **Changes**:
