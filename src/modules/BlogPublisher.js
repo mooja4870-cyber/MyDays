@@ -921,16 +921,9 @@ class BlogPublisher extends EventEmitter {
     try {
       console.log(`📋 인용구를 사용한 소제목 입력 시작: ${subtitle}`);
       
-      // 기존 상태 완전 초기화
-      await this.page.keyboard.press('Escape');
-      await this.page.keyboard.press('Escape');
-      await this.page.keyboard.press('Escape');
-      await this.page.waitForTimeout(300);
-      
-      // 현재 커서 위치 확인 및 정리
-      await this.page.keyboard.press('End');
+      // [최적화] 중첩된 Escape 및 방향키 연타 제거 (루프의 lastParagraph.click()으로 이미 포커스 고정됨)
       await this.page.keyboard.press('Enter');
-      await this.page.waitForTimeout(200);
+      await this.page.waitForTimeout(100);
       
       // 인용구 스타일 선택 (포스트별로 통일성 유지)
       const quotationStyle = this.selectQuotationStyle();
@@ -940,39 +933,39 @@ class BlogPublisher extends EventEmitter {
       const quotationButton = await this.page.waitForSelector('[data-name="quotation"]', { timeout: 5000 });
       await quotationButton.click();
       console.log('✅ 1단계: 인용구 선택 버튼 클릭 완료');
-      await this.page.waitForTimeout(800); // 충분한 대기 시간
+      await this.page.waitForTimeout(300); // 800 -> 300 단축
       
       // 2단계: 인용구 스타일 선택
       console.log(`🔹 2단계: 인용구 스타일 선택 중 (${quotationStyle})...`);
       const quotationStyleButton = await this.page.waitForSelector(`[data-value="${quotationStyle}"]`, { timeout: 5000 });
       await quotationStyleButton.click();
       console.log(`✅ 2단계: 인용구 스타일 선택 완료 (${quotationStyle})`);
-      await this.page.waitForTimeout(1000); // 인용구 적용 충분한 대기
+      await this.page.waitForTimeout(300); // 1000 -> 300 단축
       
       // 3단계: 소제목 입력
       console.log(`🔹 3단계: 소제목 입력 중 (${subtitle})...`);
-          try {
+      try {
         await this.copyTextToClipboard(subtitle);
         await this.page.keyboard.press('Control+v');
         console.log('✅ 3단계: 소제목 클립보드 입력 완료');
-          } catch (clipboardError) {
+      } catch (clipboardError) {
         console.warn('⚠️ 소제목 클립보드 복사 실패, 직접 타이핑:', clipboardError.message);
-        await this.page.keyboard.type(subtitle, { delay: 30 });
+        await this.page.keyboard.type(subtitle, { delay: 10 });
         console.log('✅ 3단계: 소제목 직접 타이핑 입력 완료');
-          }
+      }
           
-      // 소제목 입력 후 대기
-      await this.page.waitForTimeout(500);
+      // 소제목 입력 후 대기 단축
+      await this.page.waitForTimeout(200);
       
-      // 4단계: 아래방향키 두 번 입력 (본문 작성 위치로 이동)
-      console.log('🔹 4단계: 아래방향키 두 번 입력으로 본문 작성 위치로 이동...');
-      console.log('⬇️ 첫 번째 아래방향키 입력...');
+      // 4단계: 말풍선 컴포넌트를 빠져나오기 위한 초고속 포커스 이탈
+      console.log('🔹 4단계: 말풍선 탈출 방향키 입력...');
       await this.page.keyboard.press('ArrowDown');
-      await this.page.waitForTimeout(300);
-      console.log('⬇️ 두 번째 아래방향키 입력...');
+      await this.page.waitForTimeout(50);
       await this.page.keyboard.press('ArrowDown');
-      await this.page.waitForTimeout(300);
-      console.log('✅ 4단계: 아래방향키 두 번 입력 완료');
+      await this.page.waitForTimeout(50);
+      await this.page.keyboard.press('Enter');
+      await this.page.waitForTimeout(100);
+      console.log('✅ 4단계: 말풍선 탈출 완료');
       
       console.log(`🎉 인용구 소제목 입력 완료: ${subtitle}`);
       
@@ -1117,6 +1110,31 @@ class BlogPublisher extends EventEmitter {
       // 어떠한 옵션 조합에서도 이미지와 텍스트가 유실 없이 100% 매칭되도록 보장합니다.
       const loopCount = imagePaths.length > 0 ? Math.max(paragraphs.length, imagePaths.length) : paragraphs.filter(p => p.trim()).length;
       
+      // 🚀 [소제목 사전 일괄 생성] 루프 진입 전에 모든 섹션의 소제목을 병렬로 미리 생성하여 멈춤 현상(30~40초 지연)을 완전히 제거합니다.
+      const preGeneratedSubtitles = [];
+      if (this.config.useBubble !== false) {
+        console.log(`🚀 AI 소제목 사전 일괄 생성 시작 (총 ${loopCount}개 섹션)...`);
+        this.emit('publish-progress', { step: '소제목 일괄 사전 생성 중...' });
+        
+        const subtitlePromises = [];
+        for (let i = 0; i < loopCount; i++) {
+          let paragraph = paragraphs[i] ? paragraphs[i].trim() : '';
+          const imageToInsert = imagePaths && imagePaths[i] && require('fs').existsSync(imagePaths[i]) ? imagePaths[i] : null;
+          
+          if (paragraph || imageToInsert) {
+            subtitlePromises.push(
+              this.generateSubtitle(paragraph || '오늘의 순간', productName, account)
+            );
+          } else {
+            subtitlePromises.push(Promise.resolve(null));
+          }
+        }
+        
+        const results = await Promise.all(subtitlePromises);
+        preGeneratedSubtitles.push(...results);
+        console.log(`✅ 소제목 사전 일괄 생성 완료 (${preGeneratedSubtitles.length}개)`);
+      }
+
       for (let i = 0; i < loopCount; i++) {
         let paragraph = paragraphs[i] ? paragraphs[i].trim() : '';
         const imageToInsert = imagePaths && imagePaths[i] && require('fs').existsSync(imagePaths[i]) ? imagePaths[i] : null;
@@ -1141,9 +1159,9 @@ class BlogPublisher extends EventEmitter {
         // 🔥 말풍선 소제목 넣기/빼기 처리
         if (this.config.useBubble !== false) {
           if (paragraph || imageToInsert) {
-            console.log(`🔹 [말풍선 옵션 활성] ${i + 1}번째 섹션 소제목 생성 및 삽입 중...`);
-            // 🔥 소제목 생성 (AI 기반)
-            const subtitle = await this.generateSubtitle(paragraph || '오늘의 순간', productName, account);
+            console.log(`🔹 [말풍선 옵션 활성] ${i + 1}번째 섹션 소제목 삽입 중...`);
+            // 🚀 사전 생성된 소제목을 즉시 가져와서 지연 시간 0초 달성
+            const subtitle = preGeneratedSubtitles[i] || '오늘의 순간';
             await this.insertSubtitleWithQuotation(subtitle);
           }
         } else {
@@ -1185,28 +1203,26 @@ class BlogPublisher extends EventEmitter {
         // 이미지 삽입
         if (imageToInsert) {
           console.log(`📸 ${i + 1}번째 이미지 삽입`);
-          // 이미지 삽입 전 확실히 텍스트 줄로 내려가기 위해 ArrowDown 후 Enter
+          // 이미지 삽입 전 초고속 포커스 이동
           await this.page.keyboard.press('ArrowDown');
-          await this.page.waitForTimeout(200);
+          await this.page.waitForTimeout(50);
           await this.page.keyboard.press('Enter');
-          await this.page.waitForTimeout(500);
+          await this.page.waitForTimeout(100);
           
           await this.insertSingleImage(imageToInsert);
           
-          // 이미지 삽입 후 이미지 컴포넌트 포커스를 탈출하기 위해 ArrowDown 후 Enter
+          // 이미지 삽입 후 초고속 포커스 이탈
           await this.page.keyboard.press('ArrowDown');
-          await this.page.waitForTimeout(200);
+          await this.page.waitForTimeout(50);
           await this.page.keyboard.press('Enter');
-          await this.page.waitForTimeout(500);
+          await this.page.waitForTimeout(100);
         } else {
           await this.page.keyboard.press('ArrowDown');
-          await this.page.waitForTimeout(100);
+          await this.page.waitForTimeout(50);
           await this.page.keyboard.press('Enter');
-          await this.page.waitForTimeout(100);
-          await this.page.keyboard.press('Enter');
-          await this.page.waitForTimeout(100);
+          await this.page.waitForTimeout(50);
         }
-        await this.page.waitForTimeout(1500);
+        await this.page.waitForTimeout(300); // 1500 -> 300 단축
       }
       
       console.log('✅ 모든 문단과 이미지 입력 완료');

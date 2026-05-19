@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.10 (2026-05-19)
+- **Description**: Eliminated the 30~40 second delay and excessive UI flickering (11-12 clicks) when inserting speech bubbles.
+- **Changes**:
+  - Implemented `Promise.all` pre-generation for AI subtitles at the start of `enterContent` to completely eliminate the 10~30 second API network blocking delay during the posting loop.
+  - Streamlined `insertSubtitleWithQuotation` and image insertion loops by removing redundant `Escape` spamming and reducing keyboard navigation (`ArrowDown`, `Enter`) timeouts from 1500ms down to 50-300ms, making the layout execution near-instantaneous.
+
 ## v1.9.9 (2026-05-19)
 - **Description**: Updated the default PC Server URL to a custom ngrok address.
 - **Changes**:

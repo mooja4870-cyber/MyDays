@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.9)
+## 🚀 Current Status (v1.9.10)
+- **⚡ Zero-Delay UI & AI Generation Optimization (v1.9.10)**: Dramatically reduced the 30~40 second delay between inserting an image and a speech bubble by implementing `Promise.all` pre-generation for AI subtitles at the beginning of the posting loop, and significantly streamlined the layout execution by removing redundant 11-12 click escape mechanisms and timeouts.
 - **📡 Custom ngrok Default URL Update (v1.9.9)**: Hardcoded the default mobile app PC Server address to `https://doubling-crummiest-mortuary.ngrok-free.dev` across both Electron and Android WebView frontends.
 - **🔥 Title Intercept Bug KILLED (v1.9.7)**: Found the TRUE root cause: `enterTitle()` left Playwright's physical keyboard focus inside the title `<textarea>`. Previous fixes used `page.evaluate(() => el.click())` which fires DOM events but NEVER moves Playwright's keyboard target. Fixed by adding `ElementHandle.click()` (Playwright-native) at the end of `enterTitle()` AND at the start of `enterContent()` to guarantee the cursor is in the body before any `Ctrl+V`.
 - **🛠️ PC Server Routing Hardening (v1.9.4)**: Completely overhauled the `http.createServer` routing logic inside `src/main.js` to safely sanitize `req.url`.
