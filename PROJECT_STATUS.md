@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.24)
+## 🚀 Current Status (v1.9.25)
+- **⚙️ Blank Default Settings & User Entry (v1.9.25)**: Changed the mobile configuration flow to start fully blank/empty. Removed all hardcoded fallback URLs so users enter their own custom configurations (Naver credentials, PC Server URL, and optional Gemini key) directly, which are saved in browser localStorage to persist across launches.
 - **🔒 Sensitive Fields UI Masking (v1.9.24)**: Changed inputs for PC Server URL and Gemini API keys (mobile & desktop panels) from cleartext/url inputs to secure password input types (`••••••••`) to guarantee over-the-shoulder privacy.
 - **🔑 Server-Side Gemini API Key Fallback (v1.9.22)**: Implemented automated server-side Gemini API key lookup based on Naver account mappings, overriding exposed/expired keys sent by mobile clients with the secure keys saved locally in the PC configuration.
 - **🤖 Gemini 2.5-Flash Model Update (v1.9.21)**: Transitioned the core AI text generation engine in `ContentGenerator.js` from the deprecated `gemini-2.0-flash` to the newer `gemini-2.5-flash` model to resolve model deprecation errors (404 Not Found).

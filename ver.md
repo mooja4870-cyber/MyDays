@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.9.25 (2026-05-19)
+- **Description**: Replaced hardcoded connection defaults with an empty/blank initialization flow, allowing users to enter and save custom credentials directly.
+- **Changes**:
+  - Removed connection fallback URLs and key strings from `MobileApiBridge`.
+  - Allowed inputs to start completely blank and enabled user entry for PC Server URL and Gemini key fields by removing `readonly` limitations on mobile settings panel.
+  - Required fields check modified to include PC Server URL while letting Gemini API key remain optional.
+
 ## v1.9.24 (2026-05-19)
 - **Description**: Enhanced UI privacy by masking sensitive fields on both mobile and PC webapp settings screens.
 - **Changes**:

@@ -3484,7 +3484,7 @@ function closeConfirmDialog(confirmed) {
 
 // Mobile API bridge helper
 class MobileApiBridge {
-    static DEFAULT_SERVER_URL = 'https://doubling-crummiest-mortuary.ngrok-free.dev';
+    static DEFAULT_SERVER_URL = '';
     static DEFAULT_GEMINI_KEY = '';
 
     static init() {
@@ -3499,7 +3499,7 @@ class MobileApiBridge {
     }
 
     static getApiBaseUrl(required = false) {
-        const savedUrl = (localStorage.getItem('mydays-server-url') || this.DEFAULT_SERVER_URL).trim().replace(/\/+$/, '');
+        const savedUrl = (localStorage.getItem('mydays-server-url') || '').trim().replace(/\/+$/, '');
 
         if (savedUrl) {
             return savedUrl;
@@ -3517,15 +3517,7 @@ class MobileApiBridge {
     }
 
     static ensureDefaultSettings() {
-        const savedUrl = (localStorage.getItem('mydays-server-url') || '').trim();
-        if (!savedUrl) {
-            localStorage.setItem('mydays-server-url', this.DEFAULT_SERVER_URL);
-        }
-
-        const savedGemini = (localStorage.getItem('test-gemini-key') || '').trim();
-        if (!savedGemini) {
-            localStorage.setItem('test-gemini-key', this.DEFAULT_GEMINI_KEY);
-        }
+        // 처음 구동 시에도 자동 덮어쓰기를 하지 않고 공란 상태를 보존합니다.
     }
 
     static apiUrl(path, required = false) {
@@ -4022,7 +4014,7 @@ class PhotoAutomationManager {
         const naverPassword = localStorage.getItem('test-naver-password') || '';
         const blogId = localStorage.getItem('test-blog-id') || '';
         const geminiKey = localStorage.getItem('test-gemini-key') || '';
-        const serverUrl = localStorage.getItem('mydays-server-url') || MobileApiBridge.DEFAULT_SERVER_URL;
+        const serverUrl = localStorage.getItem('mydays-server-url') || '';
 
         const elId = document.getElementById('mobile-naver-id');
         const elPw = document.getElementById('mobile-naver-password');
@@ -4044,15 +4036,15 @@ class PhotoAutomationManager {
         const naverId = localStorage.getItem('test-naver-id') || '';
         const naverPassword = localStorage.getItem('test-naver-password') || '';
         const blogId = localStorage.getItem('test-blog-id') || '';
-        const geminiApi = localStorage.getItem('test-gemini-key') || '';
+        const serverUrl = localStorage.getItem('mydays-server-url') || '';
 
         const welcomeEmoji = document.querySelector('.welcome-emoji');
         const welcomePulse = document.querySelector('.welcome-pulse');
 
         if (!welcomeEmoji) return;
 
-        // 포스팅을 하려면 naverId, naverPassword, blogId, geminiApi가 모두 채워져 있어야 합니다.
-        const isReady = naverId && naverPassword && blogId && geminiApi;
+        // 네이버 ID, 비밀번호, 블로그 ID, PC 서버 주소가 필수입니다. (제미나이 키는 PC 서버 키 대체 작동하므로 비워둘 수 있음)
+        const isReady = naverId && naverPassword && blogId && serverUrl;
 
         if (isReady) {
             welcomeEmoji.classList.remove('not-ready-to-post');
@@ -4084,19 +4076,17 @@ class PhotoAutomationManager {
         const naverPassword = elPw ? elPw.value.trim() : '';
         const blogId = elBlog ? elBlog.value.trim() : '';
         const geminiKey = elGemini ? elGemini.value.trim() : '';
-        const serverUrl = elServerUrl ? (elServerUrl.value.trim().replace(/\/+$/, '') || MobileApiBridge.DEFAULT_SERVER_URL) : MobileApiBridge.DEFAULT_SERVER_URL;
+        const serverUrl = elServerUrl ? elServerUrl.value.trim().replace(/\/+$/, '') : '';
 
-        if (!naverId || !naverPassword || !blogId) {
-            alert('네이버 ID, 비밀번호, 블로그 ID는 필수 입력 사항입니다.');
+        if (!naverId || !naverPassword || !blogId || !serverUrl) {
+            alert('⚠️ 네이버 ID, 비밀번호, 블로그 ID, PC 서버 주소는 필수 입력 사항입니다.');
             return;
         }
 
         localStorage.setItem('test-naver-id', naverId);
         localStorage.setItem('test-naver-password', naverPassword);
         localStorage.setItem('test-blog-id', blogId);
-        if (geminiKey) {
-            localStorage.setItem('test-gemini-key', geminiKey);
-        }
+        localStorage.setItem('test-gemini-key', geminiKey);
         localStorage.setItem('mydays-server-url', serverUrl);
 
         // 동기화
