@@ -1,15 +1,9 @@
 # 📦 Version History
 
-## v1.9.17 (2026-05-19)
-- **Description**: Added a random delay of 3 to 7 seconds between sections to mimic human typing/pausing behavior and prevent Naver's automated bot detection systems from identifying mechanical posting patterns.
-- **Changes**:
-  - Modified `BlogPublisher.js` loop to calculate and apply dynamic pause: `Math.floor(Math.random() * (7000 - 3000 + 1)) + 3000` (ms) at the end of each section.
-
 ## v1.9.16 (2026-05-19)
-- **Description**: Resolved remaining 30~40 second delay under specific configurations where the cursor got trapped inside the image caption component (`.se-caption`), making the quotation toolbar button disabled and causing Playwright actionability retries.
+- **Description**: Fixed a key cause of the 30~40s delay. The loop focus adjustment was targeting `.se-text-paragraph` without filtering out image captions and quotation text blocks. Clicking these non-body text elements locked the Naver SmartEditor toolbar and disabled the quotation button.
 - **Changes**:
-  - Implemented browser-side 1-pass paragraph filtering (`evaluateHandle`) in `BlogPublisher.js` to target only pure body paragraphs, ignoring captions, titles, quotations, map components, etc.
-  - Enhanced post-image caret behavior: Added consecutive double `ArrowDown` keys after inserting an image to forcefully escape the image component and its caption area.
+  - Modified `src/modules/BlogPublisher.js`: Changed the loop's focus adjustment selector to `.se-component.se-text .se-text-paragraph`. This ensures Playwright always targets and clicks pure body text blocks, keeping the editor in the correct text state and making the quotation button instantly clickable.
 
 ## v1.9.15 (2026-05-19)
 - **Description**: Added Exponential Backoff and Jitter to Gemini API requests to seamlessly handle transient network/server failures (such as `502 Bad Gateway` and `503 Service Unavailable`).
