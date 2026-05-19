@@ -1,13 +1,15 @@
-# Antigravity Rules: 3 Core Vibe Coding Skills
+# Antigravity Agent Semantic & MCP Rules
 
-## 1. Artifact-based Verification (아티팩트 기반 검증 및 피드백 루프)
-- Before directly modifying code, activate 'Plan Mode' to generate an Artifact containing the implementation plan and task list.
-- Await user approval and alignment on the artifact to ensure the direction is correct before executing code changes.
+## 1. Artifact-based Verification (Plan Mode)
+- Always plan the approach and generate an artifact containing the implementation plan before writing any code.
+- Wait for user feedback on the generated artifact if requested or if there are critical design choices.
+- Keep implementation plan concise and technical.
 
-## 2. MCP-based Local Tool Integration (로컬 도구 연동)
-- Utilize native MCP capabilities to safely interact with local tools such as the terminal, databases, and browser controls.
-- When encountering errors, autonomously spawn a Browser Subagent to capture screenshots, analyze the DOM, or check local DBs/logs for debugging.
+## 2. MCP-based Local Tool Integration
+- Actively utilize native MCP tools (`run_command`, `view_file`, `list_dir`, `grep_search`, `read_url_content`, etc.) to securely debug the local database, inspect the filesystem, and view logs.
+- Launch the Browser Subagent to capture screenshots, view DOM states, and verify UI functionality autonomously when facing frontend errors or before finalizing a UI change.
 
-## 3. Semantic Codebase Sanitization (시맨틱 저장소 및 코드베이스 클린업 관리)
-- Maintain a highly intuitive file structure and remove unnecessary business explanations to prevent context bloat.
-- Synchronize code rules strictly based on technical constraints to keep the agent's context window optimized and prevent hallucination.
+## 3. Semantic Codebase Sanitization
+- Avoid creating bloated or duplicate context; remove unnecessary generic conversational responses.
+- Keep codebase semantic mapping accurate: adhere strictly to existing rules (`PROJECT_STATUS.md`, `ver.md`, file naming conventions) and maintain precise architectural constraints.
+- Modify only the required targets and preserve all untouched legacy logic identically to minimize Hallucination risks.
