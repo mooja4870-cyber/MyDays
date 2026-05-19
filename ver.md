@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.9.6 (2026-05-19)
+- **Description**: Finally fixed the absolute worst "Title Intercept" bug properly.
+- **Changes**:
+  - The previous activeElement check was failing because it didn't traverse `iframe` elements correctly, leading the bot to falsely believe it had escaped the title.
+  - Implemented an aggressive DOM `blur()` across all iframes to mathematically ensure the title loses focus.
+  - Replaced native Tab navigation with internal Javascript click events on the `se-placeholder` or `se-text-paragraph` to force body activation safely.
+
 ## v1.9.5 (2026-05-19)
 - **Description**: Fixed a notorious "Title Intercept" bug where the description text was pasted into the title when the bubble option was disabled.
 - **Changes**:

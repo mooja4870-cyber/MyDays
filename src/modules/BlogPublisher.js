@@ -1009,51 +1009,58 @@ class BlogPublisher extends EventEmitter {
       // '말풍선 빼기' 등의 옵션 상태에서도 텍스트가 제목 칸으로 올라가는 현상을 완벽히 방지합니다.
       console.log('🎯 [포커스 전환] 본문 입력 영역으로 포커스를 이동합니다...');
       try {
-        // 1단계: 마우스 강제 클릭을 통한 1차 탈출 시도 (Primary Focus)
-        const textParagraph = await targetPage.$('.se-text-paragraph, [contenteditable="true"]');
-        if (textParagraph) {
-          try {
-            await textParagraph.scrollIntoViewIfNeeded();
-            await textParagraph.click({ force: true });
-            await this.page.waitForTimeout(500);
-            console.log('✅ [포커스 전환] 1단계: 본문 텍스트 영역 클릭 완료');
-          } catch(e) {
-            console.warn('⚠️ 본문 클릭 중 오류:', e.message);
-          }
-        }
-        
-        // 2단계: 활성 요소(Active Element) 정밀 감시 및 Tab 키 강제 탈출 (Fallback)
-        // 네이버 스마트에디터의 구조적 한계(제목 칸 갇힘 현상)를 원천 차단합니다.
-        let escapeAttempts = 0;
-        let isStillInTitle = true;
-        
-        while (isStillInTitle && escapeAttempts < 3) {
-          isStillInTitle = await targetPage.evaluate(() => {
-            const active = document.activeElement;
-            if (!active) return false;
-            const className = typeof active.className === 'string' ? active.className : '';
-            return className.includes('se-document-title') || active.tagName === 'TEXTAREA' || active.placeholder === '제목';
-          });
+        // 1단계: 강제로 현재 문서 전체의 활성 엘리먼트를 blur 처리하여 제목칸 포커스 완전 해제 (인터셉트 원천 차단)
+        await this.page.evaluate(() => {
+            const getActive = (doc) => {
+                let active = doc.activeElement;
+                while (active && active.contentDocument && active.contentDocument.activeElement) {
+                    active = active.contentDocument.activeElement;
+                }
+                return active;
+            };
+            const active = getActive(document);
+            if (active) active.blur();
+        });
+        await this.page.waitForTimeout(300);
 
-          if (isStillInTitle) {
-            console.warn(`⚠️ [포커스 경고] 커서가 아직 제목 칸에 갇혀 있습니다! Tab 키 강제 탈출 시도 (${escapeAttempts + 1}/3)`);
-            await this.page.keyboard.press('Tab');
-            await this.page.waitForTimeout(500);
-            escapeAttempts++;
-          } else {
-            console.log('✅ [포커스 전환] 2단계: 커서가 본문 영역에 안전하게 탈출했음을 확인했습니다.');
-          }
-        }
+        // 2단계: 본문 영역을 찾아 마우스 클릭 이벤트 강제 발생
+        await targetPage.evaluate(() => {
+            // 플레이스홀더를 먼저 찾음 (빈 에디터일 때)
+            const placeholders = Array.from(document.querySelectorAll('.se-placeholder'));
+            const bodyPlaceholder = placeholders.find(p => !p.closest('.se-document-title'));
+            if (bodyPlaceholder) {
+                bodyPlaceholder.click();
+                return;
+            }
+            
+            // 없으면 일반 텍스트 문단 찾기
+            const paragraphs = Array.from(document.querySelectorAll('.se-text-paragraph, [contenteditable="true"]'));
+            const bodyParagraphs = paragraphs.filter(p => !p.closest('.se-document-title'));
+            if (bodyParagraphs.length > 0) {
+                const target = bodyParagraphs[bodyParagraphs.length - 1];
+                target.focus();
+                target.click();
+                return;
+            }
+            
+            // 최후의 수단으로 메인 컨테이너 클릭
+            const mainContainer = document.querySelector('.se-main-container');
+            if (mainContainer) mainContainer.click();
+        });
+        await this.page.waitForTimeout(500);
+
+        // 3단계: 확실한 탈출을 위해 Playwright 네이티브 클릭 추가 (본문 최상단 부근)
+        try {
+            const bodyLocator = targetPage.locator('.se-main-container, .se-viewer').first();
+            if (await bodyLocator.count() > 0) {
+                await bodyLocator.click({ force: true, position: { x: 10, y: 10 } });
+            }
+        } catch(e) {}
+        await this.page.waitForTimeout(300);
         
-        // 3단계: 만약 Tab 키로도 탈출하지 못했다면 비상 수단으로 좌표 강제 클릭
-        if (isStillInTitle) {
-            console.warn('⚠️ [비상 탈출] 커서가 제목 칸에서 빠져나오지 못했습니다. 본문 좌표 강제 클릭 시도.');
-            await this.page.mouse.click(300, 500); // 화면 중앙 하단 임의 위치 클릭
-            await this.page.waitForTimeout(500);
-        }
-        
+        console.log('✅ [포커스 전환] 제목칸 탈출 및 본문 활성화 완료');
       } catch (focusError) {
-        console.warn('⚠️ 본문 포커스 전환 실패 (무시하고 계속):', focusError.message);
+        console.warn('⚠️ 본문 포커스 전환 중 일부 오류 발생 (무시하고 계속):', focusError.message);
       }
 
       // 📸 [방탄 루프 횟수 제어] 텍스트 개수와 이미지 개수를 연동하여 

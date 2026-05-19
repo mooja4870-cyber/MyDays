@@ -9,8 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.5)
-- **🛡️ Bulletproof Naver Editor Focus (v1.9.5)**: Completely eradicated the "Title Intercept" bug when `useBubble = false`. Implemented a robust 3-stage focus escape mechanism (DOM click + ActiveElement validation loop + Tab fallback) in `BlogPublisher.js` to mathematically guarantee the cursor leaves the Title area before pasting the body.
+## 🚀 Current Status (v1.9.6)
+- **🛡️ Bulletproof Naver Editor Focus V2 (v1.9.6)**: Completely eradicated the "Title Intercept" bug when `useBubble = false`. The previous `activeElement` check failed inside iframes. Implemented an aggressive `blur()` on the title element and internal DOM synthetic clicks on the body `se-placeholder` to mathematically guarantee the cursor leaves the Title area before pasting the body.
 - **🛠️ PC Server Routing Hardening (v1.9.4)**: Completely overhauled the `http.createServer` routing logic inside `src/main.js` to safely sanitize `req.url` (stripping query parameters and trailing slashes), permanently eliminating the `HTTP 404 Not Found` errors that occurred when mobile `fetch` requests contained trailing slashes.
 - **🔍 Pinch-to-Zoom Support & APK Rebuild (v1.9.3)**: Enabled native multi-touch pinch-to-zoom capabilities inside the Android WebView `MainActivity.java`, allowing users to freely zoom in and out of the UI for better accessibility.
 - **🧠 Core Agent Capabilities & Rules (v1.9.2)**: Integrated latest Vibe Coding guidelines via `.antigravityrules`, enabling Artifact-based Verification, MCP Local Tool Integration (Browser Subagent/Local Search), and Semantic Codebase Sanitization to maintain a highly optimized agentic context.
