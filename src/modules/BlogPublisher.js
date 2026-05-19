@@ -295,6 +295,59 @@ class BlogPublisher extends EventEmitter {
       }
       
       await this.page.waitForTimeout(1000);
+      
+      // 🔥🔥🔥 [v1.9.7 핵심 수정] 제목 입력 완료 후, 커서를 반드시 본문 영역으로 이동시킴.
+      // 이 단계가 없으면 커서가 제목 textarea에 갇혀서, 이후 enterContent에서
+      // Ctrl+V로 본문을 붙여넣을 때 제목 칸에 텍스트가 오염되는 치명적 버그 발생.
+      try {
+        // 본문 영역의 텍스트 문단을 Playwright 네이티브로 직접 클릭
+        const bodySelectors = [
+          '.se-component.se-text .se-text-paragraph',
+          '.se-content .se-text-paragraph',
+          '.se-text-paragraph'
+        ];
+        let bodyClicked = false;
+        for (const sel of bodySelectors) {
+          try {
+            const elements = await this.page.$$(sel);
+            // 제목 영역 안의 요소는 건너뛰고 본문 영역의 요소만 클릭
+            for (const el of elements) {
+              const isInTitle = await el.evaluate(node => !!node.closest('.se-document-title'));
+              if (!isInTitle) {
+                await el.click();
+                bodyClicked = true;
+                console.log(`✅ [제목→본문 탈출] 본문 영역 클릭 성공: ${sel}`);
+                break;
+              }
+            }
+            if (bodyClicked) break;
+          } catch(e) { /* 다음 셀렉터 시도 */ }
+        }
+        
+        if (!bodyClicked) {
+          // 본문 텍스트 문단을 못 찾으면 플레이스홀더 클릭 시도
+          const placeholders = await this.page.$$('.se-placeholder');
+          for (const ph of placeholders) {
+            const isInTitle = await ph.evaluate(node => !!node.closest('.se-document-title'));
+            if (!isInTitle) {
+              await ph.click();
+              bodyClicked = true;
+              console.log('✅ [제목→본문 탈출] 본문 플레이스홀더 클릭 성공');
+              break;
+            }
+          }
+        }
+        
+        if (!bodyClicked) {
+          console.warn('⚠️ [제목→본문 탈출] 본문 요소를 찾지 못함. Tab 키로 시도합니다.');
+          await this.page.keyboard.press('Tab');
+        }
+        
+        await this.page.waitForTimeout(500);
+      } catch (focusError) {
+        console.warn('⚠️ 제목→본문 포커스 이동 실패:', focusError.message);
+      }
+      
       console.log(`제목 입력 완료: ${title}`);
     } catch (error) {
       console.error('제목 입력 중 오류:', error);
@@ -1009,58 +1062,55 @@ class BlogPublisher extends EventEmitter {
       // '말풍선 빼기' 등의 옵션 상태에서도 텍스트가 제목 칸으로 올라가는 현상을 완벽히 방지합니다.
       console.log('🎯 [포커스 전환] 본문 입력 영역으로 포커스를 이동합니다...');
       try {
-        // 1단계: 강제로 현재 문서 전체의 활성 엘리먼트를 blur 처리하여 제목칸 포커스 완전 해제 (인터셉트 원천 차단)
-        await this.page.evaluate(() => {
-            const getActive = (doc) => {
-                let active = doc.activeElement;
-                while (active && active.contentDocument && active.contentDocument.activeElement) {
-                    active = active.contentDocument.activeElement;
-                }
-                return active;
-            };
-            const active = getActive(document);
-            if (active) active.blur();
-        });
-        await this.page.waitForTimeout(300);
-
-        // 2단계: 본문 영역을 찾아 마우스 클릭 이벤트 강제 발생
-        await targetPage.evaluate(() => {
-            // 플레이스홀더를 먼저 찾음 (빈 에디터일 때)
-            const placeholders = Array.from(document.querySelectorAll('.se-placeholder'));
-            const bodyPlaceholder = placeholders.find(p => !p.closest('.se-document-title'));
-            if (bodyPlaceholder) {
-                bodyPlaceholder.click();
-                return;
+        // 🔥🔥🔥 [v1.9.7 Playwright 네이티브 포커스 전환]
+        // enterTitle에서 이미 본문으로 탈출했지만, 제휴마케팅 문구 등 중간 단계를 거치면서
+        // 포커스가 다시 이탈했을 수 있으므로 한 번 더 Playwright 네이티브 클릭으로 본문 고정.
+        // ※ page.evaluate() 내부의 DOM click()은 Playwright 키보드 이벤트 대상을 바꾸지 못하므로
+        //    반드시 Playwright의 ElementHandle.click()을 사용해야 함.
+        const bodySelectors = [
+          '.se-component.se-text .se-text-paragraph',
+          '.se-content .se-text-paragraph',
+          '.se-text-paragraph'
+        ];
+        let bodyClicked = false;
+        for (const sel of bodySelectors) {
+          try {
+            const elements = await this.page.$$(sel);
+            for (const el of elements) {
+              const isInTitle = await el.evaluate(node => !!node.closest('.se-document-title'));
+              if (!isInTitle) {
+                await el.click();
+                bodyClicked = true;
+                console.log(`✅ [enterContent 포커스] 본문 영역 Playwright 클릭 성공: ${sel}`);
+                break;
+              }
             }
-            
-            // 없으면 일반 텍스트 문단 찾기
-            const paragraphs = Array.from(document.querySelectorAll('.se-text-paragraph, [contenteditable="true"]'));
-            const bodyParagraphs = paragraphs.filter(p => !p.closest('.se-document-title'));
-            if (bodyParagraphs.length > 0) {
-                const target = bodyParagraphs[bodyParagraphs.length - 1];
-                target.focus();
-                target.click();
-                return;
-            }
-            
-            // 최후의 수단으로 메인 컨테이너 클릭
-            const mainContainer = document.querySelector('.se-main-container');
-            if (mainContainer) mainContainer.click();
-        });
-        await this.page.waitForTimeout(500);
-
-        // 3단계: 확실한 탈출을 위해 Playwright 네이티브 클릭 추가 (본문 최상단 부근)
-        try {
-            const bodyLocator = targetPage.locator('.se-main-container, .se-viewer').first();
-            if (await bodyLocator.count() > 0) {
-                await bodyLocator.click({ force: true, position: { x: 10, y: 10 } });
-            }
-        } catch(e) {}
-        await this.page.waitForTimeout(300);
+            if (bodyClicked) break;
+          } catch(e) { /* 다음 셀렉터 시도 */ }
+        }
         
-        console.log('✅ [포커스 전환] 제목칸 탈출 및 본문 활성화 완료');
+        if (!bodyClicked) {
+          const placeholders = await this.page.$$('.se-placeholder');
+          for (const ph of placeholders) {
+            const isInTitle = await ph.evaluate(node => !!node.closest('.se-document-title'));
+            if (!isInTitle) {
+              await ph.click();
+              bodyClicked = true;
+              console.log('✅ [enterContent 포커스] 본문 플레이스홀더 Playwright 클릭 성공');
+              break;
+            }
+          }
+        }
+        
+        if (!bodyClicked) {
+          console.warn('⚠️ [enterContent 포커스] 본문 요소를 찾지 못함. Tab 키 시도.');
+          await this.page.keyboard.press('Tab');
+        }
+        
+        await this.page.waitForTimeout(500);
+        console.log('✅ [포커스 전환] 본문 활성화 완료');
       } catch (focusError) {
-        console.warn('⚠️ 본문 포커스 전환 중 일부 오류 발생 (무시하고 계속):', focusError.message);
+        console.warn('⚠️ 본문 포커스 전환 중 오류 (무시하고 계속):', focusError.message);
       }
 
       // 📸 [방탄 루프 횟수 제어] 텍스트 개수와 이미지 개수를 연동하여 

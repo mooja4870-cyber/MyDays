@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.9.7 (2026-05-19)
+- **Description**: Finally identified the TRUE root cause of the Title Intercept bug.
+- **Root Cause**: `enterTitle()` left the Playwright keyboard focus stuck in the title `<textarea>`. Previous fixes tried `page.evaluate(() => element.click())` which only fires DOM events but does NOT move Playwright's internal keyboard target. Only `ElementHandle.click()` (Playwright-native) actually moves the physical focus.
+- **Changes**:
+  - Added Playwright-native body click at the end of `enterTitle()` to escape the title textarea immediately after typing.
+  - Replaced all `page.evaluate`-based focus logic in `enterContent()` with Playwright-native `ElementHandle.click()` calls.
+  - Both functions now filter out `.se-document-title` children to only click actual body elements.
+
 ## v1.9.6 (2026-05-19)
 - **Description**: Finally fixed the absolute worst "Title Intercept" bug properly.
 - **Changes**:
