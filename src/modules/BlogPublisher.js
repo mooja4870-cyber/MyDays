@@ -300,52 +300,13 @@ class BlogPublisher extends EventEmitter {
       // 이 단계가 없으면 커서가 제목 textarea에 갇혀서, 이후 enterContent에서
       // Ctrl+V로 본문을 붙여넣을 때 제목 칸에 텍스트가 오염되는 치명적 버그 발생.
       try {
-        // 본문 영역의 텍스트 문단을 Playwright 네이티브로 직접 클릭
-        const bodySelectors = [
-          '.se-component.se-text .se-text-paragraph',
-          '.se-content .se-text-paragraph',
-          '.se-text-paragraph'
-        ];
-        let bodyClicked = false;
-        for (const sel of bodySelectors) {
-          try {
-            const elements = await this.page.$$(sel);
-            // 제목 영역 안의 요소는 건너뛰고 본문 영역의 요소만 클릭
-            for (const el of elements) {
-              const isInTitle = await el.evaluate(node => !!node.closest('.se-document-title'));
-              if (!isInTitle) {
-                await el.click();
-                bodyClicked = true;
-                console.log(`✅ [제목→본문 탈출] 본문 영역 클릭 성공: ${sel}`);
-                break;
-              }
-            }
-            if (bodyClicked) break;
-          } catch(e) { /* 다음 셀렉터 시도 */ }
-        }
-        
-        if (!bodyClicked) {
-          // 본문 텍스트 문단을 못 찾으면 플레이스홀더 클릭 시도
-          const placeholders = await this.page.$$('.se-placeholder');
-          for (const ph of placeholders) {
-            const isInTitle = await ph.evaluate(node => !!node.closest('.se-document-title'));
-            if (!isInTitle) {
-              await ph.click();
-              bodyClicked = true;
-              console.log('✅ [제목→본문 탈출] 본문 플레이스홀더 클릭 성공');
-              break;
-            }
-          }
-        }
-        
-        if (!bodyClicked) {
-          console.warn('⚠️ [제목→본문 탈출] 본문 요소를 찾지 못함. Tab 키로 시도합니다.');
-          await this.page.keyboard.press('Tab');
-        }
-        
+        const contentFrame = await this.page.frame('se_iframe');
+        const targetPage = contentFrame || this.page;
+        await this.focusBottom(targetPage);
         await this.page.waitForTimeout(500);
       } catch (focusError) {
-        console.warn('⚠️ 제목→본문 포커스 이동 실패:', focusError.message);
+        console.warn('⚠️ 제목→본문 포커스 이동 실패, 기본 백업 사용:', focusError.message);
+        await this.page.keyboard.press('Tab');
       }
       
       console.log(`제목 입력 완료: ${title}`);
@@ -921,10 +882,11 @@ class BlogPublisher extends EventEmitter {
     try {
       console.log(`📋 인용구를 사용한 소제목 입력 시작: ${subtitle}`);
       
-      // [v1.9.14 핵심 수정] 이미지 편집 모드 잔류 시 인용구 툴바가 클릭 차단되므로
-      // Escape로 에디터의 활성 컴포넌트 모드를 완전히 해제한 뒤 진입합니다.
-      await this.page.keyboard.press('Escape');
-      await this.page.waitForTimeout(150);
+      const contentFrame = await this.page.frame('se_iframe');
+      const targetPage = contentFrame || this.page;
+      
+      // 말풍선 입력 전에 에디터 하단을 한번 안전하게 클릭하여 포커스를 정확히 본문 빈 곳에 둡니다.
+      await this.focusBottom(targetPage);
       
       await this.page.keyboard.press('Enter');
       await this.page.waitForTimeout(100);
@@ -1041,6 +1003,35 @@ class BlogPublisher extends EventEmitter {
   }
 
   /**
+   * 에디터 최하단 빈 영역을 클릭하여 안전하게 포커스를 잡고 새로운 문단을 형성합니다.
+   * @param {Object} targetPage - 에디터가 포함된 페이지 또는 프레임
+   */
+  async focusBottom(targetPage) {
+    try {
+      let container = await targetPage.$('.se-content');
+      if (!container) {
+        container = await targetPage.$('.se-canvas');
+      }
+      
+      if (container) {
+        const box = await container.boundingBox();
+        if (box) {
+          // 에디터 컨테이너 하단에서 40px 위 지점을 클릭 (여백 영역 클릭 보장)
+          const clickX = box.x + box.width / 2;
+          const clickY = box.y + box.height - 40;
+          await this.page.mouse.click(clickX, clickY);
+          console.log(`🎯 [포커스] 에디터 하단 여백 클릭 완료 (X: ${clickX.toFixed(1)}, Y: ${clickY.toFixed(1)})`);
+          await this.page.waitForTimeout(300);
+          return true;
+        }
+      }
+    } catch (e) {
+      console.warn('⚠️ 에디터 하단 포커스 이동 실패:', e.message);
+    }
+    return false;
+  }
+
+  /**
    * 본문 내용 입력
    * @param {string} content - 본문 내용
    * @param {Array<string>} imagePaths - 이미지 파일 경로 목록
@@ -1059,55 +1050,12 @@ class BlogPublisher extends EventEmitter {
       // '말풍선 빼기' 등의 옵션 상태에서도 텍스트가 제목 칸으로 올라가는 현상을 완벽히 방지합니다.
       console.log('🎯 [포커스 전환] 본문 입력 영역으로 포커스를 이동합니다...');
       try {
-        // 🔥🔥🔥 [v1.9.7 Playwright 네이티브 포커스 전환]
-        // enterTitle에서 이미 본문으로 탈출했지만, 제휴마케팅 문구 등 중간 단계를 거치면서
-        // 포커스가 다시 이탈했을 수 있으므로 한 번 더 Playwright 네이티브 클릭으로 본문 고정.
-        // ※ page.evaluate() 내부의 DOM click()은 Playwright 키보드 이벤트 대상을 바꾸지 못하므로
-        //    반드시 Playwright의 ElementHandle.click()을 사용해야 함.
-        const bodySelectors = [
-          '.se-component.se-text .se-text-paragraph',
-          '.se-content .se-text-paragraph',
-          '.se-text-paragraph'
-        ];
-        let bodyClicked = false;
-        for (const sel of bodySelectors) {
-          try {
-            const elements = await this.page.$$(sel);
-            for (const el of elements) {
-              const isInTitle = await el.evaluate(node => !!node.closest('.se-document-title'));
-              if (!isInTitle) {
-                await el.click();
-                bodyClicked = true;
-                console.log(`✅ [enterContent 포커스] 본문 영역 Playwright 클릭 성공: ${sel}`);
-                break;
-              }
-            }
-            if (bodyClicked) break;
-          } catch(e) { /* 다음 셀렉터 시도 */ }
-        }
-        
-        if (!bodyClicked) {
-          const placeholders = await this.page.$$('.se-placeholder');
-          for (const ph of placeholders) {
-            const isInTitle = await ph.evaluate(node => !!node.closest('.se-document-title'));
-            if (!isInTitle) {
-              await ph.click();
-              bodyClicked = true;
-              console.log('✅ [enterContent 포커스] 본문 플레이스홀더 Playwright 클릭 성공');
-              break;
-            }
-          }
-        }
-        
-        if (!bodyClicked) {
-          console.warn('⚠️ [enterContent 포커스] 본문 요소를 찾지 못함. Tab 키 시도.');
-          await this.page.keyboard.press('Tab');
-        }
-        
+        await this.focusBottom(targetPage);
         await this.page.waitForTimeout(500);
         console.log('✅ [포커스 전환] 본문 활성화 완료');
       } catch (focusError) {
         console.warn('⚠️ 본문 포커스 전환 중 오류 (무시하고 계속):', focusError.message);
+        await this.page.keyboard.press('Tab');
       }
 
       // 📸 [방탄 루프 횟수 제어] 텍스트 개수와 이미지 개수를 연동하여 
@@ -1147,17 +1095,7 @@ class BlogPublisher extends EventEmitter {
         // 각 섹션 루프 시작 시점에 본문 최하단의 빈 문단(.se-text-paragraph)을 한 번 더 정밀 클릭하여 초점을 확실히 고정시킵니다.
         if (i > 0) {
           console.log(`🎯 [루프 포커스 재조정] ${i + 1}번째 섹션 시작 전 본문 최하단 문단에 초점을 맞춥니다...`);
-          try {
-            const textParagraphs = await targetPage.$$('.se-component.se-text .se-text-paragraph');
-            if (textParagraphs && textParagraphs.length > 0) {
-              const lastParagraph = textParagraphs[textParagraphs.length - 1];
-              await lastParagraph.click();
-              await this.page.waitForTimeout(500);
-              console.log('✅ [루프 포커스 재조정] 순수 본문 최하단 문단 클릭 완료');
-            }
-          } catch (e) {
-            console.warn('⚠️ 루프 포커스 재조정 실패:', e.message);
-          }
+          await this.focusBottom(targetPage);
         }
         
         // 🔥 말풍선 소제목 넣기/빼기 처리
@@ -1215,15 +1153,8 @@ class BlogPublisher extends EventEmitter {
           
           await this.insertSingleImage(imageToInsert);
           
-          // [v1.9.14 핵심 수정] 이미지 삽입 직후 Escape로 이미지 편집 모드를 즉시 해제합니다.
-          // 이것이 없으면 에디터 툴바가 '이미지 편집 모드'에 잠겨 인용구 버튼이 클릭 차단되어
-          // Playwright가 actionability check을 11~12회 반복하며 30~40초를 낭비합니다.
-          await this.page.keyboard.press('Escape');
-          await this.page.waitForTimeout(200);
-          
-          // 이미지 편집 모드 해제 후 포커스 이탈
-          await this.page.keyboard.press('ArrowDown');
-          await this.page.waitForTimeout(50);
+          // 이미지 삽입 후 에디터 하단 빈 여백을 직접 클릭하여 이미지 포커스 상태를 완전히 해제하고 커서를 내립니다.
+          await this.focusBottom(targetPage);
           await this.page.keyboard.press('Enter');
           await this.page.waitForTimeout(100);
         } else {

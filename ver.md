@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.17 (2026-05-19)
+- **Description**: Resolved the "image shifting left" / toolbar overlap retry issue during speech bubble insertion. When an image block is selected, its floating toolbar pops up directly above the image, physical overlapping and blocking the main editor's quotation toolbar button. Playwright's click attempts on the quotation button were intercepted by the image's "Left Align" button, shifting the image left and triggering endless retries.
+- **Changes**:
+  - Implemented `focusBottom(targetPage)`: Directly simulates a mouse click on the empty canvas space at the bottom of the editor container (`.se-content`/`.se-canvas`), which instantly deselects the image block and creates/focuses a new, clean paragraph block below it.
+  - Refactored `enterTitle`, `enterContent`, and `insertSubtitleWithQuotation` to use `focusBottom` instead of complex, error-prone selector clicks, completely eliminating cursor entrapment and floating toolbar collisions.
+
 ## v1.9.16 (2026-05-19)
 - **Description**: Fixed a key cause of the 30~40s delay. The loop focus adjustment was targeting `.se-text-paragraph` without filtering out image captions and quotation text blocks. Clicking these non-body text elements locked the Naver SmartEditor toolbar and disabled the quotation button.
 - **Changes**:
