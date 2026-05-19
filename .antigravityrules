@@ -13,3 +13,11 @@
 - Avoid creating bloated or duplicate context; remove unnecessary generic conversational responses.
 - Keep codebase semantic mapping accurate: adhere strictly to existing rules (`PROJECT_STATUS.md`, `ver.md`, file naming conventions) and maintain precise architectural constraints.
 - Modify only the required targets and preserve all untouched legacy logic identically to minimize Hallucination risks.
+
+## 4. Run-time Environment & Process Validation (Anti-Zombie Rule)
+- Before verifying any code fixes, launching tests, or reporting deployment completion:
+  1. Inspect the system for running zombie instances of the target application (e.g., `electron.exe`, `node.exe` holding application paths).
+  2. Query network ports (e.g., port 3333) to check for binding conflicts (`EADDRINUSE`).
+  3. Forcefully terminate any conflicting zombie processes using OS-level commands (e.g., `taskkill /F /IM electron.exe` on Windows) to ensure new code loads successfully.
+  4. Run comprehensive diagnostic test suites (e.g., `npm run test:comprehensive`) to validate runtime health before final user reports.
+
