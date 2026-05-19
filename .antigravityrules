@@ -21,3 +21,7 @@
   3. Forcefully terminate any conflicting zombie processes using OS-level commands (e.g., `taskkill /F /IM electron.exe` on Windows) to ensure new code loads successfully.
   4. Run comprehensive diagnostic test suites (e.g., `npm run test:comprehensive`) to validate runtime health before final user reports.
 
+## 5. APK Release & Link Format Policy
+- Never use markdown hyperlink anchor text (such as `[MyDays.apk 다운로드 받기](url)`) when sharing the built APK link.
+- Always provide the raw text URL as is: `https://github.com/mooja4870-cyber/MyDays/raw/master/src/renderer/MyDays.apk?raw=true` to ensure easy copy-paste/sharing capability (e.g., via KakaoTalk).
+
