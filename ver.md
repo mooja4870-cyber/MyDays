@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.12 (2026-05-19)
+- **Description**: Updated 60-character description tooltip text to correctly read "바로 위에" (directly above) instead of "바로 아래에" (directly below), and recompiled the Android APK.
+- **Changes**:
+  - Modified `src/renderer/index.html` and `android/app/src/main/assets/www/index.html` to update the description placement wording in `#desc-help-dialog`.
+  - Executed Gradle debug build and deployed the recompiled APK to `src/renderer/MyDays.apk`.
+
 ## v1.9.11 (2026-05-19)
 - **Description**: Replaced tooltip dialog images with clear, simple Korean explanations for the three target locations: 발행 공개 설정, 섹션 속 사각 말풍선, 섹션 속 60자 설명문.
 - **Changes**:

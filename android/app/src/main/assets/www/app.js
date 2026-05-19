@@ -4030,6 +4030,42 @@ class PhotoAutomationManager {
         if (elBlog) elBlog.value = blogId;
         if (elGemini) elGemini.value = geminiKey;
         if (elServerUrl) elServerUrl.value = serverUrl;
+
+        // 🌸 벚꽃 펄스 애니메이션 상태 업데이트
+        this.updateCherryBlossomStatus();
+    }
+
+    static updateCherryBlossomStatus() {
+        const naverId = localStorage.getItem('test-naver-id') || '';
+        const naverPassword = localStorage.getItem('test-naver-password') || '';
+        const blogId = localStorage.getItem('test-blog-id') || '';
+        const geminiApi = localStorage.getItem('test-gemini-key') || '';
+
+        const welcomeEmoji = document.querySelector('.welcome-emoji');
+        const welcomePulse = document.querySelector('.welcome-pulse');
+
+        if (!welcomeEmoji) return;
+
+        // 포스팅을 하려면 naverId, naverPassword, blogId, geminiApi가 모두 채워져 있어야 합니다.
+        const isReady = naverId && naverPassword && blogId && geminiApi;
+
+        if (isReady) {
+            welcomeEmoji.classList.remove('not-ready-to-post');
+            welcomeEmoji.classList.add('ready-to-post');
+            if (welcomePulse) {
+                welcomePulse.classList.remove('not-ready-to-post');
+                welcomePulse.classList.add('ready-to-post');
+            }
+            console.log('🌸 [CherryBlossom] App is ready to post. Pink blossom active.');
+        } else {
+            welcomeEmoji.classList.remove('ready-to-post');
+            welcomeEmoji.classList.add('not-ready-to-post');
+            if (welcomePulse) {
+                welcomePulse.classList.remove('ready-to-post');
+                welcomePulse.classList.add('not-ready-to-post');
+            }
+            console.log('🌸 [CherryBlossom] App is not ready to post. Black blossom active.');
+        }
     }
 
     static saveMobileSettings() {
@@ -4070,6 +4106,9 @@ class PhotoAutomationManager {
         if (tGemini) tGemini.value = geminiKey;
 
         alert('💾 설정 정보가 브라우저에 안전하게 보관 및 동기화되었습니다!');
+
+        // 🌸 벚꽃 펄스 애니메이션 상태 업데이트
+        this.updateCherryBlossomStatus();
     }
 
     // 🔍 PC 서버 IP 자동 탐색 및 저장 처리

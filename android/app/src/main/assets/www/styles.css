@@ -2001,6 +2001,148 @@ body {
     50% {
         transform: translateY(-8px) rotate(4deg);
     }
+.photo-upload-zone {
+    padding: 1.75rem 1rem !important;
+}
+
+.upload-zone-icon {
+    font-size: 2.25rem !important;
+}
+
+.photo-upload-zone {
+    position: relative;
+    min-height: 148px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.photo-file-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 5;
+}
+
+.photo-upload-zone > div {
+    pointer-events: none;
+}
+
+#mobile-settings-panel .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+}
+
+#mobile-settings-panel .form-group {
+    grid-column: 1 / -1 !important;
+    min-width: 0;
+}
+
+#mobile-settings-panel .form-input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.mobile-api-key-row {
+    width: 100%;
+    min-width: 0;
+}
+
+.mobile-api-key-row .form-input {
+    flex: 1 1 auto !important;
+}
+
+.mobile-api-key-row .btn {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 420px) {
+    .main-content {
+        max-width: 100vw;
+        border-left: 0;
+        border-right: 0;
+    }
+
+    .content-area {
+        padding: 1rem !important;
+        padding-bottom: 102px !important;
+    }
+
+    .card {
+        padding: 1rem !important;
+    }
+
+    .mobile-api-key-row {
+        flex-direction: column;
+    }
+
+    .mobile-api-key-row .btn {
+        width: 100%;
+        min-height: 44px;
+        justify-content: center;
+    }
+
+    .bottom-nav {
+        width: calc(100% - 20px);
+        bottom: 10px !important;
+    }
+}
+
+/* ==========================================
+   🌸 웰컴 랜딩 뷰 마이크로 인터랙션 및 키프레임
+   ========================================== */
+
+.welcome-card {
+    border: 1px solid rgba(255, 118, 172, 0.15) !important;
+    box-shadow: 0 12px 32px rgba(255, 118, 172, 0.05), var(--shadow-md) !important;
+    animation: welcomeCardEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.welcome-logo {
+    animation: welcomeTextGlow 3s ease-in-out infinite alternate;
+}
+
+.welcome-illustration {
+    animation: floatIllustration 4s ease-in-out infinite;
+}
+
+.welcome-pulse {
+    animation: pulseIllustrationBg 3.5s ease-in-out infinite;
+}
+
+/* 카드 진입 애니메이션 */
+@keyframes welcomeCardEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 로고 네온 펄스 효과 */
+@keyframes welcomeTextGlow {
+    0% {
+        filter: drop-shadow(0 2px 6px rgba(255, 118, 172, 0.15));
+    }
+    100% {
+        filter: drop-shadow(0 6px 16px rgba(255, 118, 172, 0.35));
+    }
+}
+
+/* 예쁜 벚꽃 아이콘 둥둥 뜨기 */
+@keyframes floatIllustration {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(4deg);
+    }
     100% {
         transform: translateY(0px) rotate(0deg);
     }
@@ -2019,5 +2161,95 @@ body {
     100% {
         transform: scale(0.9);
         opacity: 0.12;
+    }
+}
+
+/* 🌸 웰컴 랜딩 뷰 벚꽃 포스팅 가능/불가능 상태 애니메이션 */
+.welcome-emoji {
+    display: inline-block;
+    transition: all 0.5s ease;
+}
+
+/* 포스팅 가능한 상태 (핑크색 & 펄스 애니메이션) */
+.welcome-emoji.ready-to-post {
+    animation: cherryPulsePink 2.5s ease-in-out infinite;
+}
+
+.welcome-pulse.ready-to-post {
+    background: radial-gradient(circle, rgba(255, 126, 179, 0.25) 0%, rgba(255, 126, 179, 0) 70%) !important;
+    animation: pulseBgPink 2.5s ease-in-out infinite;
+}
+
+/* 포스팅 불가능한 상태 (검정색 & 펄스 애니메이션) */
+.welcome-emoji.not-ready-to-post {
+    animation: cherryPulseBlack 2.5s ease-in-out infinite;
+}
+
+.welcome-pulse.not-ready-to-post {
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0) 70%) !important;
+    animation: pulseBgBlack 2.5s ease-in-out infinite;
+}
+
+/* 🌸 벚꽃 핑크색 스케일 및 그림자 애니메이션 */
+@keyframes cherryPulsePink {
+    0% {
+        transform: scale(0.95);
+        filter: drop-shadow(0 6px 12px rgba(255, 126, 179, 0.35));
+    }
+    50% {
+        transform: scale(1.18);
+        filter: drop-shadow(0 12px 24px rgba(255, 126, 179, 0.7));
+    }
+    100% {
+        transform: scale(0.95);
+        filter: drop-shadow(0 6px 12px rgba(255, 126, 179, 0.35));
+    }
+}
+
+/* 🌸 벚꽃 검정색 스케일 및 그림자 애니메이션 */
+@keyframes cherryPulseBlack {
+    0% {
+        transform: scale(0.95);
+        filter: grayscale(100%) brightness(0) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
+    }
+    50% {
+        transform: scale(1.18);
+        filter: grayscale(100%) brightness(0) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.55));
+    }
+    100% {
+        transform: scale(0.95);
+        filter: grayscale(100%) brightness(0) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
+    }
+}
+
+/* 백그라운드 핑크빛 빛 파동 효과 (기존 pulseIllustrationBg 오버라이드) */
+@keyframes pulseBgPink {
+    0% {
+        transform: scale(0.85);
+        opacity: 0.15;
+    }
+    50% {
+        transform: scale(1.25);
+        opacity: 0.35;
+    }
+    100% {
+        transform: scale(0.85);
+        opacity: 0.15;
+    }
+}
+
+/* 백그라운드 검정빛 빛 파동 효과 */
+@keyframes pulseBgBlack {
+    0% {
+        transform: scale(0.85);
+        opacity: 0.1;
+    }
+    50% {
+        transform: scale(1.25);
+        opacity: 0.3;
+    }
+    100% {
+        transform: scale(0.85);
+        opacity: 0.1;
     }
 }
