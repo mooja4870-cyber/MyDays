@@ -3520,6 +3520,18 @@ class MobileApiBridge {
         // 처음 구동 시에도 자동 덮어쓰기를 하지 않고 공란 상태를 보존합니다.
     }
 
+    static maskUrl(url) {
+        if (!url) return '';
+        try {
+            const parsed = new URL(url);
+            const protocol = parsed.protocol;
+            const port = parsed.port ? `:${parsed.port}` : '';
+            return `${protocol}//********${port}`;
+        } catch (e) {
+            return '********';
+        }
+    }
+
     static apiUrl(path, required = false) {
         const baseUrl = this.getApiBaseUrl(required);
         return baseUrl ? `${baseUrl}${path}` : path;
@@ -3651,13 +3663,14 @@ class ErrorMessageHelper {
 
         // 📡 네트워크 연결 실패(Failed to fetch) 시스템적 안내 강화
         if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('network') || msg.includes('Failed to connect') || msg.includes('connect')) {
-            const savedUrl = (localStorage.getItem('mydays-server-url') || 'https://doubling-crummiest-mortuary.ngrok-free.dev').trim();
+            const savedUrl = (localStorage.getItem('mydays-server-url') || '').trim();
+            const maskedUrl = MobileApiBridge.maskUrl(savedUrl);
             return `PC 서버 연결 실패 (Failed to fetch)\n` +
                    `👉 조치 방법:\n` +
                    `1. PC에서 Electron 자동화 프로그램이 켜져 있는지 확인해 주세요.\n` +
                    `2. 휴대폰과 PC가 반드시 '같은 Wi-Fi(공유기)'에 연결되어 있어야 합니다.\n` +
                    `3. 모바일 [설정] 탭의 PC 서버 주소가 PC의 실제 IP와 일치하는지 확인해 주세요.\n` +
-                   ` (현재 시도 주소: ${savedUrl})`;
+                   ` (현재 시도 주소: ${maskedUrl})`;
         }
 
         return msg;
@@ -4132,7 +4145,7 @@ class PhotoAutomationManager {
                 
                 Utils.showDialog('success', 'PC 서버 검색 성공', 
                     `동일 Wi-Fi 네트워크에서 PC 자동화 서버를 찾았습니다!\n\n` +
-                    `• 검색된 주소: ${foundUrl}\n` +
+                    `• 검색된 주소: ${MobileApiBridge.maskUrl(foundUrl)}\n` +
                     `• 설정이 자동으로 입력되고 저장되었습니다.`
                 );
             } else {

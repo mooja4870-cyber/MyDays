@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.27 (2026-05-19)
+- **Description**: Enhanced connection security by masking the PC Server IP/URL in status outputs, search notifications, and connection failure diagnostic dialogs.
+- **Changes**:
+  - Implemented `MobileApiBridge.maskUrl()` helper to censor local IPs/domains while preserving the protocol and port details.
+  - Applied the mask to all alert dialogues and connection failure status fields.
+
 ## v1.9.26 (2026-05-19)
 - **Description**: Strengthened credentials privacy by masking passwords in the registered accounts card list.
 - **Changes**:
