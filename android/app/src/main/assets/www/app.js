@@ -4341,3 +4341,45 @@ function closeHelpDialog() {
         dialog.style.display = 'none';
     }
 }
+
+function openPrivacyHelpDialog() {
+    const dialog = document.getElementById('privacy-help-dialog');
+    if (dialog) {
+        dialog.style.display = 'flex';
+    }
+}
+
+function closePrivacyHelpDialog() {
+    const dialog = document.getElementById('privacy-help-dialog');
+    if (dialog) {
+        dialog.style.display = 'none';
+    }
+}
+
+function openBubbleHelpDialog() {
+    const dialog = document.getElementById('bubble-help-dialog');
+    if (dialog) {
+        dialog.style.display = 'flex';
+    }
+}
+
+function closeBubbleHelpDialog() {
+    const dialog = document.getElementById('bubble-help-dialog');
+    if (dialog) {
+        dialog.style.display = 'none';
+    }
+}
+
+function openDescHelpDialog() {
+    const dialog = document.getElementById('desc-help-dialog');
+    if (dialog) {
+        dialog.style.display = 'flex';
+    }
+}
+
+function closeDescHelpDialog() {
+    const dialog = document.getElementById('desc-help-dialog');
+    if (dialog) {
+        dialog.style.display = 'none';
+    }
+}

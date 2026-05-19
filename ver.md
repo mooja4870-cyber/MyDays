@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.11 (2026-05-19)
+- **Description**: Replaced tooltip dialog images with clear, simple Korean explanations for the three target locations: 발행 공개 설정, 섹션 속 사각 말풍선, 섹션 속 60자 설명문.
+- **Changes**:
+  - Modified `src/renderer/index.html` and `android/app/src/main/assets/www/index.html` to remove helper image tags (`bubble_help.png`, `privacy_help.jpg`) and split the shared modal into individual text-based help modal containers (`bubble-help-dialog`, `desc-help-dialog`, `privacy-help-dialog`) with simplified wording.
+  - Modified `src/renderer/app.js` and `android/app/src/main/assets/www/app.js` to register corresponding `openDescHelpDialog()` and `closeDescHelpDialog()` functions.
+
 ## v1.9.10 (2026-05-19)
 - **Description**: Eliminated the 30~40 second delay and excessive UI flickering (11-12 clicks) when inserting speech bubbles.
 - **Changes**:
