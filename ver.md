@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.15 (2026-05-19)
+- **Description**: Added Exponential Backoff and Jitter to Gemini API requests to seamlessly handle transient network/server failures (such as `502 Bad Gateway` and `503 Service Unavailable`).
+- **Changes**:
+  - Upgraded `sendMessageWithRetry` in `src/modules/ContentGenerator.js` to calculate dynamic delay: `Math.pow(2, attempt) * 1000 + Math.random() * 1000` (ms).
+  - Keeps the app running smoothly even during temporary Google Generative AI gateway anomalies.
+
 ## v1.9.14 (2026-05-19)
 - **Description**: Fundamentally resolved the 30~40 second delay (with 11-12 "clicking" retries) between image insertion and speech bubble placement. Root cause: Naver SmartEditor ONE locks the toolbar into "Image Edit Mode" after inserting a photo, making the quotation toolbar button click-intercepted; Playwright's actionability check then retries at 100ms intervals for up to 15 seconds per attempt.
 - **Changes**:

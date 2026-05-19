@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.14)
+## 🚀 Current Status (v1.9.15)
+- **⚡ Google API 502/503 Transient Error Handling with Exponential Backoff (v1.9.15)**: Resolved occasional posting failure due to Gemini API temporary network/server error (`502 Bad Gateway`). Replaced the legacy fixed-interval retry delay with an Exponential Backoff + Jitter retry policy (2^attempt * 1s + jitter) inside `ContentGenerator.sendMessageWithRetry`.
 - **🔧 Image Edit Mode Lock: Root Cause Fix for 30~40s Delay (v1.9.14)**: Fundamentally resolved the persistent 30~40 second delay (with 11-12 "clicking" Playwright actionability retries) between image insertion and speech bubble placement. Root cause: Naver SmartEditor ONE locks the toolbar into "Image Edit Mode" after photo insertion, making the quotation button click-intercepted. Fix: `Escape` key press immediately after image insertion and at `insertSubtitleWithQuotation` entry to force-exit image editing mode. `waitForSelector` timeouts reduced from 5000ms to 1500ms. Expected per-section time: 15~30s → 4~6s.
 - **🔑 Preset PC Server URL & Gemini API Key (v1.9.13)**: Hardcoded the active PC Server URL (`https://doubling-crummiest-mortuary.ngrok-free.dev`) and Gemini API Key (`AIzaSyBsGDK8zMnlItHdhA8TVZ8_uFc0y_k5v_jA`) as the default mobile app configuration fallbacks. New APK installations will automatically initialize with these credentials pre-loaded. Recompiled and deployed the updated `MyDays.apk` asset.
 - **✍️ Description Placement Text Correction & APK Rebuild (v1.9.12)**: Corrected the explanation text inside the 60-character description tooltip to correctly state "바로 위에" (directly above the photo) instead of "바로 아래에" (directly below the photo). Recompiled the Android project and deployed the latest `MyDays.apk` asset.

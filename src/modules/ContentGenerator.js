@@ -140,8 +140,10 @@ class ContentGenerator {
                     throw new Error(`최대 재시도 횟수 초과: ${error.message}`);
                 }
                 
-                console.log(`⏳ ${retryDelay/1000}초 후 재시도...`);
-                await this.delay(retryDelay);
+                // 지수 백오프(Exponential Backoff) 적용: 2^(attempt) * 1000ms + random jitter (0~1000ms)
+                const backoffDelay = Math.pow(2, attempt) * 1000 + Math.floor(Math.random() * 1000);
+                console.log(`⏳ 일시적인 구글 API 오류(502/503 등) 감지. ${backoffDelay/1000}초 후 지수 백오프 재시도 진행...`);
+                await this.delay(backoffDelay);
             }
         }
     }
