@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.20 (2026-05-19)
+- **Description**: Resolved Google Gemini API Key validation issue on the mobile APK by updating the default hardcoded key fallback to match the active PC webapp key configuration.
+- **Changes**:
+  - Updated `DEFAULT_GEMINI_KEY` from the old invalid key to the active working key (`AIzaSyAqVpf0iFU96VIH22VENAvUWk92xlTNOEU`) in `src/renderer/app.js` and `android/app/src/main/assets/www/app.js`.
+  - Recompiled the Android codebase using `build-android-apk.ps1` to produce the updated `MyDays.apk` asset.
+
 ## v1.9.19 (2026-05-19)
 - **Description**: Formally integrated the runtime environment process validation (Anti-Zombie Rule) into the project's agent rules configuration.
 - **Changes**:
