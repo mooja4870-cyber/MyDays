@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.24 (2026-05-19)
+- **Description**: Enhanced UI privacy by masking sensitive fields on both mobile and PC webapp settings screens.
+- **Changes**:
+  - Changed input element types for PC Server URL (`mobile-server-url`) and Google Gemini API keys (`mobile-gemini-key`, `gemini-api`, `edit-gemini-api`) from `text`/`url` to `password` type.
+  - Fully removed the exposed default fallback API key from codebase, allowing the server to safely apply the local personal key.
+
 ## v1.9.22 (2026-05-19)
 - **Description**: Resolved key exposure risk and mismatch issues between mobile app and server configurations by implementing a server-side Gemini API key fallback logic.
 - **Changes**:

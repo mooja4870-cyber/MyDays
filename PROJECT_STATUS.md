@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.22)
+## 🚀 Current Status (v1.9.24)
+- **🔒 Sensitive Fields UI Masking (v1.9.24)**: Changed inputs for PC Server URL and Gemini API keys (mobile & desktop panels) from cleartext/url inputs to secure password input types (`••••••••`) to guarantee over-the-shoulder privacy.
 - **🔑 Server-Side Gemini API Key Fallback (v1.9.22)**: Implemented automated server-side Gemini API key lookup based on Naver account mappings, overriding exposed/expired keys sent by mobile clients with the secure keys saved locally in the PC configuration.
 - **🤖 Gemini 2.5-Flash Model Update (v1.9.21)**: Transitioned the core AI text generation engine in `ContentGenerator.js` from the deprecated `gemini-2.0-flash` to the newer `gemini-2.5-flash` model to resolve model deprecation errors (404 Not Found).
 - **🔑 Mobile APK Gemini API Key Fallback Alignment (v1.9.20)**: Updated `DEFAULT_GEMINI_KEY` inside `app.js` to match the valid active key (`AIzaSyAqVpf0iFU96VIH22VENAvUWk92xlTNOEU`) stored in the PC accounts configuration. Recompiled the codebase into `MyDays.apk` so that new installations automatically initialize with the correct working key.
