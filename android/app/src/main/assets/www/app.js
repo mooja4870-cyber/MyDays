@@ -4192,11 +4192,7 @@ class PhotoAutomationManager {
             return;
         }
 
-        if (!geminiApi) {
-            alert('⚙️ 제미나이 AI가 PHOTO를 분석하여 감성 포스팅을 작성하려면 Google Gemini API Key가 필요합니다. 설정에서 입력해주세요.');
-            Navigation.switchPanel('mobile-settings');
-            return;
-        }
+        // 제미나이 API 키는 선택 사항입니다 (비워두면 PC 서버에 등록된 키가 자동으로 사용됨)
 
         if (this.selectedFiles.length === 0) {
             alert('📷 포스팅할 일상 PHOTO를 1장 이상 선택해주세요.');
