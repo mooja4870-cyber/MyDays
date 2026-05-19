@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Days - Add Entry</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#f0dee1",
+                        "outline-variant": "#d7c1c4",
+                        "on-secondary-container": "#761830",
+                        "surface-container-highest": "#e9e0e1",
+                        "on-tertiary-container": "#54484a",
+                        "on-primary-container": "#763745",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#ffb1c0",
+                        "secondary-fixed-dim": "#ffb2bb",
+                        "on-surface": "#1e1b1c",
+                        "surface-bright": "#fff8f8",
+                        "surface-container-high": "#efe6e7",
+                        "on-tertiary-fixed": "#22191b",
+                        "inverse-on-surface": "#f7eff0",
+                        "tertiary": "#685b5e",
+                        "outline": "#857375",
+                        "surface-variant": "#e9e0e1",
+                        "on-surface-variant": "#524345",
+                        "on-primary-fixed": "#3a0717",
+                        "primary-fixed": "#ffd9df",
+                        "background": "#fff8f8",
+                        "inverse-surface": "#342f30",
+                        "surface-container-low": "#faf1f2",
+                        "primary-container": "#f8a4b4",
+                        "surface-tint": "#8d4a59",
+                        "error-container": "#ffdad6",
+                        "secondary": "#a23a4f",
+                        "surface-container": "#f5eced",
+                        "surface": "#fff8f8",
+                        "on-primary-fixed-variant": "#713341",
+                        "secondary-fixed": "#ffd9dd",
+                        "error": "#ba1a1a",
+                        "primary": "#8d4a59",
+                        "inverse-primary": "#ffb1c0",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#832238",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#4f4446",
+                        "tertiary-fixed-dim": "#d3c2c5",
+                        "secondary-container": "#ff8296",
+                        "surface-dim": "#e0d8d9",
+                        "tertiary-container": "#c7b7ba",
+                        "on-secondary-fixed": "#400012",
+                        "on-primary": "#ffffff",
+                        "on-background": "#1e1b1c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-gap": "48px",
+                        "container-padding-mobile": "20px",
+                        "container-padding-desktop": "40px",
+                        "gutter": "16px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["34px", {"lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ambient-glow {
+            box-shadow: 0 30px 50px 0px rgba(248, 164, 180, 0.15);
+        }
+        .glass-nav {
+            backdrop-filter: blur(20px);
+        }
+        body {
+            background-color: #fff8f8;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<header class="bg-surface/70 dark:bg-surface-dim/70 backdrop-blur-2xl flex justify-between items-center w-full px-container-padding-mobile h-16 z-50 fixed top-0 shadow-[0_10px_40px_0px_rgba(248,164,180,0.1)]">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A soft-focus, high-key portrait of a smiling woman with a warm, natural expression. The lighting is diffused and ethereal, matching a gentle aesthetic. She is positioned against a clean, minimalist background with subtle pastel pink undertones that align with the sophisticated lifestyle brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVzA1cKV9Q21I1mbgmMoSCuwD9hps23-BgFi7OpvIUTkxM1gNoyXT-ho0r55PG5ETNcfGmiTVInbOyS8C-yWLht2TZSA915z8sH8kTV7GVz1LubpxnJLBAG3nhWLaJiREKu06OUnHHbjXaUJXk7C_RVKAG6__NhX-kCtYRGeB1dTR3bzd8-dqEBNU35xO3En7sK0Oen2_6M94leruF19QVPo0dyG5k49LDvIwJCbU2JjsCr9ha0Sq_qP90XPdL-WiuoXX_BbouxtLf"/>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold tracking-tight text-secondary">My Days</h1>
+</div>
+<button class="text-secondary hover:-translate-y-0.5 transition-transform duration-200 active:scale-95 transition-all duration-150">
+<span class="material-symbols-outlined" data-icon="add_a_photo">add_a_photo</span>
+</button>
+</header>
+<main class="pt-24 pb-32 px-container-padding-mobile max-w-[1100px] mx-auto">
+<section class="flex flex-col gap-8">
+<div class="relative group">
+<div class="w-full aspect-[4/5] md:aspect-video rounded-3xl overflow-hidden ambient-glow bg-white p-4">
+<div class="w-full h-full rounded-2xl bg-surface-container-low flex flex-col items-center justify-center border-2 border-dashed border-outline-variant hover:border-primary transition-colors cursor-pointer">
+<img alt="Journal preview" class="w-full h-full object-cover rounded-2xl" data-alt="A nostalgic and serene photo of a sun-drenched breakfast table in a minimalist studio. A ceramic coffee cup sits next to a small vase of delicate pink flowers. The lighting is soft morning gold, casting long, gentle shadows across a clean white linen tablecloth. The composition is airy and peaceful, evoking a sense of calm joy and modern simplicity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSwxYU4DP7dmU9rmImOFid6k09VgF4AfbknmDLOZWM4ZrnFYcK4lkhfsa2OoZjZwzNJbTYu7fpPggG7sTgwZ4DWr6lR4tBX8Hiv0-J1_9LTDI_TMtocvkRO0r04vd7p5HqNRcLFsDaD_OLT5R5yHhkty_Lzbr9k4ubI7hnBjg6oBO_meNiRk27o_oCyB8TuPf0rB28bdf_cJwcjTTsCS7DfBi_Zf1X0q4wVKGaREf7WnjXZov5vO50HfUjANeJGqU7ewDbUpd8yqqK"/>
+<div class="absolute inset-0 bg-black/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="bg-white/90 glass-nav px-6 py-3 rounded-full text-secondary font-label-md text-label-md flex items-center gap-2 shadow-lg">
+<span class="material-symbols-outlined" data-icon="photo_camera">photo_camera</span>
+                                Change Photo
+                            </span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-4">
+<button class="bg-primary-container/30 text-secondary px-6 py-3 rounded-full font-label-md text-label-md flex items-center gap-2 hover:-translate-y-0.5 transition-transform duration-200 active:scale-95 shadow-sm">
+<span class="material-symbols-outlined" data-icon="add_photo_alternate">add_photo_alternate</span>
+                        Add Photo
+                    </button>
+<div class="h-[1px] flex-1 bg-outline-variant/30"></div>
+</div>
+<div class="ambient-glow bg-white rounded-3xl p-6 md:p-8">
+<label class="font-label-md text-label-md text-on-surface-variant block mb-3">YOUR THOUGHTS</label>
+<textarea class="w-full min-h-[120px] bg-transparent border-2 border-outline-variant/20 rounded-2xl p-4 font-body-md text-body-md focus:border-primary-container focus:ring-0 transition-all placeholder:text-outline/50 resize-none" placeholder="Write a short journal entry about your day..."></textarea>
+</div>
+<div class="flex items-center justify-between mt-4">
+<div class="flex gap-2">
+<span class="bg-tertiary-fixed text-on-secondary-fixed-variant px-4 py-1.5 rounded-full font-label-md text-label-md flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]" data-icon="mood">mood</span>
+                            Grateful
+                        </span>
+<span class="bg-tertiary-fixed text-on-secondary-fixed-variant px-4 py-1.5 rounded-full font-label-md text-label-md flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]" data-icon="location_on">location_on</span>
+                            Home
+                        </span>
+</div>
+<button class="bg-secondary text-on-secondary px-10 py-4 rounded-full font-label-md text-label-md hover:-translate-y-0.5 transition-transform duration-200 active:scale-95 shadow-lg shadow-secondary/20">
+                        Post Entry
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface/70 dark:bg-surface-dim/70 backdrop-blur-2xl rounded-t-xl shadow-[0_-10px_40px_0px_rgba(248,164,180,0.15)]">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-6 py-1 hover:text-secondary transition-colors active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-label-md text-[10px] uppercase tracking-wider">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container dark:bg-on-secondary-fixed-variant text-on-secondary-container dark:text-secondary-fixed rounded-full px-6 py-1 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_today" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="font-label-md text-[10px] uppercase tracking-wider">History</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-6 py-1 hover:text-secondary transition-colors active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined mb-1" data-icon="settings">settings</span>
+<span class="font-label-md text-[10px] uppercase tracking-wider">Settings</span>
+</button>
+</nav>
+</body></html>

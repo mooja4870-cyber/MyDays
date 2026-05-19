@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.3 (2026-05-19)
+- **Description**: Enabled pinch-to-zoom support on the Android mobile app.
+- **Changes**:
+  - Modified `MainActivity.java` to set `setSupportZoom(true)`, `setBuiltInZoomControls(true)`, and `setDisplayZoomControls(false)`.
+  - Bumped Android APK build version to `1.9.3`.
+
 ## v1.9.2 (2026-05-19)
 - **Description**: Integrated three core Agentic Vibe Coding skills (Artifact-based Verification, MCP-based Local Tool Integration, and Semantic Codebase Sanitization) to enhance automation resilience and context optimization.
 - **Changes**:

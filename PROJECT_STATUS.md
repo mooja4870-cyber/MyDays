@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.2)
+## 🚀 Current Status (v1.9.3)
+- **🔍 Pinch-to-Zoom Support & APK Rebuild (v1.9.3)**: Enabled native multi-touch pinch-to-zoom capabilities inside the Android WebView `MainActivity.java`, allowing users to freely zoom in and out of the UI for better accessibility.
 - **🧠 Core Agent Capabilities & Rules (v1.9.2)**: Integrated latest Vibe Coding guidelines via `.antigravityrules`, enabling Artifact-based Verification, MCP Local Tool Integration (Browser Subagent/Local Search), and Semantic Codebase Sanitization to maintain a highly optimized agentic context.
 - **📡 Subnet Auto-Discovery IP Scan Engine & APK Rebuild (v1.9.1)**: Deployed a lightning-fast IP Scanner on the mobile app to automatically detect the PC automation server within typical subnets (`172.30.1.X`, `192.168.0.X`, `192.168.1.X`, etc.) and instantly configure the connection, completely eliminating the need for manual IP entries. Added a `/api/health` check endpoint inside the Electron HTTP server to safely authenticate the app target, and wired a background discovery task that auto-scans and suggests active servers if a connection failure is triggered during posting.
 - **🛡️ Deployed Ultimate Placeholder Click & Component Escaping (v1.9.0)**: Upgraded the core focus engine with direct empty editor placeholder activation (`.se-placeholder`) and active component `ArrowDown` escapes to eliminate the remaining bubble-omitted leakage entirely. (1) Checks and clicks `.se-placeholder` if it exists at the start of `enterContent`, activating the body for empty layouts. (2) Implemented keyboard component escaping (`ArrowDown` -> `Enter`) before and after uploading images in `enterContent` to cleanly detach from active image card elements.
