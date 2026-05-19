@@ -3484,7 +3484,7 @@ function closeConfirmDialog(confirmed) {
 
 // Mobile API bridge helper
 class MobileApiBridge {
-    static DEFAULT_SERVER_URL = 'http://172.30.1.41:3333';
+    static DEFAULT_SERVER_URL = 'https://doubling-crummiest-mortuary.ngrok-free.dev';
 
     static init() {
         if (this.isAndroidShell()) {
@@ -3654,7 +3654,7 @@ class ErrorMessageHelper {
 
         // 📡 네트워크 연결 실패(Failed to fetch) 시스템적 안내 강화
         if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('network') || msg.includes('Failed to connect') || msg.includes('connect')) {
-            const savedUrl = (localStorage.getItem('mydays-server-url') || 'http://172.30.1.41:3333').trim();
+            const savedUrl = (localStorage.getItem('mydays-server-url') || 'https://doubling-crummiest-mortuary.ngrok-free.dev').trim();
             return `PC 서버 연결 실패 (Failed to fetch)\n` +
                    `👉 조치 방법:\n` +
                    `1. PC에서 Electron 자동화 프로그램이 켜져 있는지 확인해 주세요.\n` +

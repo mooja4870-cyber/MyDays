@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.9 (2026-05-19)
+- **Description**: Updated the default PC Server URL to a custom ngrok address.
+- **Changes**:
+  - Modified `src/renderer/index.html` and `android/app/src/main/assets/www/index.html` to update the placeholder URL to the new ngrok address.
+  - Modified `src/renderer/app.js` and `android/app/src/main/assets/www/app.js` to change `DEFAULT_SERVER_URL` and `localStorage` fallback values.
+
 ## v1.9.8 (2026-05-19)
 - **Description**: Updated the mobile settings interface to lock fixed configuration values.
 - **Changes**:

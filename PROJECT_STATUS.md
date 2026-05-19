@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.7)
+## 🚀 Current Status (v1.9.9)
+- **📡 Custom ngrok Default URL Update (v1.9.9)**: Hardcoded the default mobile app PC Server address to `https://doubling-crummiest-mortuary.ngrok-free.dev` across both Electron and Android WebView frontends.
 - **🔥 Title Intercept Bug KILLED (v1.9.7)**: Found the TRUE root cause: `enterTitle()` left Playwright's physical keyboard focus inside the title `<textarea>`. Previous fixes used `page.evaluate(() => el.click())` which fires DOM events but NEVER moves Playwright's keyboard target. Fixed by adding `ElementHandle.click()` (Playwright-native) at the end of `enterTitle()` AND at the start of `enterContent()` to guarantee the cursor is in the body before any `Ctrl+V`.
 - **🛠️ PC Server Routing Hardening (v1.9.4)**: Completely overhauled the `http.createServer` routing logic inside `src/main.js` to safely sanitize `req.url`.
 - **🔍 Pinch-to-Zoom Support & APK Rebuild (v1.9.3)**: Enabled native multi-touch pinch-to-zoom capabilities inside the Android WebView `MainActivity.java`, allowing users to freely zoom in and out of the UI for better accessibility.
