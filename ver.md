@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.9.13 (2026-05-19)
+- **Description**: Hardcoded the active PC Server URL and Gemini API Key as default fallbacks inside the Android mobile app, so new installations automatically initialize with the correct configuration.
+- **Changes**:
+  - Modified `src/renderer/app.js` to include `DEFAULT_GEMINI_KEY` (`AIzaSyBsGDK8zMnlItHdhA8TVZ8_uFc0y_k5v_jA`) alongside `DEFAULT_SERVER_URL`.
+  - Added `MobileApiBridge.ensureDefaultSettings()` to write both default parameters into `localStorage` on initial Android app execution.
+  - Recompiled the Android project and deployed the latest `MyDays.apk` asset.
+
 ## v1.9.12 (2026-05-19)
 - **Description**: Updated 60-character description tooltip text to correctly read "바로 위에" (directly above) instead of "바로 아래에" (directly below), and recompiled the Android APK.
 - **Changes**:

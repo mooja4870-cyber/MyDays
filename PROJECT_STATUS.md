@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.12)
+## 🚀 Current Status (v1.9.13)
+- **🔑 Preset PC Server URL & Gemini API Key (v1.9.13)**: Hardcoded the active PC Server URL (`https://doubling-crummiest-mortuary.ngrok-free.dev`) and Gemini API Key (`AIzaSyBsGDK8zMnlItHdhA8TVZ8_uFc0y_k5v_jA`) as the default mobile app configuration fallbacks. New APK installations will automatically initialize with these credentials pre-loaded. Recompiled and deployed the updated `MyDays.apk` asset.
 - **✍️ Description Placement Text Correction & APK Rebuild (v1.9.12)**: Corrected the explanation text inside the 60-character description tooltip to correctly state "바로 위에" (directly above the photo) instead of "바로 아래에" (directly below the photo). Recompiled the Android project and deployed the latest `MyDays.apk` asset.
 - **💬 Simplified Tooltip Modals with Easy Explanations (v1.9.11)**: Replaced helper images inside the three main tooltips ("발행 공개 설정", "섹션 속 사각 말풍선", "섹션 속 60자 설명문") with concise, user-friendly Korean explanations. Split the shared modal into independent dialogue containers (`bubble-help-dialog`, `desc-help-dialog`, `privacy-help-dialog`) for precise interactions.
 - **⚡ Zero-Delay UI & AI Generation Optimization (v1.9.10)**: Dramatically reduced the 30~40 second delay between inserting an image and a speech bubble by implementing `Promise.all` pre-generation for AI subtitles at the beginning of the posting loop, and significantly streamlined the layout execution by removing redundant 11-12 click escape mechanisms and timeouts.

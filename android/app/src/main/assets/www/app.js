@@ -3485,11 +3485,12 @@ function closeConfirmDialog(confirmed) {
 // Mobile API bridge helper
 class MobileApiBridge {
     static DEFAULT_SERVER_URL = 'https://doubling-crummiest-mortuary.ngrok-free.dev';
+    static DEFAULT_GEMINI_KEY = 'AIzaSyBsGDK8zMnlItHdhA8TVZ8_uFc0y_k5v_jA';
 
     static init() {
         if (this.isAndroidShell()) {
             document.body.classList.add('mydays-android');
-            this.ensureDefaultServerUrl();
+            this.ensureDefaultSettings();
         }
     }
 
@@ -3515,11 +3516,15 @@ class MobileApiBridge {
         return '';
     }
 
-    static ensureDefaultServerUrl() {
+    static ensureDefaultSettings() {
         const savedUrl = (localStorage.getItem('mydays-server-url') || '').trim();
-
         if (!savedUrl) {
             localStorage.setItem('mydays-server-url', this.DEFAULT_SERVER_URL);
+        }
+
+        const savedGemini = (localStorage.getItem('test-gemini-key') || '').trim();
+        if (!savedGemini) {
+            localStorage.setItem('test-gemini-key', this.DEFAULT_GEMINI_KEY);
         }
     }
 
