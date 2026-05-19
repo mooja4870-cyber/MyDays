@@ -1725,7 +1725,7 @@ class AccountManager {
                     </div>
                     <div class="account-field">
                         <span class="account-field-label">비밀번호</span>
-                        <span class="account-field-value">${account.password || account.naverPassword || ''}</span>
+                        <span class="account-field-value">●●●●●●●●</span>
                     </div>
                 </div>
             </div>

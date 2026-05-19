@@ -1,5 +1,10 @@
 # 📦 Version History
 
+## v1.9.26 (2026-05-19)
+- **Description**: Strengthened credentials privacy by masking passwords in the registered accounts card list.
+- **Changes**:
+  - Replaced plain-text password display inside the rendered account cards with a masked string (`●●●●●●●●`).
+
 ## v1.9.25 (2026-05-19)
 - **Description**: Replaced hardcoded connection defaults with an empty/blank initialization flow, allowing users to enter and save custom credentials directly.
 - **Changes**:

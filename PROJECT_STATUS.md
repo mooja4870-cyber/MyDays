@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.25)
+## 🚀 Current Status (v1.9.26)
+- **🔒 Password Card Masking (v1.9.26)**: Replaced plain-text password displays in the registered account cards list with secure dot masks (`●●●●●●●●`) to guarantee absolute credential privacy on screen.
 - **⚙️ Blank Default Settings & User Entry (v1.9.25)**: Changed the mobile configuration flow to start fully blank/empty. Removed all hardcoded fallback URLs so users enter their own custom configurations (Naver credentials, PC Server URL, and optional Gemini key) directly, which are saved in browser localStorage to persist across launches.
 - **🔒 Sensitive Fields UI Masking (v1.9.24)**: Changed inputs for PC Server URL and Gemini API keys (mobile & desktop panels) from cleartext/url inputs to secure password input types (`••••••••`) to guarantee over-the-shoulder privacy.
 - **🔑 Server-Side Gemini API Key Fallback (v1.9.22)**: Implemented automated server-side Gemini API key lookup based on Naver account mappings, overriding exposed/expired keys sent by mobile clients with the secure keys saved locally in the PC configuration.
