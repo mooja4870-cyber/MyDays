@@ -1,5 +1,10 @@
 # 📦 Version History
 
+## v1.9.4 (2026-05-19)
+- **Description**: Fixed `HTTP 404 Not Found` routing bug on PC HTTP Server when receiving mobile API requests.
+- **Changes**:
+  - Rewrote the HTTP server routing logic in `src/main.js` to parse and sanitize `req.url`, cleanly stripping trailing slashes and query parameters so that API endpoints (like `/api/execute-automation-step`) and static file resolutions never fail due to strict string matching discrepancies.
+
 ## v1.9.3 (2026-05-19)
 - **Description**: Enabled pinch-to-zoom support on the Android mobile app.
 - **Changes**:

@@ -4461,8 +4461,14 @@ function startLocalHttpServer(port = 3333) {
             return;
         }
 
+        let reqPathName = req.url.split('?')[0];
+        if (req.url.startsWith('http')) {
+            try { reqPathName = new URL(req.url).pathname; } catch(e) {}
+        }
+        const reqPath = reqPathName === '/' ? '/' : reqPathName.replace(/\/+$/, '');
+
         // SSE endpoint: GET /api/logs
-        if (req.method === 'GET' && req.url === '/api/logs') {
+        if (req.method === 'GET' && reqPath === '/api/logs') {
             res.writeHead(200, {
                 'Content-Type': 'text/event-stream',
                 'Cache-Control': 'no-cache',
@@ -4483,14 +4489,14 @@ function startLocalHttpServer(port = 3333) {
         }
 
         // Health check endpoint: GET /api/health
-        if (req.method === 'GET' && req.url === '/api/health') {
+        if (req.method === 'GET' && reqPath === '/api/health') {
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ status: 'ok', app: 'MyDays' }));
             return;
         }
 
         // API endpoint: POST /api/execute-automation-step
-        if (req.method === 'POST' && req.url === '/api/execute-automation-step') {
+        if (req.method === 'POST' && reqPath === '/api/execute-automation-step') {
             let body = '';
             req.on('data', chunk => { body += chunk; });
             req.on('end', async () => {
@@ -4535,7 +4541,7 @@ function startLocalHttpServer(port = 3333) {
         }
 
         // Serve static files
-        let filePath = path.join(PUBLIC_DIR, req.url === '/' ? 'index.html' : req.url);
+        let filePath = path.join(PUBLIC_DIR, reqPath === '/' ? 'index.html' : reqPath);
         if (!filePath.startsWith(PUBLIC_DIR)) {
             res.statusCode = 403;
             res.end('Access Denied');
