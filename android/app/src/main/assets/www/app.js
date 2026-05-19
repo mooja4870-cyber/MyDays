@@ -3491,6 +3491,18 @@ class MobileApiBridge {
         if (this.isAndroidShell()) {
             document.body.classList.add('mydays-android');
             this.ensureDefaultSettings();
+            
+            // 모바일 앱(Android WebView)인 경우에만 불필요한 버튼 삭제
+            if (/MyDaysAndroid|; wv\)/i.test(navigator.userAgent)) {
+                const btnDiscover = document.getElementById('btn-discover-pc-server');
+                if (btnDiscover) {
+                    btnDiscover.remove();
+                }
+                const btnGeminiHelp = document.querySelector('#mobile-settings-panel button[onclick*="aistudio.google.com"]');
+                if (btnGeminiHelp) {
+                    btnGeminiHelp.remove();
+                }
+            }
         }
     }
 

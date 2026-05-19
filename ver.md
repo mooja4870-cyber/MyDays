@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.9.28 (2026-05-19)
+- **Description**: Excluded and deleted "PC IP 자동 검색" and "API Key 구하러 가기" buttons specifically on the mobile version (Android WebView) of the application, leaving the PC/web version completely untouched.
+- **Changes**:
+  - Modified `src/renderer/app.js` within `MobileApiBridge.init()` to check for `/MyDaysAndroid|; wv\)/i` in the user agent.
+  - Dynamically removed the PC server discover button (`btn-discover-pc-server`) and Gemini help key link button in the settings panel when running inside the Android WebView.
+  - Recompiled the updated assets into `MyDays.apk`.
+
 ## v1.9.27 (2026-05-19)
 - **Description**: Enhanced connection security by masking the PC Server IP/URL in status outputs, search notifications, and connection failure diagnostic dialogs.
 - **Changes**:
