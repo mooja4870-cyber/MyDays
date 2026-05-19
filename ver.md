@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.21 (2026-05-19)
+- **Description**: Resolved Google Gemini API Model 404 Deprecation issue by transitioning from the retired `gemini-2.0-flash` model to the newer `gemini-2.5-flash` model.
+- **Changes**:
+  - Replaced the deprecated `"gemini-2.0-flash"` model identifier with `"gemini-2.5-flash"` inside `src/modules/ContentGenerator.js`.
+  - Killed existing zombie `electron.exe` processes and restarted the PC server application (`npx electron .`) to run the updated API model.
+
 ## v1.9.20 (2026-05-19)
 - **Description**: Resolved Google Gemini API Key validation issue on the mobile APK by updating the default hardcoded key fallback to match the active PC webapp key configuration.
 - **Changes**:

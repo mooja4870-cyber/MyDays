@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.20)
+## 🚀 Current Status (v1.9.21)
+- **🤖 Gemini 2.5-Flash Model Update (v1.9.21)**: Transitioned the core AI text generation engine in `ContentGenerator.js` from the deprecated `gemini-2.0-flash` to the newer `gemini-2.5-flash` model to resolve model deprecation errors (404 Not Found).
 - **🔑 Mobile APK Gemini API Key Fallback Alignment (v1.9.20)**: Updated `DEFAULT_GEMINI_KEY` inside `app.js` to match the valid active key (`AIzaSyAqVpf0iFU96VIH22VENAvUWk92xlTNOEU`) stored in the PC accounts configuration. Recompiled the codebase into `MyDays.apk` so that new installations automatically initialize with the correct working key.
 - **🛡️ Agent Anti-Zombie Rules Integration (v1.9.19)**: Formally embedded the runtime validation rules into the root `.antigravityrules` configuration to mandate that the agent kills conflicting zombie processes and verifies port conflicts before executing tests and releasing fixes.
 - **🧪 10-Methodology Test Suite (v1.9.18)**: Created a multi-methodology diagnostic test suite containing 10 categories of tests (unit folder structure, dependency loader, sharp image processing, playwright sandbox launch, DOM selector search, publisher instantiate, mouse coordinate mathematics, quotation style policy check, exponential backoff jitter calculations, and API key safety validation) to ensure 100% stable execution. Run via `npm run test:comprehensive`.

@@ -46,7 +46,7 @@ class ContentGenerator {
             
             this.apiKey = apiKey;
             this.genAI = new GoogleGenerativeAI(apiKey);
-            this.model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+            this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
             
             console.log('✅ Gemini AI 모델 초기화 완료');
         } catch (error) {
