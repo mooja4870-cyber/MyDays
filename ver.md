@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.18 (2026-05-19)
+- **Description**: Introduced a comprehensive multi-methodology test suite containing 10 distinct testing types (unit, integration, smoke, regression, static analysis, mock E2E, math bounds checking, and security formatting validation) to systematically verify system integrity and zero-retry performance.
+- **Changes**:
+  - Added `tests/comprehensive_suite.js` covering all 10 target checks.
+  - Added `npm run test:comprehensive` command to `package.json`.
+
 ## v1.9.17 (2026-05-19)
 - **Description**: Resolved the "image shifting left" / toolbar overlap retry issue during speech bubble insertion. When an image block is selected, its floating toolbar pops up directly above the image, physical overlapping and blocking the main editor's quotation toolbar button. Playwright's click attempts on the quotation button were intercepted by the image's "Left Align" button, shifting the image left and triggering endless retries.
 - **Changes**:
