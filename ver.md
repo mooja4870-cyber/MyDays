@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.9.36 (2026-05-20)
+- **Description**: Added robust retry and automatic model fallback mechanism to handle Google Gemini API temporary overload (503 Service Unavailable) errors, ensuring maximum system resilience.
+- **Changes**:
+  - Implemented `sendMessageWithRetryAndFallback` in `src/modules/ContentGenerator.js` to try `gemini-2.5-flash` first and automatically fall back to `gemini-1.5-flash` on failure.
+  - Modified `testConnection` and `generateAgodaContent` in `src/modules/ContentGenerator.js` to use the new retry/fallback method.
+  - Updated `executePhotoPublish` in `src/main.js` to use `sendMessageWithRetryAndFallback` for multimodal content generation.
+
 ## v1.9.35 (2026-05-20)
 - **Description**: Completely deleted "PC IP 자동 검색" and "API Key 구하러 가기" buttons from the mobile settings panel in both the renderer and Android assets index HTML, letting input fields occupy full width.
 - **Changes**:

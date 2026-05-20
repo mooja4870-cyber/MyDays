@@ -61,19 +61,14 @@ class ContentGenerator {
      */
     async testConnection() {
         try {
-            if (!this.model) {
+            if (!this.genAI) {
                 throw new Error('API 키가 설정되지 않았습니다.');
             }
             
             console.log('🧪 Gemini API 연결 테스트 중...');
             
             const testPrompt = "안녕하세요. 연결 테스트입니다. '테스트 성공'이라고 답변해주세요.";
-            const chatSession = this.model.startChat({
-                generationConfig: this.generationConfig,
-                history: [],
-            });
-            
-            const result = await this.sendMessageWithRetry(chatSession, testPrompt, 3, 5000);
+            const result = await this.sendMessageWithRetryAndFallback(testPrompt, 3);
             
             if (result && result.includes('테스트')) {
                 console.log('✅ Gemini API 연결 테스트 성공');
@@ -151,6 +146,80 @@ class ContentGenerator {
                 await this.delay(backoffDelay);
             }
         }
+    }
+
+    /**
+     * 재시도 및 모델 폴백 기능이 있는 메시지 전송
+     * @param {string|Array} messageParts 메시지 텍스트 또는 이미지 파트가 포함된 배열
+     * @param {number} maxRetries 최대 재시도 횟수
+     * @returns {Promise<string>}
+     */
+    async sendMessageWithRetryAndFallback(messageParts, maxRetries = this.maxRetries) {
+        const modelsToTry = ["gemini-2.5-flash", "gemini-1.5-flash"];
+        let lastError = null;
+
+        for (const modelName of modelsToTry) {
+            console.log(`🤖 모델 ${modelName} 시도 시작...`);
+            let modelInstance;
+            try {
+                modelInstance = this.genAI.getGenerativeModel({ model: modelName });
+            } catch (initErr) {
+                console.error(`❌ 모델 ${modelName} 인스턴스 생성 실패:`, initErr.message);
+                continue;
+            }
+            
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                if (this.shouldStop) {
+                    throw new Error('콘텐츠 생성이 중지되었습니다.');
+                }
+                
+                try {
+                    console.log(`🤖 Gemini AI 호출 (${modelName}, 시도 ${attempt}/${maxRetries})`);
+                    const chatSession = modelInstance.startChat({
+                        generationConfig: this.generationConfig,
+                        history: [],
+                    });
+                    
+                    const result = await chatSession.sendMessage(messageParts);
+                    
+                    if (this.shouldStop) {
+                        throw new Error('콘텐츠 생성이 중지되었습니다.');
+                    }
+                    
+                    const response = result.response.text();
+                    if (response && response.trim()) {
+                        console.log(`✅ Gemini AI (${modelName}) 응답 수신 성공`);
+                        // 성공한 경우, 이 인스턴스를 기본 model로 캐싱해둡니다.
+                        this.model = modelInstance;
+                        return response;
+                    } else {
+                        throw new Error('빈 응답을 받았습니다.');
+                    }
+                } catch (error) {
+                    lastError = error;
+                    console.error(`❌ ${modelName} 시도 ${attempt}/${maxRetries} 실패:`, error.message);
+                    
+                    // API 키 유출 또는 403 Forbidden 에러 등은 즉시 실패 처리 (재시도 및 모델 폴백 불필요)
+                    if (error.message.includes('leaked') || error.message.includes('API key not valid') || error.message.includes('403 Forbidden')) {
+                        throw new Error(`사용 중인 Gemini API 키가 유출되었거나 유효하지 않습니다. Google AI Studio(https://aistudio.google.com/api-keys)에서 새 API 키를 발급받아 설정해 주세요.`);
+                    }
+                    
+                    if (this.shouldStop) {
+                        throw new Error('콘텐츠 생성이 중지되었습니다.');
+                    }
+                    
+                    if (attempt < maxRetries) {
+                        const backoffDelay = Math.pow(2, attempt) * 1000 + Math.floor(Math.random() * 1000);
+                        console.log(`⏳ 일시적인 구글 API 오류(502/503/504 등) 감지. ${backoffDelay/1000}초 후 지수 백오프 재시도 진행...`);
+                        await this.delay(backoffDelay);
+                    }
+                }
+            }
+            
+            console.warn(`⚠️ 모델 ${modelName}이(가) 실패하여 다음 모델로 폴백을 시도합니다.`);
+        }
+        
+        throw new Error(`모든 제미나이 모델 호출에 실패했습니다: ${lastError ? lastError.message : '알 수 없는 오류'}`);
     }
 
     /**
@@ -733,12 +802,7 @@ JSON 데이터의 "title" 필드에 있는 상품명을 중심으로 하여, 아
             반드시 5개 문단으로 구성된 본문 내용만 생성해주세요.
             `;
 
-            const chatSession = this.model.startChat({
-                generationConfig: this.generationConfig,
-                history: [],
-            });
-
-            const generatedContent = await this.sendMessageWithRetry(chatSession, prompt);
+            const generatedContent = await this.sendMessageWithRetryAndFallback(prompt);
             
             // 중지 조건 확인 (본문 생성 후)
             if (this.shouldStop) {
@@ -764,7 +828,7 @@ JSON 데이터의 "title" 필드에 있는 상품명을 중심으로 하여, 아
             - 감탄사나 이모지, 특수문자는 사용 금지
             - 반드시 하나의 제목만 제공`;
 
-            const titleResult = await this.sendMessageWithRetry(chatSession, titlePrompt);
+            const titleResult = await this.sendMessageWithRetryAndFallback(titlePrompt);
             
             // 중지 조건 확인 (제목 생성 후)
             if (this.shouldStop) {

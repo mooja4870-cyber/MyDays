@@ -1310,17 +1310,12 @@ class BlogAutomation {
 }
 JSON 외에 다른 여담이나 설명 문구, 백틱(\`\`\`json 등)은 붙이지 말고 순수 JSON 데이터만 출력해주세요.`;
 
-            const chatSession = generator.model.startChat({
-                generationConfig: generator.generationConfig,
-                history: [],
-            });
-
             // 멀티모달 메시지 파트 구성
             const messageParts = [...imageParts, prompt];
             
             console.log('🤖 제미나이 AI 멀티모달 호출...');
-            const aiResult = await chatSession.sendMessage(messageParts);
-            let responseText = aiResult.response.text().trim();
+            let responseText = await generator.sendMessageWithRetryAndFallback(messageParts);
+            responseText = responseText.trim();
             console.log('🤖 제미나이 AI 응답 수신 완료');
             
             // JSON 마크다운 포맷 제거 후 파싱
