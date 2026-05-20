@@ -1,5 +1,14 @@
 # 📦 Version History
 
+## v1.9.41 (2026-05-20)
+- **Description**: Resolved speech bubble escaping and text/photo mismatch bugs by implementing an 이중 탈출 가드 (Double Escape Guard) for Naver Editor's quotation blocks, and passing structured section data to prevent duplicate subtitles in descriptions.
+- **Changes**:
+  - Modified `insertSubtitleWithQuotation()` in `src/modules/BlogPublisher.js` to increase keyboard arrow delays to 200ms and trigger `focusBottom()` after insertion, acting as a double-guard to force the cursor out of quotation blocks.
+  - Refactored `enterContent()` in `src/modules/BlogPublisher.js` to accept structured `sections` data (containing separate `subtitle` and `body` fields).
+  - Added a hybrid fallback parser inside `enterContent()` to automatically split combined `소제목\n본문내용` paragraphs in case structured sections are missing.
+  - Updated `executePhotoPublish()` in `src/main.js` to pass `postJson.sections` inside `postData`.
+  - Recompiled the Android APK to `MyDays.apk`.
+
 ## v1.9.40 (2026-05-20)
 - **Description**: Replaced the default application logo and Android launcher icons with a high-fidelity, premium 3D cherry blossom icon aligned with the Rosé design system.
 - **Changes**:

@@ -9,8 +9,9 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.32)
-- **📱 Secure Preset Mobile APK (v1.9.32)**: Configured the active ngrok tunnel address (`https://doubling-crummiest-mortuary.ngrok-free.dev`) and validated Gemini key (`AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA`) as default parameters in the mobile settings initialization flow. These are stored securely in browser `localStorage` as password types (masked as dots) on startup, completely eliminating server connection errors and manual key entry. Recompiled updated code into `MyDays.apk`.
+## 🚀 Current Status (v1.9.41)
+- **💬 Quotation Bubbles Escaping & Structured Posting (v1.9.41)**: Resolved speech bubble escaping and text/photo mismatch bugs by implementing an 이중 탈출 가드 (Double Escape Guard) for Naver Editor's quotation blocks (increasing keyboard delays to 200ms and calling `focusBottom()` as a double-guard to force-escape bubbles), and passing structured `sections` data containing separate `subtitle` and `body` fields to prevent duplicate subtitles in descriptions. Recompiled updated code into `MyDays.apk`.
+- **📱 Premium Cherry Blossom Icon (v1.9.40)**: Replaced the default application logo and Android launcher icons with a high-fidelity, premium 3D cherry blossom icon aligned with the Rosé design system. Generated a modern minimalist cherry blossom launcher icon. Removed `android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml` to prevent adaptive icon scaling/clipping issues.
 - **🔑 Gemini API Key Restoration (v1.9.31)**: Successfully restored automated content generation by replacing the expired Gemini API key with a validated working key (`AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA`) in both user AppData and local mock server configurations. Terminated and restarted the background server on port 3333 to reload config into active memory.
 - **🔒 PC Server URL Masking (v1.9.27)**: Implemented masking for the PC Server IP/URL in the connection failure diagnosis dialogs and successful auto-discovery popup alerts to completely hide internal/external server coordinates.
 - **🔒 Password Card Masking (v1.9.26)**: Replaced plain-text password displays in the registered account cards list with secure dot masks (`●●●●●●●●`) to guarantee absolute credential privacy on screen.

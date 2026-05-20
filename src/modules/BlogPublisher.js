@@ -923,15 +923,19 @@ class BlogPublisher extends EventEmitter {
       // 소제목 입력 후 대기 단축
       await this.page.waitForTimeout(200);
       
-      // 4단계: 말풍선 컴포넌트를 빠져나오기 위한 초고속 포커스 이탈
+      // 4단계: 말풍선 컴포넌트를 빠져나오기 위한 정밀 포커스 이탈 (방향키 딜레이 200ms 확보 + 마우스 강제 하단 클릭)
       console.log('🔹 4단계: 말풍선 탈출 방향키 입력...');
       await this.page.keyboard.press('ArrowDown');
-      await this.page.waitForTimeout(50);
+      await this.page.waitForTimeout(200);
       await this.page.keyboard.press('ArrowDown');
-      await this.page.waitForTimeout(50);
+      await this.page.waitForTimeout(200);
       await this.page.keyboard.press('Enter');
-      await this.page.waitForTimeout(100);
-      console.log('✅ 4단계: 말풍선 탈출 완료');
+      await this.page.waitForTimeout(200);
+      
+      // 마우스로 에디터 하단을 클릭해 확실하게 강제 탈출 처리
+      await this.focusBottom(targetPage);
+      await this.page.waitForTimeout(200);
+      console.log('✅ 4단계: 말풍선 강제 이중 탈출 완료');
       
       console.log(`🎉 인용구 소제목 입력 완료: ${subtitle}`);
       
@@ -1038,7 +1042,7 @@ class BlogPublisher extends EventEmitter {
    * @param {string} productName - 상품명 (소제목 생성용)
    * @param {Object} account - 계정 정보 (Gemini API 키 포함)
    */
-  async enterContent(content, imagePaths = [], productName, account) {
+  async enterContent(content, imagePaths = [], productName, account, sections = null) {
     try {
       this.emit('publish-progress', { step: '본문 내용 및 이미지 입력' });
       
@@ -1060,11 +1064,14 @@ class BlogPublisher extends EventEmitter {
 
       // 📸 [방탄 루프 횟수 제어] 텍스트 개수와 이미지 개수를 연동하여 
       // 어떠한 옵션 조합에서도 이미지와 텍스트가 유실 없이 100% 매칭되도록 보장합니다.
-      const loopCount = imagePaths.length > 0 ? Math.max(paragraphs.length, imagePaths.length) : paragraphs.filter(p => p.trim()).length;
+      const loopCount = sections ? 
+        (imagePaths.length > 0 ? Math.max(sections.length, imagePaths.length) : sections.length) :
+        (imagePaths.length > 0 ? Math.max(paragraphs.length, imagePaths.length) : paragraphs.filter(p => p.trim()).length);
       
       // 🚀 [소제목 사전 일괄 생성] 루프 진입 전에 모든 섹션의 소제목을 병렬로 미리 생성하여 멈춤 현상(30~40초 지연)을 완전히 제거합니다.
+      // (단, sections 정보가 직접 제공된 경우에는 제미나이가 이미 최적의 소제목을 만들었으므로 사전 생성을 생략합니다)
       const preGeneratedSubtitles = [];
-      if (this.config.useBubble !== false) {
+      if (this.config.useBubble !== false && !sections) {
         console.log(`🚀 AI 소제목 사전 일괄 생성 시작 (총 ${loopCount}개 섹션)...`);
         this.emit('publish-progress', { step: '소제목 일괄 사전 생성 중...' });
         
@@ -1088,7 +1095,26 @@ class BlogPublisher extends EventEmitter {
       }
 
       for (let i = 0; i < loopCount; i++) {
-        let paragraph = paragraphs[i] ? paragraphs[i].trim() : '';
+        let subtitle = '';
+        let bodyText = '';
+        
+        if (sections && sections[i]) {
+          subtitle = sections[i].subtitle || '오늘의 순간';
+          bodyText = sections[i].body || '';
+        } else {
+          // 폴백: paragraph 분할 처리
+          const rawPara = paragraphs[i] ? paragraphs[i].trim() : '';
+          const parts = rawPara.split('\n');
+          if (parts.length > 1) {
+            // "소제목\n본문내용" 형태로 결합되어 들어온 경우를 분리
+            subtitle = parts[0].trim();
+            bodyText = parts.slice(1).join('\n').trim();
+          } else {
+            subtitle = preGeneratedSubtitles[i] || '오늘의 순간';
+            bodyText = rawPara;
+          }
+        }
+        
         const imageToInsert = imagePaths && imagePaths[i] && require('fs').existsSync(imagePaths[i]) ? imagePaths[i] : null;
         
         // 🎯 [방탄 포커스 고정] 이전 루프에서 이미지가 삽입된 후 포커스가 이미지 블록에 갇히는 현상을 완벽히 차단합니다.
@@ -1100,10 +1126,8 @@ class BlogPublisher extends EventEmitter {
         
         // 🔥 말풍선 소제목 넣기/빼기 처리
         if (this.config.useBubble !== false) {
-          if (paragraph || imageToInsert) {
-            console.log(`🔹 [말풍선 옵션 활성] ${i + 1}번째 섹션 소제목 삽입 중...`);
-            // 🚀 사전 생성된 소제목을 즉시 가져와서 지연 시간 0초 달성
-            const subtitle = preGeneratedSubtitles[i] || '오늘의 순간';
+          if (subtitle || imageToInsert) {
+            console.log(`🔹 [말풍선 옵션 활성] ${i + 1}번째 섹션 소제목 삽입 중... [${subtitle}]`);
             await this.insertSubtitleWithQuotation(subtitle);
           }
         } else {
@@ -1111,19 +1135,19 @@ class BlogPublisher extends EventEmitter {
         }
         
         // 🔥 60자 설명문 넣기/빼기 처리 (또는 사장님의 천재적 아이디어인 사진 인덱스 자동 표기 처리)
-        if (this.config.useDescription !== false && paragraph && paragraph.trim() !== '') {
+        if (this.config.useDescription !== false && bodyText && bodyText.trim() !== '') {
           console.log(`🔹 [설명문 옵션 활성] ${i + 1}번째 섹션 본문 텍스트 입력 중...`);
           // 🔥 문장별 줄바꿈 추가 (숫자 뒤의 마침표는 제외)
-          paragraph = paragraph.replace(/(?<!\d)[.!?]\s*/g, '$&\n').trim();
-          console.log(`📝 문단 내용 (줄바꿈 적용):\n${paragraph}`);
+          let paragraphToType = bodyText.replace(/(?<!\d)[.!?]\s*/g, '$&\n').trim();
+          console.log(`📝 문단 내용 (줄바꿈 적용):\n${paragraphToType}`);
             
           // 문단 내용 입력
           try {
-            await this.copyTextToClipboard(paragraph);
+            await this.copyTextToClipboard(paragraphToType);
             await targetPage.keyboard.press('Control+V');
           } catch (clipboardError) {
             console.warn(`⚠️ 문단 클립보드 복사 실패, 직접 타이핑:`, clipboardError.message);
-            await targetPage.keyboard.type(paragraph, { delay: 40 });
+            await targetPage.keyboard.type(paragraphToType, { delay: 40 });
           }
           await targetPage.waitForTimeout(500);
         } else if (this.config.useBubble === false && this.config.useDescription === false) {
@@ -1163,7 +1187,7 @@ class BlogPublisher extends EventEmitter {
           await this.page.keyboard.press('Enter');
           await this.page.waitForTimeout(50);
         }
-        await this.page.waitForTimeout(300); // 1500 -> 300 단축
+        await this.page.waitForTimeout(300);
       }
       
       console.log('✅ 모든 문단과 이미지 입력 완료');
@@ -1737,7 +1761,7 @@ class BlogPublisher extends EventEmitter {
           const content = postData.content || postData.mainContent;
           const images = postData.images || [];
           const productName = postData.title || '';
-          await this.enterContent(content, images, productName, account);
+          await this.enterContent(content, images, productName, account, postData.sections);
         }
         
         // 4b. 제목 입력 (맨 마지막 - 커서가 제목에 남아도 무방)
@@ -1773,7 +1797,7 @@ class BlogPublisher extends EventEmitter {
           const content = postData.content || postData.mainContent;
           const images = postData.images || [];
           const productName = postData.title || '';
-          await this.enterContent(content, images, productName, account);
+          await this.enterContent(content, images, productName, account, postData.sections);
         }
       }
 
@@ -1985,7 +2009,7 @@ class BlogPublisher extends EventEmitter {
         const content = postData.content || postData.mainContent;
         const images = postData.images || [];
         const productName = postData.title || '';
-        await this.enterContent(content, images, productName, account);
+        await this.enterContent(content, images, productName, account, postData.sections);
       }
 
       // 9-12. 포스트 발행 (공개 설정 및 카테고리, 태그 입력을 발행 레이어가 열린 후 진행하도록 객체 전달)
@@ -2367,7 +2391,7 @@ class BlogPublisher extends EventEmitter {
         const content = postData.content || postData.mainContent;
         const images = postData.images || [];
         const productName = postData.title || '';
-        await this.enterContent(content, images, productName, account);
+        await this.enterContent(content, images, productName, account, postData.sections);
       }
 
       // 12. 포스트 발행 전 세션 저장 (안전한 시점)
