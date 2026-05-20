@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.9.42 (2026-05-20)
+- **Description**: Removed Settings pill buttons (MyIP, 서버IP, My Key, 서버Key) to deliver a simplified settings interface. Kept Naver ID, password, Blog ID, server address, and Gemini API key as standard inputs that initialize blank but persist locally after the first input.
+- **Changes**:
+  - Deleted the button DOM structures from `src/renderer/index.html`.
+  - Removed event listener bindings for `#btn-fill-myip`, `#btn-fill-serverip`, `#btn-fill-mykey`, and `#btn-fill-serverkey` in `src/renderer/app.js`.
+  - Confirmed localStorage persistence of credentials to ensure users only need to input them once.
+  - Recompiled the Android APK to `MyDays.apk`.
+
 ## v1.9.41 (2026-05-20)
 - **Description**: Resolved speech bubble escaping and text/photo mismatch bugs by implementing an 이중 탈출 가드 (Double Escape Guard) for Naver Editor's quotation blocks, and passing structured section data to prevent duplicate subtitles in descriptions.
 - **Changes**:

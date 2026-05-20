@@ -3933,55 +3933,7 @@ class PhotoAutomationManager {
             });
         }
 
-        // MyIP 및 서버IP 채우기 버튼 바인딩
-        const btnFillMyIp = document.getElementById('btn-fill-myip');
-        if (btnFillMyIp) {
-            btnFillMyIp.addEventListener('click', () => {
-                this.discoverPcServer();
-            });
-        }
 
-        const btnFillServerIp = document.getElementById('btn-fill-serverip');
-        if (btnFillServerIp) {
-            btnFillServerIp.addEventListener('click', () => {
-                const elServerUrl = document.getElementById('mobile-server-url');
-                const defaultServerUrl = MobileApiBridge.DEFAULT_SERVER_URL;
-                if (elServerUrl) {
-                    elServerUrl.value = defaultServerUrl;
-                }
-                localStorage.setItem('mydays-server-url', defaultServerUrl);
-                
-                Utils.showDialog('success', '서버 IP 자동 입력 완료',
-                    `고정 터널 서버 주소가 자동으로 설정되었습니다.\n\n` +
-                    `• 주소: ${MobileApiBridge.maskUrl(defaultServerUrl)}`
-                );
-                
-                this.updateCherryBlossomStatus();
-            });
-        }
-
-        const btnFillMyKey = document.getElementById('btn-fill-mykey');
-        if (btnFillMyKey) {
-            btnFillMyKey.addEventListener('click', () => {
-                window.open('https://aistudio.google.com/api-keys', '_blank');
-            });
-        }
-
-        const btnFillServerKey = document.getElementById('btn-fill-serverkey');
-        if (btnFillServerKey) {
-            btnFillServerKey.addEventListener('click', () => {
-                const elGemini = document.getElementById('mobile-gemini-key');
-                const defaultKey = MobileApiBridge.DEFAULT_GEMINI_KEY;
-                if (elGemini) {
-                    elGemini.value = defaultKey;
-                }
-                localStorage.setItem('test-gemini-key', defaultKey);
-                
-                Utils.showDialog('success', '서버 Key 자동 입력 완료',
-                    `PC 서버의 기본 제미나이 API Key가 모바일에 설정되었습니다.`
-                );
-            });
-        }
 
         // 초기 설정 불러오기
         this.loadSettings();

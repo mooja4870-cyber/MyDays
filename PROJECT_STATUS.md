@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.41)
+## 🚀 Current Status (v1.9.42)
+- **⚙️ Simplified Settings & Persistence (v1.9.42)**: Removed settings pill buttons (MyIP, 서버IP, My Key, 서버Key) to deliver a simplified settings interface. All configuration fields (Naver ID/password, Blog ID, PC Server URL, and Gemini Key) start blank on fresh launch, but persist securely in browser localStorage upon saving. Recompiled updated code into `MyDays.apk`.
 - **💬 Quotation Bubbles Escaping & Structured Posting (v1.9.41)**: Resolved speech bubble escaping and text/photo mismatch bugs by implementing an 이중 탈출 가드 (Double Escape Guard) for Naver Editor's quotation blocks (increasing keyboard delays to 200ms and calling `focusBottom()` as a double-guard to force-escape bubbles), and passing structured `sections` data containing separate `subtitle` and `body` fields to prevent duplicate subtitles in descriptions. Recompiled updated code into `MyDays.apk`.
 - **📱 Premium Cherry Blossom Icon (v1.9.40)**: Replaced the default application logo and Android launcher icons with a high-fidelity, premium 3D cherry blossom icon aligned with the Rosé design system. Generated a modern minimalist cherry blossom launcher icon. Removed `android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml` to prevent adaptive icon scaling/clipping issues.
 - **🔑 Gemini API Key Restoration (v1.9.31)**: Successfully restored automated content generation by replacing the expired Gemini API key with a validated working key (`AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA`) in both user AppData and local mock server configurations. Terminated and restarted the background server on port 3333 to reload config into active memory.
