@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.9.31 (2026-05-20)
+- **Description**: Restored Gemini API functionality by replacing the compromised key with a validated working key in the configuration files, synchronizing files between AppData and the local mock server, and restarting the HTTP server.
+- **Changes**:
+  - Replaced the leaked Gemini API key with the secure validated key (`AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA`) in both user AppData (`c:\Users\mooja\AppData\Roaming\nepas\config\accounts.json`) and PC mock server (`d:\AI\project\my_days\userData\userData\config\accounts.json`) configurations.
+  - Gracefully terminated the active Electron/Node server process and restarted it using `node server.js` to ensure the new configuration loads into active memory.
+  - Verified Gemini API generation functionality using a scratch validation script testing the `ContentGenerator` model directly.
+  - Successfully ran the comprehensive test suite (`npm run test:comprehensive`) to guarantee system-wide stability.
+
 ## v1.9.30 (2026-05-19)
 - **Description**: Synchronized Android project version configuration and WebView User Agent version to match the actual release version (v1.9.30).
 - **Changes**:
