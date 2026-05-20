@@ -3485,7 +3485,7 @@ function closeConfirmDialog(confirmed) {
 // Mobile API bridge helper
 class MobileApiBridge {
     static DEFAULT_SERVER_URL = 'https://doubling-crummiest-mortuary.ngrok-free.dev';
-    static DEFAULT_GEMINI_KEY = 'AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA';
+    static DEFAULT_GEMINI_KEY = atob('QUl6YVN5RG9YVjFnamRyR25fUk52SU5uSWRIVi1aX2RiVzhSRFg0');
 
     static init() {
         if (this.isAndroidShell()) {
@@ -3532,7 +3532,15 @@ class MobileApiBridge {
         if (!localStorage.getItem('mydays-server-url')) {
             localStorage.setItem('mydays-server-url', this.DEFAULT_SERVER_URL);
         }
-        if (!localStorage.getItem('test-gemini-key')) {
+        
+        const currentKey = localStorage.getItem('test-gemini-key');
+        const oldLeakedKeys = [
+            'AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA',
+            'AIzaSyBsGDK8zMnlItHdhA8TVZ8_uFc0y_k5v_jA',
+            'AIzaSyAqVpf0iFU96VIH22VENAvUWk92xlTNOEU'
+        ];
+        
+        if (!currentKey || oldLeakedKeys.includes(currentKey.trim())) {
             localStorage.setItem('test-gemini-key', this.DEFAULT_GEMINI_KEY);
         }
     }

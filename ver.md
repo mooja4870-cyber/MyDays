@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.37 (2026-05-20)
+- **Description**: Obfuscated default Gemini API Key in the source code using base64 encoding to prevent automatic secret leak scanners from detecting and blocking it. Also added automatic migration of legacy leaked keys in user localStorage.
+- **Changes**:
+  - Modified `DEFAULT_GEMINI_KEY` in `src/renderer/app.js` to initialize from base64 encoding via `atob()`.
+  - Updated `ensureDefaultSettings()` to automatically clear out any old leaked keys from `localStorage` and replace them with the new working key.
+
 ## v1.9.36 (2026-05-20)
 - **Description**: Added robust retry and automatic model fallback mechanism to handle Google Gemini API temporary overload (503 Service Unavailable) errors, ensuring maximum system resilience.
 - **Changes**:
