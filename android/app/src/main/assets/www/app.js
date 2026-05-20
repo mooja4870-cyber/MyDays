@@ -3529,8 +3529,9 @@ class MobileApiBridge {
     }
 
     static ensureDefaultSettings() {
-        if (!localStorage.getItem('mydays-server-url')) {
-            localStorage.setItem('mydays-server-url', this.DEFAULT_SERVER_URL);
+        // PC 서버 주소는 초기값으로 공란 상태로 둡니다.
+        if (localStorage.getItem('mydays-server-url') === null) {
+            localStorage.setItem('mydays-server-url', '');
         }
         
         const currentKey = localStorage.getItem('test-gemini-key');
@@ -3926,11 +3927,30 @@ class PhotoAutomationManager {
             });
         }
 
-        // PC IP 자동 검색 버튼 바인딩
-        const btnDiscover = document.getElementById('btn-discover-pc-server');
-        if (btnDiscover) {
-            btnDiscover.addEventListener('click', () => {
+        // MyIP 및 서버IP 채우기 버튼 바인딩
+        const btnFillMyIp = document.getElementById('btn-fill-myip');
+        if (btnFillMyIp) {
+            btnFillMyIp.addEventListener('click', () => {
                 this.discoverPcServer();
+            });
+        }
+
+        const btnFillServerIp = document.getElementById('btn-fill-serverip');
+        if (btnFillServerIp) {
+            btnFillServerIp.addEventListener('click', () => {
+                const elServerUrl = document.getElementById('mobile-server-url');
+                const defaultServerUrl = MobileApiBridge.DEFAULT_SERVER_URL;
+                if (elServerUrl) {
+                    elServerUrl.value = defaultServerUrl;
+                }
+                localStorage.setItem('mydays-server-url', defaultServerUrl);
+                
+                Utils.showDialog('success', '서버 IP 자동 입력 완료',
+                    `고정 터널 서버 주소가 자동으로 설정되었습니다.\n\n` +
+                    `• 주소: ${MobileApiBridge.maskUrl(defaultServerUrl)}`
+                );
+                
+                this.updateCherryBlossomStatus();
             });
         }
 
@@ -4146,19 +4166,19 @@ class PhotoAutomationManager {
 
     // 🔍 PC 서버 IP 자동 탐색 및 저장 처리
     static async discoverPcServer() {
-        const btnDiscover = document.getElementById('btn-discover-pc-server');
+        const btnMyIp = document.getElementById('btn-fill-myip');
         const elServerUrl = document.getElementById('mobile-server-url');
         
-        if (!btnDiscover) return;
+        if (!btnMyIp) return;
         
-        btnDiscover.disabled = true;
-        btnDiscover.style.opacity = '0.7';
+        btnMyIp.disabled = true;
+        btnMyIp.style.opacity = '0.7';
         
         try {
             console.log('🔄 PC 서버 IP 자동 탐색 중...');
             
             const foundUrl = await MobileApiBridge.discoverPcServer((subnet, current, total) => {
-                btnDiscover.innerHTML = `⏳ 검색 중 (${current}/${total})...`;
+                btnMyIp.innerHTML = `⏳ (${current}/${total})`;
             });
             
             if (foundUrl) {
@@ -4173,6 +4193,9 @@ class PhotoAutomationManager {
                     `• 검색된 주소: ${MobileApiBridge.maskUrl(foundUrl)}\n` +
                     `• 설정이 자동으로 입력되고 저장되었습니다.`
                 );
+                
+                // 🌸 벚꽃 펄스 애니메이션 상태 업데이트
+                this.updateCherryBlossomStatus();
             } else {
                 console.warn('❌ PC 서버를 찾지 못했습니다.');
                 Utils.showDialog('error', 'PC 서버 검색 실패', 
@@ -4187,9 +4210,9 @@ class PhotoAutomationManager {
             console.error('❌ PC 서버 탐색 중 치명적 오류:', error);
             alert(`오류 발생: ${error.message}`);
         } finally {
-            btnDiscover.disabled = false;
-            btnDiscover.style.opacity = '1';
-            btnDiscover.innerHTML = '🔍 PC IP 자동 검색';
+            btnMyIp.disabled = false;
+            btnMyIp.style.opacity = '1';
+            btnMyIp.innerHTML = '🏠 MyIP';
         }
     }
 

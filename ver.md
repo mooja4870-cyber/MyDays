@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.9.38 (2026-05-20)
+- **Description**: Configured default PC Server Address to load blank on clean installations and added two interactive inline pill buttons next to the label for quick server setup: 'MyIP' (auto local subnet scanning) and '서버IP' (predefined ngrok tunnel).
+- **Changes**:
+  - Modified `ensureDefaultSettings()` in `src/renderer/app.js` to leave `mydays-server-url` blank by default on fresh launches.
+  - Added HTML structure in `src/renderer/index.html` with `#btn-fill-myip` and `#btn-fill-serverip` buttons positioned to the right of the PC Server Address label.
+  - Implemented `.pill-badge-btn` styling in `src/renderer/styles.css` using theme-aligned Rosé pink tones and scale transform states.
+  - Bound click event listeners in `PhotoAutomationManager.init()` in `src/renderer/app.js` to trigger local network discovery (MyIP) and fill the default ngrok address (서버IP) respectively.
+
 ## v1.9.37 (2026-05-20)
 - **Description**: Obfuscated default Gemini API Key in the source code using base64 encoding to prevent automatic secret leak scanners from detecting and blocking it. Also added automatic migration of legacy leaked keys in user localStorage.
 - **Changes**:
