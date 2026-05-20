@@ -132,6 +132,11 @@ class ContentGenerator {
             } catch (error) {
                 console.error(`❌ 시도 ${attempt}/${maxRetries} 실패:`, error.message);
                 
+                // API 키 유출 또는 잘못된 API 키 에러 등은 즉시 실패 처리 (재시도 불필요)
+                if (error.message.includes('leaked') || error.message.includes('API key not valid') || error.message.includes('403 Forbidden')) {
+                    throw new Error(`사용 중인 Gemini API 키가 유출되었거나 유효하지 않습니다. Google AI Studio(https://aistudio.google.com/api-keys)에서 새 API 키를 발급받아 설정해 주세요.`);
+                }
+                
                 if (this.shouldStop) {
                     throw new Error('콘텐츠 생성이 중지되었습니다.');
                 }

@@ -1176,13 +1176,28 @@ class BlogAutomation {
             const { naverId, naverPassword, blogId, geminiApi, images, context, openType, useBubble, useDescription } = payload;
             
             let activeGeminiApi = geminiApi;
-            if (this.configManager) {
+            if ((!activeGeminiApi || activeGeminiApi.trim() === '') && this.configManager) {
                 const localAccount = this.configManager.getAccounts().find(acc => 
                     acc.username && acc.username.trim().toLowerCase() === naverId.trim().toLowerCase()
                 );
                 if (localAccount && localAccount.geminiApi) {
-                    console.log(`🔑 [서버 키 자동 대체] 모바일 수신 키 대신 PC 서버의 안전한 API 키를 적용합니다.`);
+                    console.log(`🔑 [서버 키 자동 대체] 모바일 수신 키가 비어 있어 PC 서버의 API 키를 적용합니다.`);
                     activeGeminiApi = localAccount.geminiApi;
+                }
+            } else if (activeGeminiApi && activeGeminiApi.trim() !== '') {
+                console.log(`🔑 [모바일 API 키 사용] 모바일 기기에서 수신한 API 키를 사용합니다.`);
+                // PC 서버의 계정 설정에 저장된 키와 다르면 동기화하여 저장
+                if (this.configManager) {
+                    const localAccount = this.configManager.getAccounts().find(acc => 
+                        acc.username && acc.username.trim().toLowerCase() === naverId.trim().toLowerCase()
+                    );
+                    if (localAccount && localAccount.geminiApi !== activeGeminiApi) {
+                        console.log(`💾 [API 키 동기화] PC 서버의 기존 API 키를 모바일에서 입력한 새 API 키로 업데이트합니다.`);
+                        localAccount.geminiApi = activeGeminiApi;
+                        this.configManager.addOrUpdateAccount(localAccount).catch(err => {
+                            console.error('❌ [API 키 동기화 실패]:', err);
+                        });
+                    }
                 }
             }
             

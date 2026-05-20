@@ -1,5 +1,23 @@
 # 📦 Version History
 
+## v1.9.35 (2026-05-20)
+- **Description**: Completely deleted "PC IP 자동 검색" and "API Key 구하러 가기" buttons from the mobile settings panel in both the renderer and Android assets index HTML, letting input fields occupy full width.
+- **Changes**:
+  - Modified `src/renderer/index.html` to remove the container divs and button elements for both buttons.
+  - Modified `android/app/src/main/assets/www/index.html` to mirror the button deletions.
+
+## v1.9.34 (2026-05-20)
+- **Description**: Resolved key override bug on the PC server that ignored valid Gemini API keys submitted from mobile clients by replacing them with the server's local configuration.
+- **Changes**:
+  - Modified `src/main.js`'s `executePhotoPublish` to prioritize the incoming mobile client's Gemini API key, using the server's key strictly as a fallback.
+  - Automatically syncs the new valid API key into the local account config (`accounts.json`) to keep both environments synchronized.
+
+## v1.9.33 (2026-05-20)
+- **Description**: Implemented fast-fail validation for leaked or invalid Gemini API keys in the content generation module, bypassing exponential backoff retry loops on permanent authentication failures and displaying a user-friendly Korean instructions message.
+- **Changes**:
+  - Modified `src/modules/ContentGenerator.js` to catch `leaked`, `API key not valid`, or `403 Forbidden` errors immediately within `sendMessageWithRetry` to prevent wasteful delayed retries.
+  - Added clean step-by-step user instructions with a direct Google AI Studio API Key manager URL link inside the thrown error string.
+
 ## v1.9.32 (2026-05-20)
 - **Description**: Preset default PC Server URL (ngrok address) and Gemini API Key in the mobile app's default configuration, and restored the initial settings initialization logic. Built the updated secure mobile APK with masked password fields.
 - **Changes**:
