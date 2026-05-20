@@ -3484,8 +3484,8 @@ function closeConfirmDialog(confirmed) {
 
 // Mobile API bridge helper
 class MobileApiBridge {
-    static DEFAULT_SERVER_URL = '';
-    static DEFAULT_GEMINI_KEY = '';
+    static DEFAULT_SERVER_URL = 'https://doubling-crummiest-mortuary.ngrok-free.dev';
+    static DEFAULT_GEMINI_KEY = 'AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA';
 
     static init() {
         if (this.isAndroidShell()) {
@@ -3529,7 +3529,12 @@ class MobileApiBridge {
     }
 
     static ensureDefaultSettings() {
-        // 처음 구동 시에도 자동 덮어쓰기를 하지 않고 공란 상태를 보존합니다.
+        if (!localStorage.getItem('mydays-server-url')) {
+            localStorage.setItem('mydays-server-url', this.DEFAULT_SERVER_URL);
+        }
+        if (!localStorage.getItem('test-gemini-key')) {
+            localStorage.setItem('test-gemini-key', this.DEFAULT_GEMINI_KEY);
+        }
     }
 
     static maskUrl(url) {

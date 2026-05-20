@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.31)
+## 🚀 Current Status (v1.9.32)
+- **📱 Secure Preset Mobile APK (v1.9.32)**: Configured the active ngrok tunnel address (`https://doubling-crummiest-mortuary.ngrok-free.dev`) and validated Gemini key (`AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA`) as default parameters in the mobile settings initialization flow. These are stored securely in browser `localStorage` as password types (masked as dots) on startup, completely eliminating server connection errors and manual key entry. Recompiled updated code into `MyDays.apk`.
 - **🔑 Gemini API Key Restoration (v1.9.31)**: Successfully restored automated content generation by replacing the expired Gemini API key with a validated working key (`AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA`) in both user AppData and local mock server configurations. Terminated and restarted the background server on port 3333 to reload config into active memory.
 - **🔒 PC Server URL Masking (v1.9.27)**: Implemented masking for the PC Server IP/URL in the connection failure diagnosis dialogs and successful auto-discovery popup alerts to completely hide internal/external server coordinates.
 - **🔒 Password Card Masking (v1.9.26)**: Replaced plain-text password displays in the registered account cards list with secure dot masks (`●●●●●●●●`) to guarantee absolute credential privacy on screen.

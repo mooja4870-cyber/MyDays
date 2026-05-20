@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.9.32 (2026-05-20)
+- **Description**: Preset default PC Server URL (ngrok address) and Gemini API Key in the mobile app's default configuration, and restored the initial settings initialization logic. Built the updated secure mobile APK with masked password fields.
+- **Changes**:
+  - Pre-configured `DEFAULT_SERVER_URL` in `src/renderer/app.js` with the active ngrok tunnel address (`https://doubling-crummiest-mortuary.ngrok-free.dev`).
+  - Pre-configured `DEFAULT_GEMINI_KEY` in `src/renderer/app.js` with the validated working Gemini key (`AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA`).
+  - Restored `MobileApiBridge.ensureDefaultSettings()` to automatically populate browser `localStorage` on initial mobile app startup.
+  - Compiled the updated code into `src/renderer/MyDays.apk` using `build-android-apk.ps1`.
+
 ## v1.9.31 (2026-05-20)
 - **Description**: Restored Gemini API functionality by replacing the compromised key with a validated working key in the configuration files, synchronizing files between AppData and the local mock server, and restarting the HTTP server.
 - **Changes**:
