@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.9.40 (2026-05-20)
+- **Description**: Replaced the default application logo and Android launcher icons with a high-fidelity, premium 3D cherry blossom icon aligned with the Rosé design system.
+- **Changes**:
+  - Generated a modern minimalist cherry blossom launcher icon.
+  - Replaced `src/renderer/icon.png` (web renderer icon) with the new 512x512 resolution icon.
+  - Resized and replaced all PNG files under `android/app/src/main/res/mipmap-*` (`ic_launcher.png` and `ic_launcher_foreground.png`).
+  - Removed `android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml` to prevent adaptive icon scaling/clipping issues.
+
 ## v1.9.39 (2026-05-20)
 - **Description**: Updated Google Gemini API Key field to default to blank on clean installations and added two interactive inline pill buttons next to the label: 'My Key' (opens Google AI Studio api-keys link) and '서버 Key' (fills in the base64-obfuscated server API Key).
 - **Changes**:
