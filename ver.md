@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.9.39 (2026-05-20)
+- **Description**: Updated Google Gemini API Key field to default to blank on clean installations and added two interactive inline pill buttons next to the label: 'My Key' (opens Google AI Studio api-keys link) and '서버 Key' (fills in the base64-obfuscated server API Key).
+- **Changes**:
+  - Renamed label to 'Google Gemini API Key' in `src/renderer/index.html` and added inline buttons `#btn-fill-mykey` and `#btn-fill-serverkey`.
+  - Configured `DEFAULT_GEMINI_KEY` in `src/renderer/app.js` to store the new server key `AIzaSyBr_T_kt2sr9SU3f5EwTHm0iVlGNxBdAGQ` securely in Base64.
+  - Modified `ensureDefaultSettings()` in `src/renderer/app.js` to leave `test-gemini-key` blank by default on fresh launches and clear out old leaked keys.
+  - Bound click listeners in `PhotoAutomationManager.init()` to open the key registration URL (My Key) and fill in the obfuscated server key (서버 Key) respectively.
+
 ## v1.9.38 (2026-05-20)
 - **Description**: Configured default PC Server Address to load blank on clean installations and added two interactive inline pill buttons next to the label for quick server setup: 'MyIP' (auto local subnet scanning) and '서버IP' (predefined ngrok tunnel).
 - **Changes**:

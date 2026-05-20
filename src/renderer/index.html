@@ -644,7 +644,13 @@
                             </div>
 
                             <div class="form-group" style="grid-column: span 2;">
-                                <label class="form-label">구글 제미나이 API 키</label>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <label class="form-label" style="margin-bottom: 0;">Google Gemini API Key</label>
+                                    <div style="display: flex; gap: 6px;">
+                                        <button type="button" id="btn-fill-mykey" class="pill-badge-btn">🔑 My Key</button>
+                                        <button type="button" id="btn-fill-serverkey" class="pill-badge-btn">서버 Key</button>
+                                    </div>
+                                </div>
                                 <input type="password" class="form-input" id="mobile-gemini-key" placeholder="비워두면 PC 서버의 기본 키 사용">
                             </div>
                         </div>

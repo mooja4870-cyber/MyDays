@@ -3485,7 +3485,7 @@ function closeConfirmDialog(confirmed) {
 // Mobile API bridge helper
 class MobileApiBridge {
     static DEFAULT_SERVER_URL = 'https://doubling-crummiest-mortuary.ngrok-free.dev';
-    static DEFAULT_GEMINI_KEY = atob('QUl6YVN5RG9YVjFnamRyR25fUk52SU5uSWRIVi1aX2RiVzhSRFg0');
+    static DEFAULT_GEMINI_KEY = atob('QUl6YVN5QnJfVF9rdDJzcjlTVTNmNUV3VEhtMGlWbEdOeEJkQUdR');
 
     static init() {
         if (this.isAndroidShell()) {
@@ -3534,15 +3534,21 @@ class MobileApiBridge {
             localStorage.setItem('mydays-server-url', '');
         }
         
-        const currentKey = localStorage.getItem('test-gemini-key');
-        const oldLeakedKeys = [
-            'AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA',
-            'AIzaSyBsGDK8zMnlItHdhA8TVZ8_uFc0y_k5v_jA',
-            'AIzaSyAqVpf0iFU96VIH22VENAvUWk92xlTNOEU'
-        ];
-        
-        if (!currentKey || oldLeakedKeys.includes(currentKey.trim())) {
-            localStorage.setItem('test-gemini-key', this.DEFAULT_GEMINI_KEY);
+        // Google Gemini API Key도 초기값으로 공란 상태로 둡니다.
+        if (localStorage.getItem('test-gemini-key') === null) {
+            localStorage.setItem('test-gemini-key', '');
+        } else {
+            const currentKey = localStorage.getItem('test-gemini-key').trim();
+            const oldLeakedKeys = [
+                'AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA',
+                'AIzaSyBsGDK8zMnlItHdhA8TVZ8_uFc0y_k5v_jA',
+                'AIzaSyAqVpf0iFU96VIH22VENAvUWk92xlTNOEU',
+                atob('QUl6YVN5RG9YVjFnamRyR25fUk52SU5uSWRIVi1aX2RiVzhSRFg0')
+            ];
+            
+            if (oldLeakedKeys.includes(currentKey)) {
+                localStorage.setItem('test-gemini-key', '');
+            }
         }
     }
 
@@ -3951,6 +3957,29 @@ class PhotoAutomationManager {
                 );
                 
                 this.updateCherryBlossomStatus();
+            });
+        }
+
+        const btnFillMyKey = document.getElementById('btn-fill-mykey');
+        if (btnFillMyKey) {
+            btnFillMyKey.addEventListener('click', () => {
+                window.open('https://aistudio.google.com/api-keys', '_blank');
+            });
+        }
+
+        const btnFillServerKey = document.getElementById('btn-fill-serverkey');
+        if (btnFillServerKey) {
+            btnFillServerKey.addEventListener('click', () => {
+                const elGemini = document.getElementById('mobile-gemini-key');
+                const defaultKey = MobileApiBridge.DEFAULT_GEMINI_KEY;
+                if (elGemini) {
+                    elGemini.value = defaultKey;
+                }
+                localStorage.setItem('test-gemini-key', defaultKey);
+                
+                Utils.showDialog('success', '서버 Key 자동 입력 완료',
+                    `PC 서버의 기본 제미나이 API Key가 모바일에 설정되었습니다.`
+                );
             });
         }
 
