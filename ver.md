@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.9.48 (2026-05-21)
+- **Description**: Replaced app icon with a newly AI-generated premium cherry blossom icon (delicate pink petals with glassmorphism, rose-to-peach gradient).
+- **Changes**:
+  - Generated new cherry blossom icon via AI image generation.
+  - Replaced `src/renderer/icon.png`, `android/app/src/main/assets/www/icon.png`, and all `mipmap-*` launcher icons.
+  - Recompiled the Android APK to `MyDays.apk`.
+
 ## v1.9.47 (2026-05-21)
 - **Description**: Restored the premium 3D cherry blossom app icon from v1.9.42 (replacing the v1.9.29 default icon).
 - **Changes**:
