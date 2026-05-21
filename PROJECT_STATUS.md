@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.43)
+## 🚀 Current Status (v1.9.44)
+- **📡 Background Network Discovered Log Align (v1.9.44)**: Aligned the background auto-discovery success log message with the newly introduced UI button name `[주소 자동 설정]`, replacing the legacy label references to avoid confusing instructions. Recompiled updated code into `MyDays.apk`.
 - **📡 PC Server IP Auto-Discovery (v1.9.43)**: Added a "주소 자동 설정" button adjacent to the PC Server Address input field in the settings panel (both PC and Android asset frontends). The button dynamically runs subnet scanning to autodetect the active PC server and saves/populates the configuration automatically, resolving user feedback for local connection setup.
 - **⚙️ Simplified Settings & Persistence (v1.9.42)**: Removed settings pill buttons (MyIP, 서버IP, My Key, 서버Key) to deliver a simplified settings interface. All configuration fields (Naver ID/password, Blog ID, PC Server URL, and Gemini Key) start blank on fresh launch, but persist securely in browser localStorage upon saving. Recompiled updated code into `MyDays.apk`.
 - **💬 Quotation Bubbles Escaping & Structured Posting (v1.9.41)**: Resolved speech bubble escaping and text/photo mismatch bugs by implementing an 이중 탈출 가드 (Double Escape Guard) for Naver Editor's quotation blocks (increasing keyboard delays to 200ms and calling `focusBottom()` as a double-guard to force-escape bubbles), and passing structured `sections` data containing separate `subtitle` and `body` fields to prevent duplicate subtitles in descriptions. Recompiled updated code into `MyDays.apk`.

@@ -4350,7 +4350,7 @@ class PhotoAutomationManager {
                                 if (foundUrl) {
                                     PostingHistoryManager.appendLog({ 
                                         level: 'success', 
-                                        message: `💡 [서버 자동 탐색 성공] 연결 가능한 PC 서버(${foundUrl})를 발견했습니다! 모바일 [설정] 탭의 [PC IP 자동 검색]을 클릭하시면 자동으로 연결 세팅이 완료됩니다!` 
+                                        message: `💡 [서버 자동 탐색 성공] 연결 가능한 PC 서버(${foundUrl})를 발견했습니다! 모바일 [설정] 탭의 [주소 자동 설정]을 클릭하시면 자동으로 연결 세팅이 완료됩니다!` 
                                     });
                                 } else {
                                     PostingHistoryManager.appendLog({ 

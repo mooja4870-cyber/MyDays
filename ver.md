@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.44 (2026-05-21)
+- **Description**: Aligned background auto-discovery success log message text with the newly added button label "[주소 자동 설정]".
+- **Changes**:
+  - Modified the success callback message in `src/renderer/app.js` to refer to "[주소 자동 설정]" instead of "[PC IP 자동 검색]".
+  - Recompiled the Android APK to `MyDays.apk`.
+
 ## v1.9.43 (2026-05-21)
 - **Description**: Added "주소 자동 설정" button to the right of PC Server Address to automatically scan and discover the active PC server URL on the local subnet.
 - **Changes**:
