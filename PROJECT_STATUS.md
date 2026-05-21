@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.45)
+## 🚀 Current Status (v1.9.46)
+- **🔒 Fixed Server Config & UI Field Removal (v1.9.46)**: Removed the PC Server URL and Gemini API Key fields from the mobile settings panel to run on a fixed server, while hardcoding default values/fallbacks inside `MobileApiBridge` and local storage initialization.
 - **⏪ Rollback to Stable Release (v1.9.45)**: Rolled back the entire codebase to the stable `v1.9.29` state to resolve the critical issue where images were missing in sections during automation, while maintaining version status and history files. Recompiled the clean `v1.9.29` code into `MyDays.apk`.
 - **📡 Background Network Discovered Log Align (v1.9.44)**: Aligned the background auto-discovery success log message with the newly introduced UI button name `[주소 자동 설정]`, replacing the legacy label references to avoid confusing instructions. Recompiled updated code into `MyDays.apk`.
 - **📡 PC Server IP Auto-Discovery (v1.9.43)**: Added a "주소 자동 설정" button adjacent to the PC Server Address input field in the settings panel (both PC and Android asset frontends). The button dynamically runs subnet scanning to autodetect the active PC server and saves/populates the configuration automatically, resolving user feedback for local connection setup.

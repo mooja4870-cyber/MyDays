@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.9.46 (2026-05-21)
+- **Description**: Removed PC Server URL and Gemini API Key inputs from mobile settings UI, hardcoding the fixed server URL and Gemini API Key as default fallback variables in `MobileApiBridge` and local storage setup.
+- **Changes**:
+  - Removed PC Server URL and Gemini API Key fields from settings form in `src/renderer/index.html`.
+  - Configured `DEFAULT_SERVER_URL` and `DEFAULT_GEMINI_KEY` values in `src/renderer/app.js`.
+  - Added robust localStorage fallback assignments in `saveMobileSettings()` and `ensureDefaultSettings()` in `src/renderer/app.js`.
+  - Recompiled the Android APK to `MyDays.apk`.
+
 ## v1.9.45 (2026-05-21)
 - **Description**: Rolled back all codebase changes (including automation, UI, and icons) to the stable v1.9.29 release to resolve issues where images were missing in sections.
 - **Changes**:

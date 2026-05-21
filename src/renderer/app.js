@@ -3484,13 +3484,13 @@ function closeConfirmDialog(confirmed) {
 
 // Mobile API bridge helper
 class MobileApiBridge {
-    static DEFAULT_SERVER_URL = '';
-    static DEFAULT_GEMINI_KEY = '';
+    static DEFAULT_SERVER_URL = 'https://doubling-crummiest-mortuary.ngrok-free.dev';
+    static DEFAULT_GEMINI_KEY = atob('QUl6YVN5QTNBSHZ6OE5RellvLU9qQkx3dkY1b0RPaEoyRE1nZVJr');
 
     static init() {
+        this.ensureDefaultSettings();
         if (this.isAndroidShell()) {
             document.body.classList.add('mydays-android');
-            this.ensureDefaultSettings();
             
             // 모바일 앱(Android WebView)인 경우에만 불필요한 버튼 삭제
             if (/MyDaysAndroid|; wv\)/i.test(navigator.userAgent)) {
@@ -3517,6 +3517,10 @@ class MobileApiBridge {
             return savedUrl;
         }
 
+        if (this.DEFAULT_SERVER_URL) {
+            return this.DEFAULT_SERVER_URL;
+        }
+
         if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
             return window.location.origin;
         }
@@ -3529,7 +3533,12 @@ class MobileApiBridge {
     }
 
     static ensureDefaultSettings() {
-        // 처음 구동 시에도 자동 덮어쓰기를 하지 않고 공란 상태를 보존합니다.
+        if (!localStorage.getItem('mydays-server-url')) {
+            localStorage.setItem('mydays-server-url', this.DEFAULT_SERVER_URL);
+        }
+        if (!localStorage.getItem('test-gemini-key')) {
+            localStorage.setItem('test-gemini-key', this.DEFAULT_GEMINI_KEY);
+        }
     }
 
     static maskUrl(url) {
@@ -4100,8 +4109,8 @@ class PhotoAutomationManager {
         const naverId = elId ? elId.value.trim() : '';
         const naverPassword = elPw ? elPw.value.trim() : '';
         const blogId = elBlog ? elBlog.value.trim() : '';
-        const geminiKey = elGemini ? elGemini.value.trim() : '';
-        const serverUrl = elServerUrl ? elServerUrl.value.trim().replace(/\/+$/, '') : '';
+        const geminiKey = elGemini ? elGemini.value.trim() : (localStorage.getItem('test-gemini-key') || MobileApiBridge.DEFAULT_GEMINI_KEY || '');
+        const serverUrl = elServerUrl ? elServerUrl.value.trim().replace(/\/+$/, '') : (localStorage.getItem('mydays-server-url') || MobileApiBridge.DEFAULT_SERVER_URL || '');
 
         if (!naverId || !naverPassword || !blogId || !serverUrl) {
             alert('⚠️ 네이버 ID, 비밀번호, 블로그 ID, PC 서버 주소는 필수 입력 사항입니다.');
