@@ -10,7 +10,7 @@ android {
         applicationId 'com.mydays.app'
         minSdk 23
         targetSdk 35
-        versionCode 10944
-        versionName '1.9.44'
+        versionCode 10945
+        versionName '1.9.45'
     }
 }

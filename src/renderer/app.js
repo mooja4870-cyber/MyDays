@@ -3484,8 +3484,8 @@ function closeConfirmDialog(confirmed) {
 
 // Mobile API bridge helper
 class MobileApiBridge {
-    static DEFAULT_SERVER_URL = 'https://doubling-crummiest-mortuary.ngrok-free.dev';
-    static DEFAULT_GEMINI_KEY = atob('QUl6YVN5QnJfVF9rdDJzcjlTVTNmNUV3VEhtMGlWbEdOeEJkQUdR');
+    static DEFAULT_SERVER_URL = '';
+    static DEFAULT_GEMINI_KEY = '';
 
     static init() {
         if (this.isAndroidShell()) {
@@ -3529,27 +3529,7 @@ class MobileApiBridge {
     }
 
     static ensureDefaultSettings() {
-        // PC 서버 주소는 초기값으로 공란 상태로 둡니다.
-        if (localStorage.getItem('mydays-server-url') === null) {
-            localStorage.setItem('mydays-server-url', '');
-        }
-        
-        // Google Gemini API Key도 초기값으로 공란 상태로 둡니다.
-        if (localStorage.getItem('test-gemini-key') === null) {
-            localStorage.setItem('test-gemini-key', '');
-        } else {
-            const currentKey = localStorage.getItem('test-gemini-key').trim();
-            const oldLeakedKeys = [
-                'AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA',
-                'AIzaSyBsGDK8zMnlItHdhA8TVZ8_uFc0y_k5v_jA',
-                'AIzaSyAqVpf0iFU96VIH22VENAvUWk92xlTNOEU',
-                atob('QUl6YVN5RG9YVjFnamRyR25fUk52SU5uSWRIVi1aX2RiVzhSRFg0')
-            ];
-            
-            if (oldLeakedKeys.includes(currentKey)) {
-                localStorage.setItem('test-gemini-key', '');
-            }
-        }
+        // 처음 구동 시에도 자동 덮어쓰기를 하지 않고 공란 상태를 보존합니다.
     }
 
     static maskUrl(url) {
@@ -3933,15 +3913,13 @@ class PhotoAutomationManager {
             });
         }
 
-        // PC 서버 IP 자동 검색 버튼 바인딩
-        const btnMyIp = document.getElementById('btn-fill-myip');
-        if (btnMyIp) {
-            btnMyIp.addEventListener('click', () => {
+        // PC IP 자동 검색 버튼 바인딩
+        const btnDiscover = document.getElementById('btn-discover-pc-server');
+        if (btnDiscover) {
+            btnDiscover.addEventListener('click', () => {
                 this.discoverPcServer();
             });
         }
-
-
 
         // 초기 설정 불러오기
         this.loadSettings();
@@ -4155,19 +4133,19 @@ class PhotoAutomationManager {
 
     // 🔍 PC 서버 IP 자동 탐색 및 저장 처리
     static async discoverPcServer() {
-        const btnMyIp = document.getElementById('btn-fill-myip');
+        const btnDiscover = document.getElementById('btn-discover-pc-server');
         const elServerUrl = document.getElementById('mobile-server-url');
         
-        if (!btnMyIp) return;
+        if (!btnDiscover) return;
         
-        btnMyIp.disabled = true;
-        btnMyIp.style.opacity = '0.7';
+        btnDiscover.disabled = true;
+        btnDiscover.style.opacity = '0.7';
         
         try {
             console.log('🔄 PC 서버 IP 자동 탐색 중...');
             
             const foundUrl = await MobileApiBridge.discoverPcServer((subnet, current, total) => {
-                btnMyIp.innerHTML = `⏳ (${current}/${total})`;
+                btnDiscover.innerHTML = `⏳ 검색 중 (${current}/${total})...`;
             });
             
             if (foundUrl) {
@@ -4182,9 +4160,6 @@ class PhotoAutomationManager {
                     `• 검색된 주소: ${MobileApiBridge.maskUrl(foundUrl)}\n` +
                     `• 설정이 자동으로 입력되고 저장되었습니다.`
                 );
-                
-                // 🌸 벚꽃 펄스 애니메이션 상태 업데이트
-                this.updateCherryBlossomStatus();
             } else {
                 console.warn('❌ PC 서버를 찾지 못했습니다.');
                 Utils.showDialog('error', 'PC 서버 검색 실패', 
@@ -4199,9 +4174,9 @@ class PhotoAutomationManager {
             console.error('❌ PC 서버 탐색 중 치명적 오류:', error);
             alert(`오류 발생: ${error.message}`);
         } finally {
-            btnMyIp.disabled = false;
-            btnMyIp.style.opacity = '1';
-            btnMyIp.innerHTML = '🏠 주소 자동 설정';
+            btnDiscover.disabled = false;
+            btnDiscover.style.opacity = '1';
+            btnDiscover.innerHTML = '🔍 PC IP 자동 검색';
         }
     }
 
@@ -4350,7 +4325,7 @@ class PhotoAutomationManager {
                                 if (foundUrl) {
                                     PostingHistoryManager.appendLog({ 
                                         level: 'success', 
-                                        message: `💡 [서버 자동 탐색 성공] 연결 가능한 PC 서버(${foundUrl})를 발견했습니다! 모바일 [설정] 탭의 [주소 자동 설정]을 클릭하시면 자동으로 연결 세팅이 완료됩니다!` 
+                                        message: `💡 [서버 자동 탐색 성공] 연결 가능한 PC 서버(${foundUrl})를 발견했습니다! 모바일 [설정] 탭의 [PC IP 자동 검색]을 클릭하시면 자동으로 연결 세팅이 완료됩니다!` 
                                     });
                                 } else {
                                     PostingHistoryManager.appendLog({ 

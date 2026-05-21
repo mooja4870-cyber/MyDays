@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.9.45 (2026-05-21)
+- **Description**: Rolled back all codebase changes (including automation, UI, and icons) to the stable v1.9.29 release to resolve issues where images were missing in sections.
+- **Changes**:
+  - Rolled back all files to v1.9.29 state.
+  - Bumped version name to `1.9.45` (versionCode `10945`) to release as a new version.
+  - Recompiled the Android APK to `MyDays.apk`.
+
 ## v1.9.44 (2026-05-21)
 - **Description**: Aligned background auto-discovery success log message text with the newly added button label "[주소 자동 설정]".
 - **Changes**:
