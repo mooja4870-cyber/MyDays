@@ -3933,6 +3933,14 @@ class PhotoAutomationManager {
             });
         }
 
+        // PC 서버 IP 자동 검색 버튼 바인딩
+        const btnMyIp = document.getElementById('btn-fill-myip');
+        if (btnMyIp) {
+            btnMyIp.addEventListener('click', () => {
+                this.discoverPcServer();
+            });
+        }
+
 
 
         // 초기 설정 불러오기
@@ -4193,7 +4201,7 @@ class PhotoAutomationManager {
         } finally {
             btnMyIp.disabled = false;
             btnMyIp.style.opacity = '1';
-            btnMyIp.innerHTML = '🏠 MyIP';
+            btnMyIp.innerHTML = '🏠 주소 자동 설정';
         }
     }
 

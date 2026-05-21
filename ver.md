@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.9.43 (2026-05-21)
+- **Description**: Added "주소 자동 설정" button to the right of PC Server Address to automatically scan and discover the active PC server URL on the local subnet.
+- **Changes**:
+  - Modified `src/renderer/index.html` and `android/app/src/main/assets/www/index.html` to add the "주소 자동 설정" button beside the server URL input.
+  - Modified `src/renderer/app.js` and `android/app/src/main/assets/www/app.js` to bind the button to `PhotoAutomationManager.discoverPcServer()` and update UI reset label.
+  - Bumped version name to `1.9.43` in Android configuration files (`MainActivity.java` User-Agent and `build.gradle` versionName).
+  - Recompiled the Android APK to `MyDays.apk`.
+
 ## v1.9.42 (2026-05-20)
 - **Description**: Removed Settings pill buttons (MyIP, 서버IP, My Key, 서버Key) to deliver a simplified settings interface. Kept Naver ID, password, Blog ID, server address, and Gemini API key as standard inputs that initialize blank but persist locally after the first input.
 - **Changes**:
