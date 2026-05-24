@@ -3485,7 +3485,7 @@ function closeConfirmDialog(confirmed) {
 // Mobile API bridge helper
 class MobileApiBridge {
     static DEFAULT_SERVER_URL = 'https://doubling-crummiest-mortuary.ngrok-free.dev';
-    static DEFAULT_GEMINI_KEY = atob('QUl6YVN5QTNBSHZ6OE5RemZvLU9qQkx3dkY1b0RPaEoyRE1nZVJr');
+    static DEFAULT_GEMINI_KEY = atob('QUl6YVN5QTNBSHZ6OE5RellvLU9qQkx3dkY1b0RPaEoyRE1nZVJr');
 
     static init() {
         this.ensureDefaultSettings();
