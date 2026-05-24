@@ -9,7 +9,8 @@
 - **Frontend**: HTML5, Vanilla CSS, Vanilla JS
 - **APIs**: Google Generative AI (Gemini), Coupang open APIs
 
-## 🚀 Current Status (v1.9.48)
+## 🚀 Current Status (v1.9.49)
+- **🔑 Gemini API Key Typo Correction (v1.9.49)**: Corrected a typographical error in the Base64-encoded Gemini API key fallback for the mobile app (changing `QUl6YVN5QTNBSHZ6OE5RemZvLU9qQkx3dkY1b0RPaEoyRE1nZVJr` to `QUl6YVN5QTNBSHZ6OE5RellvLU9qQkx3dkY1b0RPaEoyRE1nZVJr`) to resolve "404 Bad Request / Invalid API Key" errors. Recompiled the APK.
 - **🌸 New AI-Generated Cherry Blossom Icon (v1.9.48)**: Replaced app icon with a freshly AI-generated premium cherry blossom design featuring glassmorphism effects and a rose-to-peach gradient.
 - **🌸 Cherry Blossom Icon Restoration (v1.9.47)**: Restored the premium 3D cherry blossom app icon from v1.9.42 to replace the default v1.9.29 icon that was brought back during the rollback.
 - **🔒 Fixed Server Config & UI Field Removal (v1.9.46)**: Removed the PC Server URL and Gemini API Key fields from the mobile settings panel to run on a fixed server, while hardcoding default values/fallbacks inside `MobileApiBridge` and local storage initialization.

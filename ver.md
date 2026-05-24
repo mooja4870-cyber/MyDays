@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.9.49 (2026-05-24)
+- **Description**: Resolved the "404 Bad Request / Invalid API Key" error on mobile deployments by correcting a typographical error in the Base64-encoded Gemini API key.
+- **Changes**:
+  - Corrected `DEFAULT_GEMINI_KEY` Base64 string in `src/renderer/app.js` and `android/app/src/main/assets/www/app.js`.
+  - Bumped version code to `10949` and version name to `1.9.49` in `android/app/build.gradle`.
+  - Recompiled the Android APK to `MyDays.apk` via GitHub Actions pipeline.
+
 ## v1.9.48 (2026-05-21)
 - **Description**: Replaced app icon with a newly AI-generated premium cherry blossom icon (delicate pink petals with glassmorphism, rose-to-peach gradient).
 - **Changes**:
