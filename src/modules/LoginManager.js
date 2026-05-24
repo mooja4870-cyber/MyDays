@@ -490,6 +490,14 @@ class LoginManager {
                 console.log(`❌ 현재 URL: ${currentUrl}`);
                 console.log(`❌ 페이지 제목: ${pageTitle}`);
                 
+                try {
+                    const screenshotPath = path.join(process.cwd(), 'naver_login_failed.png');
+                    await this.page.screenshot({ path: screenshotPath });
+                    console.log(`📸 로그인 실패 화면 캡처 완료: ${screenshotPath}`);
+                } catch (screenshotError) {
+                    console.error('⚠️ 로그인 실패 화면 캡처 실패:', screenshotError.message);
+                }
+                
                 // 구체적인 실패 원인 파악
                 let failureReason = '알 수 없는 원인';
                 if (currentUrl.includes('nidlogin')) {

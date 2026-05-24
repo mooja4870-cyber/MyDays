@@ -6,7 +6,8 @@
   "scripts": {
     "test:harness": "node tests/harness.js",
     "test:comprehensive": "node tests/comprehensive_suite.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
   },
   "author": "네파스 개발자",
   "license": "MIT",

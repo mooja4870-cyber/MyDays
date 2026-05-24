@@ -3485,7 +3485,7 @@ function closeConfirmDialog(confirmed) {
 // Mobile API bridge helper
 class MobileApiBridge {
     static DEFAULT_SERVER_URL = 'https://doubling-crummiest-mortuary.ngrok-free.dev';
-    static DEFAULT_GEMINI_KEY = atob('QUl6YVN5QTNBSHZ6OE5RellvLU9qQkx3dkY1b0RPaEoyRE1nZVJr');
+    static DEFAULT_GEMINI_KEY = atob('QUl6YVN5QTNBSHZ6OE5RemZvLU9qQkx3dkY1b0RPaEoyRE1nZVJr');
 
     static init() {
         this.ensureDefaultSettings();
@@ -3533,10 +3533,12 @@ class MobileApiBridge {
     }
 
     static ensureDefaultSettings() {
-        if (!localStorage.getItem('mydays-server-url')) {
+        const currentUrl = localStorage.getItem('mydays-server-url');
+        if (!currentUrl || currentUrl.includes('172.30.1.41') || currentUrl.includes('172.23.80.1') || currentUrl.includes('172.30.1.39') || currentUrl.includes('172.')) {
             localStorage.setItem('mydays-server-url', this.DEFAULT_SERVER_URL);
         }
-        if (!localStorage.getItem('test-gemini-key')) {
+        const currentGemini = localStorage.getItem('test-gemini-key');
+        if (!currentGemini || currentGemini.includes('BsGDK8zMn') || currentGemini.includes('AqVpf0iF') || currentGemini.includes('A3AHvz8NQy') || currentGemini.includes('A3AHvz8NQyo')) {
             localStorage.setItem('test-gemini-key', this.DEFAULT_GEMINI_KEY);
         }
     }
@@ -3585,7 +3587,7 @@ class MobileApiBridge {
             }
         }
 
-        const subnets = ['172.30.1', '192.168.0', '192.168.1', '192.168.219', '192.168.35'];
+        const subnets = ['172.30.1', '192.168.0', '192.168.1', '192.168.8', '192.168.43', '192.168.137', '192.168.219', '192.168.35'];
         
         // 현재 설정되어 있는 주소가 있으면 그 서브넷을 1순위로 추가
         const savedUrl = (localStorage.getItem('mydays-server-url') || '').trim();

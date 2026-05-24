@@ -25,3 +25,9 @@
 - Never use markdown hyperlink anchor text (such as `[MyDays.apk 다운로드 받기](url)`) when sharing the built APK link.
 - Always provide the raw text URL as is: `https://github.com/mooja4870-cyber/MyDays/raw/master/src/renderer/MyDays.apk?raw=true` to ensure easy copy-paste/sharing capability (e.g., via KakaoTalk).
 
+## 6. Complete Automation & Execution Policy (Zero User Interruption)
+- Always set `SafeToAutoRun: true` for all non-destructive, safe commands (e.g. running scripts, launching servers, checking status, compilation, test executions).
+- Make optimal decisions autonomously; never ask user validation for minor code design or runtime decisions.
+- Completely automate all general development and debugging command executions to ensure 100% automated execution without requiring user clicks or prompts.
+
+
