@@ -1180,9 +1180,19 @@ class BlogAutomation {
                 const localAccount = this.configManager.getAccounts().find(acc => 
                     acc.username && acc.username.trim().toLowerCase() === naverId.trim().toLowerCase()
                 );
+                
+                const knownExpiredKeys = [
+                    'AIzaSyA3AHvz8NQzYo-OjBLwvF5oDOhJ2DMgeRk',
+                    'AIzaSyAqVpf0iFU96VIH22VENAvUWk92xlTNOEU',
+                    'AIzaSyBsGDK8zMnItHdhA8TVZ8_uFc0y_k5v_jA',
+                    'QUl6YVN5QnNHREs4ek1uSXRIZGhBOFRWWjhfdUZjMHlfazV2X2pB'
+                ];
+
                 if (localAccount && localAccount.geminiApi) {
-                    console.log(`🔑 [서버 키 자동 대체] 모바일 수신 키 대신 PC 서버의 안전한 API 키를 적용합니다.`);
-                    activeGeminiApi = localAccount.geminiApi;
+                    if (!activeGeminiApi || knownExpiredKeys.includes(activeGeminiApi)) {
+                        console.log(`🔑 [서버 키 자동 대체] 모바일 수신 키 대신 PC 서버의 API 키를 적용합니다.`);
+                        activeGeminiApi = localAccount.geminiApi;
+                    }
                 }
             }
             
