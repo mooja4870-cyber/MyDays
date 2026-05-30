@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>네파스</title>
+    <title>MyDays</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- 사이드바 -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-title">네파스</div>
+            <div class="sidebar-title">MyDays</div>
             <div class="sidebar-subtitle">네이버 블로그 쿠팡 파트너스</div>
             <div class="sidebar-version" id="app-version">v0.0.0</div>
         </div>
@@ -127,8 +127,8 @@
                             </div>
                             
                             <div class="form-group">
-                                <label class="form-label">제미나이 API</label>
-                                <input type="password" class="form-input" id="gemini-api" placeholder="Google Gemini API 키" required>
+                                <label class="form-label">클로드 API</label>
+                                <input type="password" class="form-input" id="claude-api" placeholder="Anthropic Claude API 키" required>
                             </div>
                         
                             <div class="form-group">
@@ -611,7 +611,7 @@
                         <div class="alert-content">
                             <div class="alert-title">보안 및 저장 안내</div>
                             <div class="alert-message">
-                                입력하신 네이버 계정 정보와 제미나이 API 키는 스마트폰/브라우저 로컬 저장소에 암호화 보관되며, 외부 서버로 전송되지 않고 포스팅 시에만 안전하게 사용됩니다.
+                                입력하신 네이버 계정 정보와 클로드 API 키는 스마트폰/브라우저 로컬 저장소에 암호화 보관되며, 외부 서버로 전송되지 않고 포스팅 시에만 안전하게 사용됩니다.
                             </div>
                         </div>
                     </div>
@@ -634,12 +634,15 @@
 
                             <div class="form-group">
                                 <label class="form-label">PC 서버 주소</label>
-                                <input type="password" class="form-input" id="mobile-server-url" placeholder="https://xxxx.ngrok-free.dev" required>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" class="form-input" id="mobile-server-url" placeholder="https://xxxx.ngrok-free.dev" required style="flex: 1;">
+                                    <button type="button" class="btn btn-secondary" id="btn-discover-pc-server" style="white-space: nowrap; padding: 0.5rem 1rem;">🔍 주소 자동 검색</button>
+                                </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">Gemini API 키</label>
-                                <input type="password" class="form-input" id="mobile-gemini-key" placeholder="Gemini API Key (선택사항)">
+                                <label class="form-label">Claude API 키</label>
+                                <input type="password" class="form-input" id="mobile-claude-key" placeholder="Claude API Key (선택사항)">
                             </div>
                         </div>
 
@@ -685,8 +688,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">제미나이 API</label>
-                        <input type="password" class="form-input" id="edit-gemini-api" required>
+                        <label class="form-label">클로드 API</label>
+                        <input type="password" class="form-input" id="edit-claude-api" required>
                     </div>
                     
                     <div class="form-group">

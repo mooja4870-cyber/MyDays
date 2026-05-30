@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.9.50 (2026-05-30)
+- **Description**: Removed Coupang API key missing log, changed Chrome tab name/sidebar title from '네파스' to 'MyDays', and restored PC IP Auto Search button on mobile UI.
+- **Changes**:
+  - Commented out `📝 저장된 쿠팡 API 키가 없습니다.` log in `src/modules/CoupangApiManager.js`.
+  - Replaced '네파스' with 'MyDays' in `src/main.js`, `src/renderer/index.html`, and `android/app/src/main/assets/www/index.html`.
+  - Restored the `btn-discover-pc-server` element and its removal logic in `src/renderer/app.js` and `android/app/src/main/assets/www/app.js`.
+
 ## v1.9.49 (2026-05-24)
 - **Description**: Resolved the "404 Bad Request / Invalid API Key" error on mobile deployments by correcting a typographical error in the Base64-encoded Gemini API key.
 - **Changes**:

@@ -945,26 +945,26 @@ class BlogPublisher extends EventEmitter {
    * AI를 이용해 문단에 맞는 소제목을 생성합니다.
    * @param {string} paragraph - 문단 내용
    * @param {string} productName - 상품명
-   * @param {Object} account - 계정 정보 (Gemini API 키 포함)
+   * @param {Object} account - 계정 정보 (Claude API 키 포함)
    * @returns {Promise<string>} 생성된 소제목
    */
   async generateSubtitle(paragraph, productName, account) {
     try {
-      // 계정 정보에서 Gemini API 키 가져오기
-      const geminiApiKey = account?.geminiApi || this.config?.geminiApi || this.config?.GEMINI_API_KEY;
+      // 계정 정보에서 Claude API 키 가져오기
+      const claudeApiKey = account?.claudeApi || this.config?.claudeApi || this.config?.CLAUDE_API_KEY;
       
-      if (!geminiApiKey) {
-        console.warn('⚠️ Gemini API 키가 없습니다. 기본 소제목을 사용합니다.');
+      if (!claudeApiKey) {
+        console.warn('⚠️ Claude API 키가 없습니다. 기본 소제목을 사용합니다.');
         return this.generateDefaultSubtitle(productName);
       }
       
       // ContentGenerator API 키 설정
-      if (!this.contentGenerator.apiKey || this.contentGenerator.apiKey !== geminiApiKey) {
+      if (!this.contentGenerator.apiKey || this.contentGenerator.apiKey !== claudeApiKey) {
         try {
-          this.contentGenerator.setApiKey(geminiApiKey);
-          console.log('✅ Gemini API 키 설정 완료');
+          this.contentGenerator.setApiKey(claudeApiKey);
+          console.log('✅ Claude API 키 설정 완료');
         } catch (apiError) {
-          console.error('❌ Gemini API 키 설정 실패:', apiError.message);
+          console.error('❌ Claude API 키 설정 실패:', apiError.message);
           return this.generateDefaultSubtitle(productName);
         }
       }
@@ -1036,7 +1036,7 @@ class BlogPublisher extends EventEmitter {
    * @param {string} content - 본문 내용
    * @param {Array<string>} imagePaths - 이미지 파일 경로 목록
    * @param {string} productName - 상품명 (소제목 생성용)
-   * @param {Object} account - 계정 정보 (Gemini API 키 포함)
+   * @param {Object} account - 계정 정보 (Claude API 키 포함)
    */
   async enterContent(content, imagePaths = [], productName, account) {
     try {

@@ -65,7 +65,7 @@ const UI = {
     naverPasswordInput: document.getElementById('naver-password'),
     blogIdInput: document.getElementById('blog-id'),
     affiliateIdInput: document.getElementById('affiliate-id'),
-    geminiApiInput: document.getElementById('gemini-api'),
+    claudeApiInput: document.getElementById('claude-api'),
     categoryIdInput: document.getElementById('category-id'),
     nicknameInput: document.getElementById('nickname'),
     linkPriceCidInput: document.getElementById('link-price-cid'),
@@ -107,7 +107,7 @@ const UI = {
     editNaverPassword: document.getElementById('edit-naver-password'),
     editBlogId: document.getElementById('edit-blog-id'),
     editAffiliateId: document.getElementById('edit-affiliate-id'),
-    editGeminiApi: document.getElementById('edit-gemini-api'),
+    editClaudeApi: document.getElementById('edit-claude-api'),
     editCategoryId: document.getElementById('edit-category-id'),
     editNickname: document.getElementById('edit-nickname'),
     editLinkPriceCid: document.getElementById('edit-link-price-cid')
@@ -444,7 +444,7 @@ class StateManager {
                     nickname: account.naverId,
                     blogId: account.blogId,
                     affiliateId: account.affiliateId,
-                    geminiApi: account.geminiApi,
+                    claudeApi: account.claudeApi,
                     categoryId: account.categoryId,
                     linkPriceCid: account.linkPriceCid,
                     isActive: account.isActive,
@@ -490,7 +490,7 @@ class StateManager {
                         naverPassword: account.password || account.naverPassword || '',
                         blogId: account.blogId || '',
                         affiliateId: account.affiliateId || '',
-                        geminiApi: account.geminiApi || '',
+                        claudeApi: account.claudeApi || '',
                         categoryId: account.categoryId || '',
                         linkPriceCid: account.linkPriceCid || '',
                     
@@ -1469,7 +1469,7 @@ class Dashboard {
                         blogId: account.blogId,
                         isActive: true,
                         affiliateId: account.affiliateId,
-                        geminiApi: account.geminiApi,
+                        claudeApi: account.claudeApi,
                         categoryId: account.categoryId
                     }
                 };
@@ -1623,7 +1623,7 @@ class AccountManager {
         const naverPassword = UI.naverPasswordInput.value.trim();
         const blogId = UI.blogIdInput.value.trim();
         const affiliateId = UI.affiliateIdInput.value.trim();
-        const geminiApi = UI.geminiApiInput.value.trim();
+        const claudeApi = UI.claudeApiInput.value.trim();
         const categoryId = UI.categoryIdInput.value;
         const nickname = UI.nicknameInput.value.trim();
         const linkPriceCid = UI.linkPriceCidInput.value.trim();
@@ -1640,7 +1640,7 @@ class AccountManager {
             nickname: nickname || naverId,
             blogId: blogId,
             affiliateId: affiliateId,
-            geminiApi: geminiApi,
+            claudeApi: claudeApi,
             categoryId: categoryId,
             linkPriceCid: linkPriceCid,
             isActive: true,
@@ -1774,7 +1774,7 @@ class AccountManager {
         UI.editNaverPassword.value = account.password || account.naverPassword || '';
         UI.editBlogId.value = account.blogId;
         UI.editAffiliateId.value = account.affiliateId || '';
-        UI.editGeminiApi.value = account.geminiApi || '';
+        UI.editClaudeApi.value = account.claudeApi || '';
         UI.editCategoryId.value = account.categoryId || '';
         UI.editNickname.value = account.nickname || '';
         UI.editLinkPriceCid.value = account.linkPriceCid || '';
@@ -1805,7 +1805,7 @@ class AccountManager {
             nickname: UI.editNickname.value.trim() || UI.editNaverId.value.trim(),
             blogId: UI.editBlogId.value.trim(),
             affiliateId: UI.editAffiliateId.value.trim(),
-            geminiApi: UI.editGeminiApi.value.trim(),
+            claudeApi: UI.editClaudeApi.value.trim(),
             categoryId: UI.editCategoryId.value,
             linkPriceCid: cidValue || '',
             isValidated: account.isValidated,
@@ -3485,7 +3485,7 @@ function closeConfirmDialog(confirmed) {
 // Mobile API bridge helper
 class MobileApiBridge {
     static DEFAULT_SERVER_URL = 'https://doubling-crummiest-mortuary.ngrok-free.dev';
-    static DEFAULT_GEMINI_KEY = atob('QUl6YVN5QTNBSHZ6OE5RellvLU9qQkx3dkY1b0RPaEoyRE1nZVJr');
+    static DEFAULT_CLAUDE_KEY = atob('QUl6YVN5QTNBSHZ6OE5RellvLU9qQkx3dkY1b0RPaEoyRE1nZVJr');
 
     static init() {
         this.ensureDefaultSettings();
@@ -3494,13 +3494,10 @@ class MobileApiBridge {
             
             // 모바일 앱(Android WebView)인 경우에만 불필요한 버튼 삭제
             if (/MyDaysAndroid|; wv\)/i.test(navigator.userAgent)) {
-                const btnDiscover = document.getElementById('btn-discover-pc-server');
-                if (btnDiscover) {
-                    btnDiscover.remove();
-                }
-                const btnGeminiHelp = document.querySelector('#mobile-settings-panel button[onclick*="aistudio.google.com"]');
-                if (btnGeminiHelp) {
-                    btnGeminiHelp.remove();
+                // PC IP 자동 검색 버튼을 삭제하지 않음 (사용자 요청에 의해 복구됨)
+                const btnClaudeHelp = document.querySelector('#mobile-settings-panel button[onclick*="aistudio.google.com"]');
+                if (btnClaudeHelp) {
+                    btnClaudeHelp.remove();
                 }
             }
         }
@@ -3537,9 +3534,9 @@ class MobileApiBridge {
         if (!currentUrl || currentUrl.includes('172.30.1.41') || currentUrl.includes('172.23.80.1') || currentUrl.includes('172.30.1.39') || currentUrl.includes('172.')) {
             localStorage.setItem('mydays-server-url', this.DEFAULT_SERVER_URL);
         }
-        const currentGemini = localStorage.getItem('test-gemini-key');
-        if (!currentGemini || currentGemini.includes('BsGDK8zMn') || currentGemini.includes('AqVpf0iF') || currentGemini.includes('A3AHvz8NQy') || currentGemini.includes('A3AHvz8NQyo')) {
-            localStorage.setItem('test-gemini-key', this.DEFAULT_GEMINI_KEY);
+        const currentClaude = localStorage.getItem('test-claude-key');
+        if (!currentClaude || currentClaude.includes('BsGDK8zMn') || currentClaude.includes('AqVpf0iF') || currentClaude.includes('A3AHvz8NQy') || currentClaude.includes('A3AHvz8NQyo')) {
+            localStorage.setItem('test-claude-key', this.DEFAULT_CLAUDE_KEY);
         }
     }
 
@@ -4049,19 +4046,19 @@ class PhotoAutomationManager {
         const naverId = localStorage.getItem('test-naver-id') || '';
         const naverPassword = localStorage.getItem('test-naver-password') || '';
         const blogId = localStorage.getItem('test-blog-id') || '';
-        const geminiKey = localStorage.getItem('test-gemini-key') || '';
+        const claudeKey = localStorage.getItem('test-claude-key') || '';
         const serverUrl = localStorage.getItem('mydays-server-url') || '';
 
         const elId = document.getElementById('mobile-naver-id');
         const elPw = document.getElementById('mobile-naver-password');
         const elBlog = document.getElementById('mobile-blog-id');
-        const elGemini = document.getElementById('mobile-gemini-key');
+        const elClaude = document.getElementById('mobile-claude-key');
         const elServerUrl = document.getElementById('mobile-server-url');
 
         if (elId) elId.value = naverId;
         if (elPw) elPw.value = naverPassword;
         if (elBlog) elBlog.value = blogId;
-        if (elGemini) elGemini.value = geminiKey;
+        if (elClaude) elClaude.value = claudeKey;
         if (elServerUrl) elServerUrl.value = serverUrl;
 
         // 🌸 벚꽃 펄스 애니메이션 상태 업데이트
@@ -4105,13 +4102,13 @@ class PhotoAutomationManager {
         const elId = document.getElementById('mobile-naver-id');
         const elPw = document.getElementById('mobile-naver-password');
         const elBlog = document.getElementById('mobile-blog-id');
-        const elGemini = document.getElementById('mobile-gemini-key');
+        const elClaude = document.getElementById('mobile-claude-key');
         const elServerUrl = document.getElementById('mobile-server-url');
 
         const naverId = elId ? elId.value.trim() : '';
         const naverPassword = elPw ? elPw.value.trim() : '';
         const blogId = elBlog ? elBlog.value.trim() : '';
-        const geminiKey = elGemini ? elGemini.value.trim() : (localStorage.getItem('test-gemini-key') || MobileApiBridge.DEFAULT_GEMINI_KEY || '');
+        const claudeKey = elClaude ? elClaude.value.trim() : (localStorage.getItem('test-claude-key') || MobileApiBridge.DEFAULT_CLAUDE_KEY || '');
         const serverUrl = elServerUrl ? elServerUrl.value.trim().replace(/\/+$/, '') : (localStorage.getItem('mydays-server-url') || MobileApiBridge.DEFAULT_SERVER_URL || '');
 
         if (!naverId || !naverPassword || !blogId || !serverUrl) {
@@ -4122,19 +4119,19 @@ class PhotoAutomationManager {
         localStorage.setItem('test-naver-id', naverId);
         localStorage.setItem('test-naver-password', naverPassword);
         localStorage.setItem('test-blog-id', blogId);
-        localStorage.setItem('test-gemini-key', geminiKey);
+        localStorage.setItem('test-claude-key', claudeKey);
         localStorage.setItem('mydays-server-url', serverUrl);
 
         // 동기화
         const tId = document.getElementById('test-naver-id');
         const tPw = document.getElementById('test-naver-password');
         const tBlog = document.getElementById('test-blog-id');
-        const tGemini = document.getElementById('test-gemini-key');
+        const tClaude = document.getElementById('test-claude-key');
 
         if (tId) tId.value = naverId;
         if (tPw) tPw.value = naverPassword;
         if (tBlog) tBlog.value = blogId;
-        if (tGemini) tGemini.value = geminiKey;
+        if (tClaude) tClaude.value = claudeKey;
 
         alert('💾 설정 정보가 브라우저에 안전하게 보관 및 동기화되었습니다!');
 
@@ -4195,7 +4192,7 @@ class PhotoAutomationManager {
         const naverId = localStorage.getItem('test-naver-id') || '';
         const naverPassword = localStorage.getItem('test-naver-password') || '';
         const blogId = localStorage.getItem('test-blog-id') || '';
-        const geminiApi = localStorage.getItem('test-gemini-key') || '';
+        const claudeApi = localStorage.getItem('test-claude-key') || '';
 
         if (!naverId || !naverPassword || !blogId) {
             alert('⚙️ 먼저 하단 [설정] 메뉴에서 네이버 계정(ID/비밀번호) 및 블로그 ID 설정을 저장해주세요.');
@@ -4277,7 +4274,7 @@ class PhotoAutomationManager {
                                 naverId,
                                 naverPassword,
                                 blogId,
-                                geminiApi,
+                                claudeApi,
                                 images: imagesBase64,
                                 context,
                                 openType,
@@ -4296,7 +4293,7 @@ class PhotoAutomationManager {
                                     naverId,
                                     naverPassword,
                                     blogId,
-                                    geminiApi,
+                                    claudeApi,
                                     images: imagesBase64,
                                     context,
                                     openType,

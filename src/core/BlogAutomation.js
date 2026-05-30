@@ -428,7 +428,7 @@ class BlogAutomation extends EventEmitter {
           console.log(`🏨 호텔 정보 수집 완료: ${hotelInfo.이름}`);
           
           // 제미나이로 블로그 글 작성
-          const blogContent = await this.contentGenerator.generateAgodaContent(hotelInfo, account.geminiApi);
+          const blogContent = await this.contentGenerator.generateAgodaContent(hotelInfo, account.claudeApi);
           
           // 🔥 BlogPublisher의 publishAgodaPost 메서드 사용 (재로그인 로직 포함)
           console.log(`📝 ${account.naverId} 계정으로 아고다 블로그 포스트 발행 시작...`);

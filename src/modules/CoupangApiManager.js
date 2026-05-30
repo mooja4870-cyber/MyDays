@@ -67,7 +67,7 @@ class CoupangApiManager {
     async loadApiKeys() {
         try {
             if (!await fs.pathExists(this.apiKeysFile)) {
-                console.log('📝 저장된 쿠팡 API 키가 없습니다.');
+                // console.log('📝 저장된 쿠팡 API 키가 없습니다.');
                 return false;
             }
 

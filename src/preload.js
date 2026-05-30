@@ -9,7 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     executeAutomationStep: (data) => ipcRenderer.invoke('execute-automation-step', data),
     
     // API 테스트
-    testGeminiAPI: (apiKey) => ipcRenderer.invoke('test-gemini-api', apiKey),
+    testClaudeAPI: (apiKey) => ipcRenderer.invoke('test-claude-api', apiKey),
     
     // 계정 관리
     manageAccount: (action, data) => {

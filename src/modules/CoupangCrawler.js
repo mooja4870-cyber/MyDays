@@ -573,13 +573,13 @@ class CoupangCrawler {
                 // ContentGenerator를 활성 목록에 추가
                 this.activeContentGenerators.add(contentGenerator);
                 
-                // 계정 정보에서 Gemini API 키 가져오기
-                const geminiApiKey = account.geminiApi || account.geminiApiKey;
-                if (!geminiApiKey) {
-                    throw new Error(`계정 ${account.username || account.id}의 Gemini API 키가 설정되지 않았습니다.`);
+                // 계정 정보에서 Claude API 키 가져오기
+                const claudeApiKey = account.claudeApi || account.claudeApiKey;
+                if (!claudeApiKey) {
+                    throw new Error(`계정 ${account.username || account.id}의 Claude API 키가 설정되지 않았습니다.`);
                 }
                 
-                contentGenerator.setApiKey(geminiApiKey);
+                contentGenerator.setApiKey(claudeApiKey);
                 contentResult = await contentGenerator.generateAllContent(productData);
                 
                 if (!contentResult.success) {
