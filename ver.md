@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.9.51 (2026-05-30)
+- **Description**: Automated the PC server IP configuration upon successful background discovery so users no longer need to click the search button manually after connection failure.
+- **Changes**:
+  - Modified `MobileApiBridge.discoverPcServer` success callback in `src/renderer/app.js` and `android/app/src/main/assets/www/app.js`.
+  - Changed the success log message to confirm automatic configuration application.
+  - The script now directly updates `localStorage['mydays-server-url']`, `MobileApiBridge.serverUrl`, and the HTML input DOM element.
+
 ## v1.9.50 (2026-05-30)
 - **Description**: Removed Coupang API key missing log, changed Chrome tab name/sidebar title from '네파스' to 'MyDays', and restored PC IP Auto Search button on mobile UI.
 - **Changes**:
