@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.54 (2026-05-30)
+- **Description**: Updated default Claude API key and removed API documentation file.
+- **Changes**:
+  - Encoded and updated the `DEFAULT_CLAUDE_KEY` in `src/renderer/app.js` and `android/app/src/main/assets/www/app.js` with the new Claude API key.
+  - Deleted `api.md` containing the raw API key as requested.
+
 ## v1.9.53 (2026-05-30)
 - **Description**: Fully automated the photo publishing retry process.
 - **Changes**:
