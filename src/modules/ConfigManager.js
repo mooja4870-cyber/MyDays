@@ -21,7 +21,7 @@ class ConfigManager {
         this.defaultConfig = {
             version: '1.0.0',
             apiKeys: {
-                gemini: ''
+                claude: ''
             },
             automation: {
                 headless: false,
@@ -397,32 +397,32 @@ class ConfigManager {
     }
 
     /**
-     * Gemini API 키 설정
+     * Claude API 키 설정
      * @param {string} apiKey API 키
      */
-    async setGeminiApiKey(apiKey) {
+    async setClaudeApiKey(apiKey) {
         try {
             if (!apiKey || typeof apiKey !== 'string') {
                 throw new Error('유효하지 않은 API 키입니다.');
             }
             
-            this.currentConfig.apiKeys.gemini = apiKey;
+            this.currentConfig.apiKeys.claude = apiKey;
             await this.saveConfig();
             
-            console.log('✅ Gemini API 키 설정 완료');
+            console.log('✅ Claude API 키 설정 완료');
             
         } catch (error) {
-            console.error('❌ Gemini API 키 설정 실패:', error);
+            console.error('❌ Claude API 키 설정 실패:', error);
             throw error;
         }
     }
 
     /**
      * API 키 조회
-     * @returns {string} Gemini API 키
+     * @returns {string} Claude API 키
      */
-    getGeminiApiKey() {
-        return this.currentConfig?.apiKeys?.gemini || '';
+    getClaudeApiKey() {
+        return this.currentConfig?.apiKeys?.claude || '';
     }
 
     /**
@@ -644,8 +644,8 @@ class ConfigManager {
         };
 
         // API 키 확인
-        if (!this.currentConfig.apiKeys.gemini) {
-            validation.warnings.push('Gemini API 키가 설정되지 않았습니다.');
+        if (!this.currentConfig.apiKeys.claude) {
+            validation.warnings.push('Claude API 키가 설정되지 않았습니다.');
         }
 
         // 계정 확인
@@ -783,7 +783,7 @@ class ConfigManager {
             configDirExists: fs.existsSync(this.configDir),
             configFileExists: fs.existsSync(this.configFile),
             accountsFileExists: fs.existsSync(this.accountsFile),
-            hasGeminiApiKey: !!this.currentConfig?.apiKeys?.gemini,
+            hasClaudeApiKey: !!this.currentConfig?.apiKeys?.claude,
             accountCount: this.accounts.length,
             activeAccountCount: this.getActiveAccounts().length,
             configValid: this.validateConfig().isValid

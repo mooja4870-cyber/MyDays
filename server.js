@@ -100,6 +100,14 @@ moduleModule.prototype.require = function(id) {
             shell: {}
         };
     }
+    if (id === 'electron-updater') {
+        return {
+            autoUpdater: {
+                on: () => {},
+                checkForUpdatesAndNotify: () => Promise.resolve()
+            }
+        };
+    }
     return originalRequire.apply(this, arguments);
 };
 

@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
 
@@ -9,17 +9,15 @@ const path = require('path');
 class ContentGenerator {
     constructor() {
         this.apiKey = null;
-        this.genAI = null;
-        this.model = null;
+        this.anthropic = null;
+        this.model = 'claude-3-5-haiku-20241022'; // 기본 모델 설정
         this.isRunning = false;
         this.shouldStop = false;
         
-        // 생성 설정 (responseMimeType 제거)
+        // 생성 설정
         this.generationConfig = {
             temperature: 1,
-            topP: 0.95,
-            topK: 64,
-            maxOutputTokens: 8192
+            max_tokens: 8192
         };
         
         // 재시도 설정
@@ -45,12 +43,11 @@ class ContentGenerator {
             }
             
             this.apiKey = apiKey;
-            this.genAI = new GoogleGenerativeAI(apiKey);
-            this.model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            this.anthropic = new Anthropic({ apiKey: apiKey });
             
-            console.log('✅ Gemini AI 모델 초기화 완료');
+            console.log('✅ Claude API 클라이언트 초기화 완료');
         } catch (error) {
-            console.error('❌ Gemini AI 초기화 실패:', error);
+            console.error('❌ Claude API 초기화 실패:', error);
             throw error;
         }
     }
@@ -61,22 +58,18 @@ class ContentGenerator {
      */
     async testConnection() {
         try {
-            if (!this.model) {
+            if (!this.anthropic) {
                 throw new Error('API 키가 설정되지 않았습니다.');
             }
             
-            console.log('🧪 Gemini API 연결 테스트 중...');
+            console.log('🧪 Claude API 연결 테스트 중...');
             
             const testPrompt = "안녕하세요. 연결 테스트입니다. '테스트 성공'이라고 답변해주세요.";
-            const chatSession = this.model.startChat({
-                generationConfig: this.generationConfig,
-                history: [],
-            });
             
-            const result = await this.sendMessageWithRetry(chatSession, testPrompt, 3, 5000);
+            const result = await this.sendMessageWithRetry(testPrompt, null, 3, 5000);
             
             if (result && result.includes('테스트')) {
-                console.log('✅ Gemini API 연결 테스트 성공');
+                console.log('✅ Claude API 연결 테스트 성공');
                 return {
                     success: true,
                     message: 'API 연결 성공',
@@ -87,7 +80,7 @@ class ContentGenerator {
             }
             
         } catch (error) {
-            console.error('❌ Gemini API 연결 테스트 실패:', error);
+            console.error('❌ Claude API 연결 테스트 실패:', error);
             return {
                 success: false,
                 error: error.message,
@@ -98,13 +91,13 @@ class ContentGenerator {
 
     /**
      * 재시도 기능이 있는 메시지 전송
-     * @param {Object} chatSession 채팅 세션
-     * @param {string} message 메시지
+     * @param {string} message 사용자 프롬프트
+     * @param {string|null} systemPrompt 시스템 프롬프트 (옵션)
      * @param {number} maxRetries 최대 재시도 횟수
-     * @param {number} retryDelay 재시도 대기 시간
+     * @param {number} retryDelay 기본 재시도 대기 시간
      * @returns {Promise<string>}
      */
-    async sendMessageWithRetry(chatSession, message, maxRetries = this.maxRetries, retryDelay = this.retryDelay) {
+    async sendMessageWithRetry(message, systemPrompt = null, maxRetries = this.maxRetries, retryDelay = this.retryDelay) {
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             // 중지 요청 확인
             if (this.shouldStop) {
@@ -112,18 +105,32 @@ class ContentGenerator {
             }
             
             try {
-                console.log(`🤖 Gemini AI 호출 (시도 ${attempt}/${maxRetries})`);
-                const result = await chatSession.sendMessage(message);
+                console.log(`🤖 Claude AI 호출 (시도 ${attempt}/${maxRetries})`);
+                
+                const params = {
+                    model: this.model,
+                    max_tokens: this.generationConfig.max_tokens,
+                    temperature: this.generationConfig.temperature,
+                    messages: [
+                        { role: 'user', content: message }
+                    ]
+                };
+                
+                if (systemPrompt) {
+                    params.system = systemPrompt;
+                }
+                
+                const result = await this.anthropic.messages.create(params);
                 
                 // 중지 요청 확인
                 if (this.shouldStop) {
                     throw new Error('콘텐츠 생성이 중지되었습니다.');
                 }
                 
-                const response = result.response.text();
+                const response = result.content[0].text;
                 
                 if (response && response.trim()) {
-                    console.log('✅ Gemini AI 응답 수신 성공');
+                    console.log('✅ Claude API 응답 수신 성공');
                     return response;
                 } else {
                     throw new Error('빈 응답을 받았습니다.');
@@ -187,7 +194,7 @@ class ContentGenerator {
      */
     async generateSubtitle(productName, paragraph) {
         try {
-            if (!this.model) {
+            if (!this.anthropic) {
                 throw new Error('API 키가 설정되지 않았습니다.');
             }
 
@@ -212,12 +219,7 @@ ${paragraph}
 
 반드시 하나의 소제목만 생성해주세요.`;
 
-            const chatSession = this.model.startChat({
-                generationConfig: this.generationConfig,
-                history: [],
-            });
-
-            let result = await this.sendMessageWithRetry(chatSession, prompt);
+            let result = await this.sendMessageWithRetry(prompt);
             result = this.removeSpecialCharacters(result.trim()).slice(0, 70); // 70자 제한
 
             console.log(`✅ 소제목 생성 완료: ${result}`);
@@ -240,7 +242,7 @@ ${paragraph}
      */
     async generateTitle(productName, content) {
         try {
-            if (!this.model) {
+            if (!this.anthropic) {
                 throw new Error('API 키가 설정되지 않았습니다.');
             }
             
@@ -263,12 +265,7 @@ ${content}
 
 중요: 본문의 톤과 내용에 어울리는 제목을 작성해주세요.`;
 
-            const chatSession = this.model.startChat({
-                generationConfig: this.generationConfig,
-                history: [],
-            });
-
-            let result = await this.sendMessageWithRetry(chatSession, prompt);
+            let result = await this.sendMessageWithRetry(prompt);
             result = this.removeSpecialCharacters(result.trim());
 
             // 여러 문단이 반환된 경우 첫 번째 문단만 사용
@@ -309,7 +306,7 @@ ${content}
         try {
             this.isRunning = true;
             
-            if (!this.model) {
+            if (!this.anthropic) {
                 throw new Error('API 키가 설정되지 않았습니다.');
             }
             
@@ -327,21 +324,13 @@ ${JSON.stringify(productData, null, 2)}
 JSON 데이터의 "title" 필드에 있는 상품명을 중심으로 하여, 아래 가이드라인에 따라 5문단으로 구성된 상품리뷰를 작성해주세요:
 
 1. 전문적이지만 친근한 어조로, 구체적인 예시를 들어 독자의 이해를 돕는 글을 작성해주세요.
-
 2. 광고나 판매 목적이 아닌 유용한 정보를 중심으로 밝고 긍정적인 느낌을 유지해주세요.
-
 3. 핵심 개념을 쉽게 풀어내면서도 사실과 근거를 제시해 신뢰감을 높여주세요.
-
 4. 독자가 스스로 문제를 해결할 수 있도록 실제 사례나 팁을 포함해주세요.
-
 5. 상업적 표현은 최대한 배제하고 정보 전달에 집중해주세요.
-
 6. 독자의 관심을 끌 수 있도록 호기심을 자극하는 도입부를 구성해주세요.
-
 7. 전문성은 살리되 과하지 않도록 균형 있게 표현해주세요.
-
 8. 결론에서는 핵심 요점을 정리해 독자에게 명확한 메시지를 남겨주세요.
-
 9. 전체적으로 밝고 희망적인 톤을 유지하면서 진부하지 않은 스토리텔링을 시도해주세요.
 
 중요사항:
@@ -353,12 +342,7 @@ JSON 데이터의 "title" 필드에 있는 상품명을 중심으로 하여, 아
 - 이모지는 절대 사용하지 마세요
 - [문단1], [문단2] 같은 표시는 절대 사용하지 마세요`;
 
-            const chatSession = this.model.startChat({
-                generationConfig: this.generationConfig,
-                history: [],
-            });
-
-            let generatedText = await this.sendMessageWithRetry(chatSession, prompt);
+            let generatedText = await this.sendMessageWithRetry(prompt);
             
             // 중지 요청 확인
             if (this.shouldStop) {
@@ -393,7 +377,7 @@ JSON 데이터의 "title" 필드에 있는 상품명을 중심으로 하여, 아
         try {
             this.isRunning = true;
             
-            if (!this.model) {
+            if (!this.anthropic) {
                 throw new Error('API 키가 설정되지 않았습니다.');
             }
             
@@ -728,12 +712,7 @@ JSON 데이터의 "title" 필드에 있는 상품명을 중심으로 하여, 아
             반드시 5개 문단으로 구성된 본문 내용만 생성해주세요.
             `;
 
-            const chatSession = this.model.startChat({
-                generationConfig: this.generationConfig,
-                history: [],
-            });
-
-            const generatedContent = await this.sendMessageWithRetry(chatSession, prompt);
+            const generatedContent = await this.sendMessageWithRetry(prompt);
             
             // 중지 조건 확인 (본문 생성 후)
             if (this.shouldStop) {
@@ -759,7 +738,7 @@ JSON 데이터의 "title" 필드에 있는 상품명을 중심으로 하여, 아
             - 감탄사나 이모지, 특수문자는 사용 금지
             - 반드시 하나의 제목만 제공`;
 
-            const titleResult = await this.sendMessageWithRetry(chatSession, titlePrompt);
+            const titleResult = await this.sendMessageWithRetry(titlePrompt);
             
             // 중지 조건 확인 (제목 생성 후)
             if (this.shouldStop) {

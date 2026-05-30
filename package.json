@@ -12,7 +12,7 @@
   "author": "네파스 개발자",
   "license": "MIT",
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
+    "@anthropic-ai/sdk": "^0.33.1",
     "@mongodb-js/zstd": "^1.2.0",
     "@noble/hashes": "^1.8.0",
     "axios": "^1.6.2",
