@@ -143,13 +143,21 @@ class ContentGenerator {
                     throw new Error('콘텐츠 생성이 중지되었습니다.');
                 }
                 
+                const errorMessage = (error.message || '').toLowerCase();
+                if (errorMessage.includes('invalid api key') || 
+                    errorMessage.includes('401') || 
+                    errorMessage.includes('403') || 
+                    errorMessage.includes('unauthorized')) {
+                    throw new Error(`인증 오류: 유효하지 않은 Claude API 키입니다. (${error.message}) 👉 올바른 Claude API 키를 설정해 주세요.`);
+                }
+
                 if (attempt === maxRetries) {
                     throw new Error(`최대 재시도 횟수 초과: ${error.message}`);
                 }
                 
                 // 지수 백오프(Exponential Backoff) 적용: 2^(attempt) * 1000ms + random jitter (0~1000ms)
                 const backoffDelay = Math.pow(2, attempt) * 1000 + Math.floor(Math.random() * 1000);
-                console.log(`⏳ 일시적인 구글 API 오류(502/503 등) 감지. ${backoffDelay/1000}초 후 지수 백오프 재시도 진행...`);
+                console.log(`⏳ 일시적인 Claude API 오류 감지. ${backoffDelay/1000}초 후 지수 백오프 재시도 진행...`);
                 await this.delay(backoffDelay);
             }
         }
