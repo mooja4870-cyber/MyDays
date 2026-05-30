@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.52 (2026-05-30)
+- **Description**: Corrected Claude API error handling to fix incorrect error messages and infinite retry loops on invalid API keys.
+- **Changes**:
+  - Changed hardcoded `구글 API 오류` string to `Claude API 오류` in `src/modules/ContentGenerator.js`.
+  - Added fast-fail logic to abort immediately without exponential backoff when encountering `401`, `403`, or `invalid api key` errors.
+
 ## v1.9.51 (2026-05-30)
 - **Description**: Automated the PC server IP configuration upon successful background discovery so users no longer need to click the search button manually after connection failure.
 - **Changes**:
