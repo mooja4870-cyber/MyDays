@@ -4331,9 +4331,14 @@ class PhotoAutomationManager {
                             try {
                                 const foundUrl = await MobileApiBridge.discoverPcServer();
                                 if (foundUrl) {
+                                    localStorage.setItem('mydays-server-url', foundUrl);
+                                    MobileApiBridge.serverUrl = foundUrl;
+                                    const serverUrlInput = document.getElementById('mobile-server-url');
+                                    if (serverUrlInput) serverUrlInput.value = foundUrl;
+                                    
                                     PostingHistoryManager.appendLog({ 
                                         level: 'success', 
-                                        message: `💡 [서버 자동 탐색 성공] 연결 가능한 PC 서버(${foundUrl})를 발견했습니다! 모바일 [설정] 탭의 [PC IP 자동 검색]을 클릭하시면 자동으로 연결 세팅이 완료됩니다!` 
+                                        message: `💡 [서버 자동 탐색 성공] 연결 가능한 PC 서버(${foundUrl})를 발견하여 설정을 자동 업데이트했습니다! 포스팅을 다시 시도해 주세요.` 
                                     });
                                 } else {
                                     PostingHistoryManager.appendLog({ 
