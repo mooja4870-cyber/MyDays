@@ -4338,8 +4338,11 @@ class PhotoAutomationManager {
                                     
                                     PostingHistoryManager.appendLog({ 
                                         level: 'success', 
-                                        message: `💡 [서버 자동 탐색 성공] 연결 가능한 PC 서버(${foundUrl})를 발견하여 설정을 자동 업데이트했습니다! 포스팅을 다시 시도해 주세요.` 
+                                        message: `💡 [서버 자동 탐색 성공] 연결 가능한 PC 서버(${foundUrl})를 발견하여 설정을 자동 업데이트했습니다! 중단된 포스팅을 즉시 자동 재시도합니다...` 
                                     });
+                                    setTimeout(() => {
+                                        PhotoAutomationManager.startPhotoPublish();
+                                    }, 1000);
                                 } else {
                                     PostingHistoryManager.appendLog({ 
                                         level: 'warn', 

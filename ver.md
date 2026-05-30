@@ -1,5 +1,11 @@
 # 📦 Version History
 
+## v1.9.53 (2026-05-30)
+- **Description**: Fully automated the photo publishing retry process.
+- **Changes**:
+  - Modified the PC Server background discovery success block in `src/renderer/app.js` and `android/app/src/main/assets/www/app.js`.
+  - The application now automatically invokes `PhotoAutomationManager.startPhotoPublish()` immediately after setting the newly discovered PC Server IP, requiring zero manual clicks from the user after a connection failure.
+
 ## v1.9.52 (2026-05-30)
 - **Description**: Corrected Claude API error handling to fix incorrect error messages and infinite retry loops on invalid API keys.
 - **Changes**:
