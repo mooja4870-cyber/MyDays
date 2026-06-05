@@ -1,5 +1,18 @@
 # 📦 Version History
 
+## v1.9.56 (2026-06-04)
+- **Description**: 앱 전역에서 단어 줄바꿈을 금지하여, 한 단어가 절대 두 개의 라인에 걸쳐 쪼개져 표시되지 않도록 함.
+- **Changes**:
+  - `src/renderer/styles.css`와 `android/app/src/main/assets/www/styles.css`의 전역 `*` 셀렉터에 `word-break: keep-all; overflow-wrap: normal; word-wrap: normal;`을 추가하여 한국어/영어 단어가 줄 끝에서 쪼개지지 않도록 함.
+  - 기존에 단어를 강제로 쪼개던 `.account-field-value`의 `word-break: break-all`과 `.dialog-message`의 `word-break: break-word`를 모두 `keep-all`로 변경.
+
+## v1.9.55 (2026-05-31)
+- **Description**: Enhanced retry logic for 503 Service Unavailable errors and increased max retry attempts.
+- **Changes**:
+  - Increased `maxRetries` from 5 to 10 in `src/modules/ContentGenerator.js` to handle transient server failures.
+  - Implemented adaptive backoff delay: 503 errors now use 2^(attempt+1) * 1000ms + jitter (vs. standard 2^attempt for other errors).
+  - This resolves the "503 No available accounts" issue by providing longer wait times and more retry attempts for Naver server temporary outages.
+
 ## v1.9.54 (2026-05-30)
 - **Description**: Updated default Claude API key and removed API documentation file.
 - **Changes**:
