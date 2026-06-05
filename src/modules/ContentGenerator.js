@@ -21,7 +21,7 @@ class ContentGenerator {
         };
         
         // 재시도 설정
-        this.maxRetries = 5;
+        this.maxRetries = 10; // 503 에러 대응을 위해 5회 → 10회로 증가
         this.retryDelay = 3000; // 3초
         
         // 파일 경로 - 빌드 환경에 맞게 사용자 데이터 폴더 사용
@@ -154,10 +154,15 @@ class ContentGenerator {
                 if (attempt === maxRetries) {
                     throw new Error(`최대 재시도 횟수 초과: ${error.message}`);
                 }
-                
-                // 지수 백오프(Exponential Backoff) 적용: 2^(attempt) * 1000ms + random jitter (0~1000ms)
-                const backoffDelay = Math.pow(2, attempt) * 1000 + Math.floor(Math.random() * 1000);
-                console.log(`⏳ 일시적인 Claude API 오류 감지. ${backoffDelay/1000}초 후 지수 백오프 재시도 진행...`);
+
+                // 503 에러는 더 긴 대기 시간 적용
+                let backoffDelay = Math.pow(2, attempt) * 1000 + Math.floor(Math.random() * 1000);
+                if (errorMessage.includes('503') || errorMessage.includes('service unavailable')) {
+                    backoffDelay = Math.pow(2, attempt + 1) * 1000 + Math.floor(Math.random() * 2000);
+                    console.log(`⏳ 503 Service Unavailable 감지. ${backoffDelay/1000}초 후 장시간 백오프 재시도 진행.`);
+                } else {
+                    console.log(`⏳ 일시적인 Claude API 오류 감지. ${backoffDelay/1000}초 후 지수 백오프 재시도 진행.`);
+                }
                 await this.delay(backoffDelay);
             }
         }

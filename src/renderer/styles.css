@@ -6,6 +6,10 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    /* 🚫 단어 줄바꿈 금지: 한 단어가 절대 두 줄에 걸쳐 쪼개지지 않도록 함 */
+    word-break: keep-all;
+    overflow-wrap: normal;
+    word-wrap: normal;
 }
 
 :root {
@@ -686,7 +690,8 @@ input:checked + .toggle-slider:before {
 .account-field-value {
     font-size: 0.875rem;
     color: var(--text-primary);
-    word-break: break-all;
+    word-break: keep-all;
+    overflow-wrap: normal;
 }
 
 /* 검증 배지 스타일 */
@@ -1006,7 +1011,8 @@ input:checked + .toggle-slider:before {
     color: var(--text-secondary);
     line-height: 1.6;
     margin-bottom: 2rem;
-    word-break: break-word;
+    word-break: keep-all;
+    overflow-wrap: normal;
 }
 
 .dialog-actions {
