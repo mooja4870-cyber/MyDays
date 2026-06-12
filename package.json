@@ -17,6 +17,7 @@
     "@noble/hashes": "^1.8.0",
     "axios": "^1.6.2",
     "clipboardy": "^4.0.0",
+    "docx": "^9.7.1",
     "dotenv": "^16.5.0",
     "electron-log": "^5.0.1",
     "electron-updater": "^6.1.7",
@@ -35,7 +36,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/cuj2090/coupang_naver.git"
+    "url": "git+https://github.com/cuj2090/coupang_naver.git"
   },
   "bugs": {
     "url": "https://github.com/cuj2090/coupang_naver/issues"
@@ -43,5 +44,10 @@
   "homepage": "https://github.com/cuj2090/coupang_naver#readme",
   "devDependencies": {
     "electron": "^42.1.0"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "keywords": [],
+  "type": "commonjs"
 }
