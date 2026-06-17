@@ -130,8 +130,45 @@ class ContentGenerator {
     }
 
     /**
+     * 사용자 메시지를 Gemini `parts` 배열로 변환한다.
+     * - 문자열: 단일 텍스트 파트로 변환
+     * - 배열(Anthropic 멀티모달 형식): 텍스트/이미지 파트를 Gemini 형식으로 변환
+     *   · {type:'text', text} → {text}
+     *   · {type:'image', source:{media_type,data}} → {inlineData:{mimeType,data}}
+     * - 이미 Gemini 형식({text} 또는 {inlineData})인 파트는 그대로 통과
+     * @param {string|Array} message
+     * @returns {Array} Gemini parts 배열
+     */
+    buildGeminiParts(message) {
+        if (typeof message === 'string') {
+            return [{ text: message }];
+        }
+        if (Array.isArray(message)) {
+            return message.map(item => {
+                if (item == null) return null;
+                // 이미 Gemini 형식이면 그대로 사용
+                if (item.text !== undefined && item.type === undefined) return { text: item.text };
+                if (item.inlineData) return item;
+                if (item.type === 'text') return { text: item.text };
+                if (item.type === 'image' && item.source) {
+                    return {
+                        inlineData: {
+                            mimeType: item.source.media_type || item.source.mimeType || 'image/png',
+                            data: item.source.data
+                        }
+                    };
+                }
+                // 알 수 없는 형식은 문자열화하여 텍스트로 처리
+                return { text: typeof item === 'string' ? item : JSON.stringify(item) };
+            }).filter(Boolean);
+        }
+        // 객체 등 기타: 문자열화
+        return [{ text: String(message) }];
+    }
+
+    /**
      * 재시도 기능이 있는 메시지 전송
-     * @param {string} message 사용자 프롬프트
+     * @param {string|Array} message 사용자 프롬프트(문자열) 또는 멀티모달 파트 배열
      * @param {string|null} systemPrompt 시스템 프롬프트 (옵션)
      * @param {number} maxRetries 최대 재시도 횟수
      * @param {number} retryDelay 기본 재시도 대기 시간
@@ -147,10 +184,10 @@ class ContentGenerator {
             try {
                 console.log(`🤖 Gemini AI 호출 (시도 ${attempt}/${maxRetries})`);
 
-                // Gemini generateContent 요청 본문 구성
+                // Gemini generateContent 요청 본문 구성 (문자열·멀티모달 배열 모두 지원)
                 const requestBody = {
                     contents: [
-                        { role: 'user', parts: [{ text: message }] }
+                        { role: 'user', parts: this.buildGeminiParts(message) }
                     ],
                     generationConfig: {
                         temperature: this.generationConfig.temperature,

@@ -1,6 +1,6 @@
 {
   "name": "nepas",
-  "version": "8.2.3",
+  "version": "8.2.4",
   "description": "네파스 - 네이버 블로그 쿠팡 파트너스 자동화 도구",
   "main": "src/main.js",
   "scripts": {
