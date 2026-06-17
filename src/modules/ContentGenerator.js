@@ -1,6 +1,8 @@
-const Anthropic = require('@anthropic-ai/sdk');
 const fs = require('fs');
 const path = require('path');
+
+// Gemini REST API 엔드포인트 (베이스)
+const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 /**
  * AI 콘텐츠 생성 관리 모듈
@@ -9,8 +11,8 @@ const path = require('path');
 class ContentGenerator {
     constructor() {
         this.apiKey = null;
-        this.anthropic = null;
-        this.model = 'claude-3-5-haiku-20241022'; // 기본 모델 설정
+        this.geminiReady = false;     // Gemini API 키 설정 완료 여부
+        this.model = 'gemini-2.5-flash'; // 기본 모델 설정 (Gemini)
         this.isRunning = false;
         this.shouldStop = false;
         
@@ -33,21 +35,59 @@ class ContentGenerator {
     }
 
     /**
+     * api.md 파일에서 GEMINI API 키를 읽어옵니다.
+     * 형식: "GEMINI API KEY: <키>"
+     * @returns {string|null} 키 문자열 또는 null
+     */
+    getGeminiKeyFromApiMd() {
+        try {
+            // 개발(소스)·빌드 환경 모두 대응하기 위해 후보 경로를 순차 탐색
+            const candidates = [
+                path.join(__dirname, '..', '..', 'api.md'),          // src/modules → 프로젝트 루트
+                path.join(process.cwd(), 'api.md'),                   // 실행 디렉터리
+            ];
+            try {
+                const { app } = require('electron');
+                if (app && typeof app.getAppPath === 'function') {
+                    candidates.push(path.join(app.getAppPath(), 'api.md'));
+                }
+            } catch (_) { /* electron 미사용 환경 무시 */ }
+
+            for (const p of candidates) {
+                if (fs.existsSync(p)) {
+                    const content = fs.readFileSync(p, 'utf-8');
+                    const m = content.match(/GEMINI\s*API\s*KEY\s*[:=]\s*(\S+)/i);
+                    if (m && m[1]) {
+                        return m[1].trim();
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('⚠️ api.md에서 GEMINI 키 읽기 실패:', error.message);
+        }
+        return null;
+    }
+
+    /**
      * API 키 설정 및 모델 초기화
-     * @param {string} apiKey Gemini API 키
+     * api.md에 GEMINI 키가 있으면 그것을 우선 사용하고, 없으면 인자로 받은 키를 사용한다.
+     * @param {string} apiKey Gemini API 키 (api.md가 없을 때의 대체값)
      */
     setApiKey(apiKey) {
         try {
-            if (!apiKey || typeof apiKey !== 'string') {
+            const fileKey = this.getGeminiKeyFromApiMd();
+            const finalKey = fileKey || apiKey;
+
+            if (!finalKey || typeof finalKey !== 'string') {
                 throw new Error('유효하지 않은 API 키입니다.');
             }
-            
-            this.apiKey = apiKey;
-            this.anthropic = new Anthropic({ apiKey: apiKey });
-            
-            console.log('✅ Claude API 클라이언트 초기화 완료');
+
+            this.apiKey = finalKey;
+            this.geminiReady = true;
+
+            console.log(`✅ Gemini API 키 설정 완료 (출처: ${fileKey ? 'api.md' : '계정설정'}, 모델: ${this.model})`);
         } catch (error) {
-            console.error('❌ Claude API 초기화 실패:', error);
+            console.error('❌ Gemini API 초기화 실패:', error);
             throw error;
         }
     }
@@ -58,18 +98,18 @@ class ContentGenerator {
      */
     async testConnection() {
         try {
-            if (!this.anthropic) {
+            if (!this.geminiReady) {
                 throw new Error('API 키가 설정되지 않았습니다.');
             }
-            
-            console.log('🧪 Claude API 연결 테스트 중...');
+
+            console.log('🧪 Gemini API 연결 테스트 중...');
             
             const testPrompt = "안녕하세요. 연결 테스트입니다. '테스트 성공'이라고 답변해주세요.";
             
             const result = await this.sendMessageWithRetry(testPrompt, null, 3, 5000);
             
             if (result && result.includes('테스트')) {
-                console.log('✅ Claude API 연결 테스트 성공');
+                console.log('✅ Gemini API 연결 테스트 성공');
                 return {
                     success: true,
                     message: 'API 연결 성공',
@@ -80,7 +120,7 @@ class ContentGenerator {
             }
             
         } catch (error) {
-            console.error('❌ Claude API 연결 테스트 실패:', error);
+            console.error('❌ Gemini API 연결 테스트 실패:', error);
             return {
                 success: false,
                 error: error.message,
@@ -105,35 +145,56 @@ class ContentGenerator {
             }
             
             try {
-                console.log(`🤖 Claude AI 호출 (시도 ${attempt}/${maxRetries})`);
-                
-                const params = {
-                    model: this.model,
-                    max_tokens: this.generationConfig.max_tokens,
-                    temperature: this.generationConfig.temperature,
-                    messages: [
-                        { role: 'user', content: message }
-                    ]
+                console.log(`🤖 Gemini AI 호출 (시도 ${attempt}/${maxRetries})`);
+
+                // Gemini generateContent 요청 본문 구성
+                const requestBody = {
+                    contents: [
+                        { role: 'user', parts: [{ text: message }] }
+                    ],
+                    generationConfig: {
+                        temperature: this.generationConfig.temperature,
+                        maxOutputTokens: this.generationConfig.max_tokens
+                    }
                 };
-                
+
                 if (systemPrompt) {
-                    params.system = systemPrompt;
+                    requestBody.systemInstruction = { parts: [{ text: systemPrompt }] };
                 }
-                
-                const result = await this.anthropic.messages.create(params);
-                
+
+                const url = `${GEMINI_API_BASE}/${this.model}:generateContent?key=${encodeURIComponent(this.apiKey)}`;
+
+                const httpRes = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!httpRes.ok) {
+                    const errText = await httpRes.text().catch(() => '');
+                    throw new Error(`Gemini API ${httpRes.status} ${httpRes.statusText} ${errText}`.trim());
+                }
+
+                const result = await httpRes.json();
+
                 // 중지 요청 확인
                 if (this.shouldStop) {
                     throw new Error('콘텐츠 생성이 중지되었습니다.');
                 }
-                
-                const response = result.content[0].text;
-                
+
+                // 안전성 차단 등으로 후보가 없을 수 있음
+                const candidate = result.candidates && result.candidates[0];
+                const response = candidate && candidate.content && candidate.content.parts
+                    ? candidate.content.parts.map(p => p.text || '').join('')
+                    : '';
+
                 if (response && response.trim()) {
-                    console.log('✅ Claude API 응답 수신 성공');
+                    console.log('✅ Gemini API 응답 수신 성공');
                     return response;
                 } else {
-                    throw new Error('빈 응답을 받았습니다.');
+                    const blockReason = (result.promptFeedback && result.promptFeedback.blockReason)
+                        || (candidate && candidate.finishReason) || '알 수 없음';
+                    throw new Error(`빈 응답을 받았습니다. (사유: ${blockReason})`);
                 }
                 
             } catch (error) {
@@ -148,7 +209,7 @@ class ContentGenerator {
                     errorMessage.includes('401') || 
                     errorMessage.includes('403') || 
                     errorMessage.includes('unauthorized')) {
-                    throw new Error(`인증 오류: 유효하지 않은 Claude API 키입니다. (${error.message}) 👉 올바른 Claude API 키를 설정해 주세요.`);
+                    throw new Error(`인증 오류: 유효하지 않은 Gemini API 키입니다. (${error.message}) 👉 api.md의 올바른 GEMINI API 키를 설정해 주세요.`);
                 }
 
                 if (attempt === maxRetries) {
@@ -161,7 +222,7 @@ class ContentGenerator {
                     backoffDelay = Math.pow(2, attempt + 1) * 1000 + Math.floor(Math.random() * 2000);
                     console.log(`⏳ 503 Service Unavailable 감지. ${backoffDelay/1000}초 후 장시간 백오프 재시도 진행.`);
                 } else {
-                    console.log(`⏳ 일시적인 Claude API 오류 감지. ${backoffDelay/1000}초 후 지수 백오프 재시도 진행.`);
+                    console.log(`⏳ 일시적인 Gemini API 오류 감지. ${backoffDelay/1000}초 후 지수 백오프 재시도 진행.`);
                 }
                 await this.delay(backoffDelay);
             }
@@ -207,7 +268,7 @@ class ContentGenerator {
      */
     async generateSubtitle(productName, paragraph) {
         try {
-            if (!this.anthropic) {
+            if (!this.geminiReady) {
                 throw new Error('API 키가 설정되지 않았습니다.');
             }
 
@@ -255,7 +316,7 @@ ${paragraph}
      */
     async generateTitle(productName, content) {
         try {
-            if (!this.anthropic) {
+            if (!this.geminiReady) {
                 throw new Error('API 키가 설정되지 않았습니다.');
             }
             
@@ -319,7 +380,7 @@ ${content}
         try {
             this.isRunning = true;
             
-            if (!this.anthropic) {
+            if (!this.geminiReady) {
                 throw new Error('API 키가 설정되지 않았습니다.');
             }
             
@@ -390,7 +451,7 @@ JSON 데이터의 "title" 필드에 있는 상품명을 중심으로 하여, 아
         try {
             this.isRunning = true;
             
-            if (!this.anthropic) {
+            if (!this.geminiReady) {
                 throw new Error('API 키가 설정되지 않았습니다.');
             }
             
@@ -793,9 +854,8 @@ JSON 데이터의 "title" 필드에 있는 상품명을 중심으로 하여, 아
             // 중지 처리
             await this.stop();
             
-            // 모델 및 API 연결 해제
-            this.model = null;
-            this.genAI = null;
+            // API 연결 해제 (모델 기본값은 유지)
+            this.geminiReady = false;
             this.apiKey = null;
             
             console.log('✅ ContentGenerator 리소스 정리 완료');
