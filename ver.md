@@ -1,5 +1,14 @@
 # 📦 Version History
 
+## v1.9.60 (2026-06-18)
+- **Description**: PHOTO 사진 분석 포스팅 시 Gemini 멀티모달 호출이 400(Invalid JSON payload, `contents[0].parts[0]`)으로 실패하던 문제 수정. Anthropic형 이미지/텍스트 배열을 Gemini `parts`로 변환.
+- **Changes**:
+  - `src/modules/ContentGenerator.js`:
+    - `buildGeminiParts(message)` 헬퍼 추가 — 문자열은 `{text}`로, Anthropic형 멀티모달 배열은 텍스트(`{type:'text'}`→`{text}`)·이미지(`{type:'image',source:{media_type,data}}`→`{inlineData:{mimeType,data}}`)로 변환. 이미 Gemini 형식인 파트는 통과.
+    - `sendMessageWithRetry`가 `parts: [{text: message}]` 대신 `parts: this.buildGeminiParts(message)` 사용 → 문자열·멀티모달 모두 지원.
+  - `src/main.js`: PHOTO 멀티모달 호출 로그 문구 Claude→Gemini 정합화.
+  - 라이브 검증: 1x1 PNG + 텍스트 멀티모달 호출 HTTP 200, finishReason STOP, 정상 응답.
+
 ## v1.9.59 (2026-06-17)
 - **Description**: PC 서버 주소(LAN IP) 자동 탐지 신뢰성 개선. 장소(네트워크)가 바뀌어도 확실히 연결되도록, 서버가 자신의 실제 LAN IP를 직접 보고하는 방식으로 전환.
 - **Changes**:
