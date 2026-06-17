@@ -1,5 +1,17 @@
 # 📦 Version History
 
+## v1.9.59 (2026-06-17)
+- **Description**: PC 서버 주소(LAN IP) 자동 탐지 신뢰성 개선. 장소(네트워크)가 바뀌어도 확실히 연결되도록, 서버가 자신의 실제 LAN IP를 직접 보고하는 방식으로 전환.
+- **Changes**:
+  - `src/main.js`:
+    - `getLocalLanIps()` 헬퍼 추가 — 가상/터널/링크로컬 인터페이스(utun, awdl, llw, bridge, vmnet, vboxnet, docker 등) 및 169.254.x(APIPA) 제외, 사설망(192.168 > 10 > 172.16~31) 우선 정렬로 가장 적합한 IP를 첫 항목으로.
+    - `/api/health` 응답에 `port`, `localIps`, `lanUrl` 추가 → 클라이언트가 스캔 없이 정확한 주소 획득.
+    - 서버 기동 로그에 권장(⭐) 주소 표기 및 LAN IP 미검출 시 경고.
+  - `src/renderer/app.js` `discoverPcServer()`:
+    - 최우선으로 상대경로 `/api/health` 호출 → 서버가 보고한 `lanUrl`을 즉시 채택(PC 자체 localhost 접속이어도 모바일 공유용 LAN 주소 확보).
+    - 폴백 서브넷 스캔 시 현재 접속 호스트의 서브넷을 1순위로 자동 추가(어느 장소든 현재 대역 포함).
+  - 라이브 검증: `/api/health` → `{"localIps":["192.168.219.55"],"lanUrl":"http://192.168.219.55:3333"}`.
+
 ## v1.9.58 (2026-06-17)
 - **Description**: AI 콘텐츠 생성 엔진을 Anthropic Claude SDK → Google Gemini REST API로 전환. API 키는 `api.md`의 `GEMINI API KEY`를 자동으로 읽어 사용.
 - **Changes**:
