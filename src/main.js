@@ -4452,6 +4452,41 @@ function broadcastLogToSse(logData) {
     }
 }
 
+/**
+ * PC의 실제 LAN IPv4 주소 목록을 반환한다.
+ * - 내부(127.x)·비IPv4 제외
+ * - 가상/터널/링크로컬 인터페이스(utun, awdl, llw, bridge, vmnet, vboxnet 등) 및
+ *   169.254.x.x(APIPA) 제외
+ * - 사설망(192.168.x / 10.x / 172.16~31.x)을 우선 정렬하여 첫 항목이 가장 적합하도록 함
+ */
+function getLocalLanIps() {
+    const result = [];
+    try {
+        const ifaces = os.networkInterfaces();
+        const skipNamePattern = /^(utun|awdl|llw|bridge|vmnet|vboxnet|tun|tap|docker|veth|zt)/i;
+        for (const name in ifaces) {
+            if (skipNamePattern.test(name)) continue;
+            for (const iface of ifaces[name]) {
+                if (iface.family !== 'IPv4' || iface.internal) continue;
+                if (iface.address.startsWith('169.254.')) continue; // APIPA(주소 미할당)
+                result.push(iface.address);
+            }
+        }
+    } catch (e) {
+        console.error('⚠️ 로컬 LAN IP 조회 실패:', e);
+    }
+
+    // 사설망 대역 우선순위: 192.168.x > 10.x > 172.16~31.x > 기타
+    const rank = (ip) => {
+        if (ip.startsWith('192.168.')) return 0;
+        if (ip.startsWith('10.')) return 1;
+        const m = ip.match(/^172\.(\d+)\./);
+        if (m && +m[1] >= 16 && +m[1] <= 31) return 2;
+        return 3;
+    };
+    return result.sort((a, b) => rank(a) - rank(b));
+}
+
 function startLocalHttpServer(port = 3333) {
     const PUBLIC_DIR = path.join(__dirname, 'renderer');
     
@@ -4507,9 +4542,19 @@ function startLocalHttpServer(port = 3333) {
         }
 
         // Health check endpoint: GET /api/health
+        // 서버가 자신의 실제 LAN IP 목록과 권장 접속 주소를 함께 응답하여
+        // 클라이언트가 무차별 스캔 없이 정확한 PC 서버 주소를 즉시 얻도록 한다.
         if (req.method === 'GET' && reqPath === '/api/health') {
+            const localIps = getLocalLanIps();
+            const primaryIp = localIps[0] || null;
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ status: 'ok', app: 'MyDays' }));
+            res.end(JSON.stringify({
+                status: 'ok',
+                app: 'MyDays',
+                port,
+                localIps,
+                lanUrl: primaryIp ? `http://${primaryIp}:${port}` : null
+            }));
             return;
         }
 
@@ -4588,23 +4633,16 @@ function startLocalHttpServer(port = 3333) {
     httpServer.listen(port, () => {
         console.log(`🚀 [HTTP 서버 실행] http://localhost:${port} 에서 웹 서비스 중입니다.`);
         
-        // PC의 모든 로컬 IPv4 인터페이스 검색 및 안내 출력
+        // PC의 실제 LAN IPv4 주소 안내 출력 (사설망 우선 정렬)
         try {
-            const networkInterfaces = os.networkInterfaces();
-            const localIps = [];
-            for (const interfaceName in networkInterfaces) {
-                const interfaces = networkInterfaces[interfaceName];
-                for (const iface of interfaces) {
-                    if (iface.family === 'IPv4' && !iface.internal) {
-                        localIps.push(iface.address);
-                    }
-                }
-            }
+            const localIps = getLocalLanIps();
             if (localIps.length > 0) {
                 console.log('📡 모바일 기기 연결 가능 주소 (같은 Wi-Fi 공유기 필수):');
-                localIps.forEach(ip => {
-                    console.log(`   👉 http://${ip}:${port}`);
+                localIps.forEach((ip, idx) => {
+                    console.log(`   👉 http://${ip}:${port}${idx === 0 ? '  ⭐ (권장)' : ''}`);
                 });
+            } else {
+                console.log('⚠️ 사용 가능한 LAN IP를 찾지 못했습니다. Wi-Fi/유선 연결 상태를 확인하세요.');
             }
         } catch (e) {
             console.error('⚠️ 로컬 IP 목록 조회 실패:', e);

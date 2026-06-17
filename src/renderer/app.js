@@ -3559,45 +3559,60 @@ class MobileApiBridge {
 
     // 🔍 동일 Wi-Fi 대역 내 PC 자동화 서버(MyDays) 탐색 기능
     static async discoverPcServer(onProgress = null) {
-        // 0순위: 현재 브라우저가 접속해 있는 호스트 주소(Origin) 검사 (이미 올바른 IP로 접속했을 수 있음)
+        // 🥇 최우선: 현재 페이지를 서빙하는 서버에게 상대경로 /api/health로 직접 물어본다.
+        //   - PC 자체 브라우저(localhost) 또는 LAN IP로 접속한 경우 모두 동작.
+        //   - 서버가 자신의 실제 LAN IP(localIps/lanUrl)를 알려주므로 무차별 스캔이 불필요.
         if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
-            const currentOrigin = window.location.origin;
-            if (currentOrigin && !currentOrigin.includes('localhost') && !currentOrigin.includes('127.0.0.1')) {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 350);
-                    const res = await fetch(`${currentOrigin}/api/health`, {
-                        signal: controller.signal,
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    clearTimeout(timeoutId);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data && data.app === 'MyDays') {
-                            console.log('🎯 브라우저 접속 Origin에서 서버 발견:', currentOrigin);
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 1500);
+                const res = await fetch(`/api/health`, {
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                clearTimeout(timeoutId);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.app === 'MyDays') {
+                        const currentOrigin = window.location.origin;
+                        const isLocal = currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1');
+                        // localhost로 접속했어도 서버가 알려준 LAN 주소를 우선 채택(모바일 공유용)
+                        if (data.lanUrl) {
+                            console.log('🎯 서버가 보고한 LAN 주소 채택:', data.lanUrl);
+                            return data.lanUrl;
+                        }
+                        if (!isLocal) {
+                            console.log('🎯 현재 접속 Origin에서 서버 확인:', currentOrigin);
                             return currentOrigin;
                         }
                     }
-                } catch (e) {
-                    // 무시
                 }
+            } catch (e) {
+                // 무시하고 아래 서브넷 스캔으로 진행
             }
         }
 
         const subnets = ['172.30.1', '192.168.0', '192.168.1', '192.168.8', '192.168.43', '192.168.137', '192.168.219', '192.168.35'];
-        
-        // 현재 설정되어 있는 주소가 있으면 그 서브넷을 1순위로 추가
+
+        // 서브넷을 목록 맨 앞(1순위)으로 끌어올리는 헬퍼
+        const promoteSubnet = (subnet) => {
+            if (!subnet) return;
+            const idx = subnets.indexOf(subnet);
+            if (idx >= 0) subnets.splice(idx, 1);
+            subnets.unshift(subnet);
+        };
+
+        // 1순위: 현재 브라우저가 접속해 있는 호스트의 서브넷(이 장소의 실제 대역)을 최우선 추가
+        const hostMatch = (window.location.hostname || '').match(/^(\d{1,3}\.\d{1,3}\.\d{1,3})\.\d{1,3}$/);
+        if (hostMatch) {
+            promoteSubnet(hostMatch[1]);
+        }
+
+        // 그 다음: 기존에 설정되어 있던 주소의 서브넷도 우선순위 상향
         const savedUrl = (localStorage.getItem('mydays-server-url') || '').trim();
         const ipMatch = savedUrl.match(/https?:\/\/(\d{1,3}\.\d{1,3}\.\d{1,3})\.\d{1,3}/);
         if (ipMatch) {
-            const currentSubnet = ipMatch[1];
-            if (!subnets.includes(currentSubnet)) {
-                subnets.unshift(currentSubnet);
-            } else {
-                const idx = subnets.indexOf(currentSubnet);
-                subnets.splice(idx, 1);
-                subnets.unshift(currentSubnet);
-            }
+            promoteSubnet(ipMatch[1]);
         }
 
         const port = 3333;
