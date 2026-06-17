@@ -573,13 +573,16 @@ class CoupangCrawler {
                 // ContentGenerator를 활성 목록에 추가
                 this.activeContentGenerators.add(contentGenerator);
                 
-                // 계정 정보에서 Claude API 키 가져오기
-                const claudeApiKey = account.claudeApi || account.claudeApiKey;
-                if (!claudeApiKey) {
-                    throw new Error(`계정 ${account.username || account.id}의 Claude API 키가 설정되지 않았습니다.`);
+                // API 키 결정: api.md의 GEMINI 키를 우선 사용, 없으면 계정 설정 키 사용
+                const fileGeminiKey = typeof contentGenerator.getGeminiKeyFromApiMd === 'function'
+                    ? contentGenerator.getGeminiKeyFromApiMd()
+                    : null;
+                const apiKey = fileGeminiKey || account.claudeApi || account.claudeApiKey;
+                if (!apiKey) {
+                    throw new Error(`api.md의 GEMINI API 키 또는 계정 ${account.username || account.id}의 API 키가 설정되지 않았습니다.`);
                 }
-                
-                contentGenerator.setApiKey(claudeApiKey);
+
+                contentGenerator.setApiKey(apiKey);
                 contentResult = await contentGenerator.generateAllContent(productData);
                 
                 if (!contentResult.success) {

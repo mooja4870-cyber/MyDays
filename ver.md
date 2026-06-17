@@ -1,5 +1,19 @@
 # 📦 Version History
 
+## v1.9.58 (2026-06-17)
+- **Description**: AI 콘텐츠 생성 엔진을 Anthropic Claude SDK → Google Gemini REST API로 전환. API 키는 `api.md`의 `GEMINI API KEY`를 자동으로 읽어 사용.
+- **Changes**:
+  - `src/modules/ContentGenerator.js`:
+    - `@anthropic-ai/sdk` 의존 제거, Gemini `generateContent` REST 엔드포인트(`generativelanguage.googleapis.com/v1beta/models`) 직접 호출로 교체.
+    - 기본 모델 `claude-3-5-haiku-20241022` → `gemini-2.5-flash`.
+    - `getGeminiKeyFromApiMd()` 추가: `api.md`에서 `GEMINI API KEY: <키>`를 파싱(소스/빌드 경로 후보 탐색).
+    - `setApiKey()`가 api.md 키를 우선 사용(없으면 계정 설정 키로 폴백).
+    - 인증은 표준 `?key=` 방식. 재시도/지수백오프/중지 로직 및 system 프롬프트(`systemInstruction`) 지원 유지.
+    - 응답 파싱을 Gemini `candidates[].content.parts[].text` 구조로 변경, 안전성 차단(blockReason/finishReason) 사유 로깅.
+    - `this.anthropic` 상태 플래그를 `this.geminiReady`로 대체, cleanup 정합성 정리.
+  - `src/modules/CoupangCrawler.js`: 콘텐츠 생성 시 api.md의 GEMINI 키 우선 사용, 없을 때만 계정 키로 폴백.
+  - 라이브 연결 테스트 통과(HTTP 200, "테스트 성공").
+
 ## v1.9.56 (2026-06-04)
 - **Description**: 앱 전역에서 단어 줄바꿈을 금지하여, 한 단어가 절대 두 개의 라인에 걸쳐 쪼개져 표시되지 않도록 함.
 - **Changes**:
