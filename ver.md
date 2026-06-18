@@ -1,5 +1,13 @@
 # 📦 Version History
 
+## v1.9.62 (2026-06-18)
+- **Description**: 네이버 블로그 발행 "가짜 성공" 판정 버그 수정. 실제 게시되지 않았는데 성공으로 보고되던 문제를 엄격 판정·진단 스크린샷·2차 팝업 처리로 해결.
+- **Changes** (`src/modules/BlogPublisher.js` `publishPost`):
+    - **성공 판정 엄격화**: 기존 `isPublished = !url.includes('postwrite') || isLayerGone`에서 `|| isLayerGone`(레이어 닫힘만으로 성공 간주) 제거. 최대 20초간 1초 간격 폴링으로 **URL이 실제로 작성화면(postwrite)을 벗어나야만** 성공 처리. 벗어나지 못하면 캡차/봇차단 가능성을 포함한 명확한 실패로 보고.
+    - **진단용 스크린샷**: `saveDiagnosticScreenshot()` 추가 — 발행 직후/오류 시 `userData/diagnostics`에 전체화면 캡처 저장(네이버 캡차·팝업 확인용).
+    - **2차 확인 팝업 처리**: 최종 발행 후 나타날 수 있는 추가 확인 버튼(`.se-popup-button-confirm` 등 다중 셀렉터)을 감지해 클릭.
+- **효과**: 더 이상 미발행이 성공으로 표시되지 않으며, 다음 실행 시 스크린샷으로 차단 지점을 특정 가능.
+
 ## v1.9.61 (2026-06-18)
 - **Description**: PC 서버 연결을 선검증(Pre-flight) + 자동복구 병행 방식으로 강화. 장소(공유기) 변경 시에도 포스팅 첫 시도 실패 메시지 없이 매끄럽게 진행.
 - **Changes**:
