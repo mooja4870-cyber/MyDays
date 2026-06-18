@@ -1,5 +1,14 @@
 # 📦 Version History
 
+## v1.9.61 (2026-06-18)
+- **Description**: PC 서버 연결을 선검증(Pre-flight) + 자동복구 병행 방식으로 강화. 장소(공유기) 변경 시에도 포스팅 첫 시도 실패 메시지 없이 매끄럽게 진행.
+- **Changes**:
+  - `src/renderer/app.js`:
+    - `MobileApiBridge.ensureServerReachable(onLog)` 추가 — 포스팅 시작 전 저장된 서버 주소를 `/api/health`로 1회 확인(1.5s 타임아웃). 살아있으면 즉시 사용, 죽어있거나 미설정이면 `discoverPcServer()`로 자동 갱신 후 사용.
+    - `PhotoAutomationManager.startPhotoPublish()`: 브라우저(모바일) 모드에서 POST 전에 `ensureServerReachable()` 선검증 호출(Electron 직접 IPC 모드는 네트워크 주소 불필요로 건너뜀).
+    - 기존 실패 후 자동복구(②: catch→discoverPcServer→재시도) 로직은 도중 끊김 대비용으로 그대로 유지(①+② 병행).
+  - 효과: 정상 시 health 1회(수십~수백 ms)만 추가, 장소 변경 시 첫 "Failed to fetch" 알림 없이 올바른 서버로 바로 진행.
+
 ## v1.9.60 (2026-06-18)
 - **Description**: PHOTO 사진 분석 포스팅 시 Gemini 멀티모달 호출이 400(Invalid JSON payload, `contents[0].parts[0]`)으로 실패하던 문제 수정. Anthropic형 이미지/텍스트 배열을 Gemini `parts`로 변환.
 - **Changes**:

@@ -3557,6 +3557,63 @@ class MobileApiBridge {
         return baseUrl ? `${baseUrl}${path}` : path;
     }
 
+    /**
+     * 🛡️ 선검증(Pre-flight): 포스팅 시작 전 현재 저장된 PC 서버 주소가 살아있는지 확인하고,
+     * 죽어있으면 자동탐색으로 갱신한다. (장소 변경으로 인한 첫 시도 실패 메시지를 예방)
+     * @param {function} [onLog] 진행 상황 로그 콜백 (level, message)
+     * @returns {Promise<string|null>} 사용 가능한 서버 URL, 없으면 null
+     */
+    static async ensureServerReachable(onLog = null) {
+        const log = (level, message) => { if (typeof onLog === 'function') onLog(level, message); };
+
+        // health 1회 확인 헬퍼 (짧은 타임아웃)
+        const checkHealth = async (baseUrl) => {
+            if (!baseUrl) return false;
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 1500);
+                const res = await fetch(`${baseUrl}/api/health`, {
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                clearTimeout(timeoutId);
+                if (res.ok) {
+                    const data = await res.json();
+                    return !!(data && data.app === 'MyDays');
+                }
+            } catch (e) {
+                // 연결 실패 → false
+            }
+            return false;
+        };
+
+        const savedUrl = this.getApiBaseUrl(false);
+
+        // 1) 저장 주소가 살아있으면 그대로 사용 (가장 빠른 경로)
+        if (savedUrl && await checkHealth(savedUrl)) {
+            return savedUrl;
+        }
+
+        // 2) 죽어있으면(또는 미설정) 자동탐색으로 갱신
+        log('warn', '🛡️ [선검증] 저장된 PC 서버 주소에 연결되지 않아 자동 탐색으로 갱신합니다...');
+        try {
+            const foundUrl = await this.discoverPcServer();
+            if (foundUrl) {
+                localStorage.setItem('mydays-server-url', foundUrl);
+                this.serverUrl = foundUrl;
+                const serverUrlInput = document.getElementById('mobile-server-url');
+                if (serverUrlInput) serverUrlInput.value = foundUrl;
+                log('success', `🛡️ [선검증 완료] PC 서버(${foundUrl})를 확인하여 설정을 갱신했습니다.`);
+                return foundUrl;
+            }
+        } catch (e) {
+            console.error('선검증 자동탐색 오류:', e);
+        }
+
+        log('warn', '⚠️ [선검증] 연결 가능한 MyDays PC 서버를 찾지 못했습니다. (PC 프로그램 실행 및 동일 Wi-Fi 여부 확인)');
+        return null;
+    }
+
     // 🔍 동일 Wi-Fi 대역 내 PC 자동화 서버(MyDays) 탐색 기능
     static async discoverPcServer(onProgress = null) {
         // 🥇 최우선: 현재 페이지를 서빙하는 서버에게 상대경로 /api/health로 직접 물어본다.
@@ -4277,6 +4334,15 @@ class PhotoAutomationManager {
             AppState.photoPublishing = true;
             Navigation.switchPanel('naver-test');
             PostingHistoryManager.appendLog({ level: 'info', message: '🚀 PHOTO 분석 및 네이버 블로그 자동 포스팅을 시작합니다...' });
+
+            // 🛡️ 선검증(Pre-flight): 브라우저(모바일) 모드에서만, POST 전에 서버 주소를 미리 확인·갱신
+            // (Electron 직접 IPC 모드는 네트워크 주소가 불필요하므로 건너뜀)
+            const isBrowserMode = !(window.electronAPI && typeof window.electronAPI.executeAutomationStep === 'function');
+            if (isBrowserMode) {
+                await MobileApiBridge.ensureServerReachable((level, message) => {
+                    PostingHistoryManager.appendLog({ level, message });
+                });
+            }
 
             // 백그라운드 비동기 비차단 실행 프로미스 정의 (await하지 않고 독립 실행)
             const executePromise = (async () => {
