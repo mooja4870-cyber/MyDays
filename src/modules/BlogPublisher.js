@@ -1518,45 +1518,113 @@ class BlogPublisher extends EventEmitter {
 
       await finalPublishButton.click();
       console.log('✅ 2단계: 최종 발행 버튼 클릭 완료');
-      
-      // 4단계: 발행 완료 대기 (URL 변경 또는 성공 메시지 확인)
-      await this.page.waitForTimeout(5000);
-      
-      // 발행 설정 레이어가 사라졌는지 확인
-      const publishLayerExists = await this.page.$('.layer_publish__vA9PX');
-      const isLayerGone = !publishLayerExists;
-      
-      // 현재 URL 확인하여 발행 성공 여부 판단
-      const currentUrl = this.page.url();
-      const isPublished = !currentUrl.includes('postwrite') || isLayerGone;
-      
-      if (isPublished) {
-        console.log('✅ 포스트가 성공적으로 발행되었습니다');
+
+      // 3-1단계: 최종 발행 후 나타날 수 있는 2차 확인 팝업 처리
+      //  (네이버가 "발행하시겠습니까?" 등 추가 확인을 띄우는 경우 대비)
+      await this.page.waitForTimeout(1500);
+      try {
+        const secondaryConfirmSelectors = [
+          '.se-popup-button-confirm',
+          '.se-popup-button.se-popup-button-confirm',
+          'button[class*="confirm_btn"][data-testid="seOnePublishBtn"]',
+          '.btn_ok__DZUtf',
+          '.layer_publish__vA9PX .confirm_btn__WEaBq'
+        ];
+        for (const sel of secondaryConfirmSelectors) {
+          const btn = await this.page.$(sel);
+          if (btn) {
+            const visible = await btn.isVisible().catch(() => false);
+            if (visible) {
+              await btn.click().catch(() => {});
+              console.log(`✅ 2차 확인 팝업 클릭: ${sel}`);
+              await this.page.waitForTimeout(1500);
+              break;
+            }
+          }
+        }
+      } catch (popupErr) {
+        console.log('ℹ️ 2차 확인 팝업 없음(또는 처리 생략):', popupErr.message);
+      }
+
+      // 4단계: 발행 완료를 '엄격하게' 확인 — URL이 실제로 postwrite를 벗어나야만 성공.
+      //  (레이어가 닫혔다는 사실만으로 성공으로 간주하지 않음: 캡차/봇차단 시 가짜 성공 방지)
+      const POLL_TIMEOUT_MS = 20000;
+      const POLL_INTERVAL_MS = 1000;
+      const startedAt = Date.now();
+      let publishedUrl = null;
+
+      while (Date.now() - startedAt < POLL_TIMEOUT_MS) {
+        const url = this.page.url();
+        // 정상 발행 시 네이버는 작성(postwrite) 화면을 벗어나 게시글/관리 페이지로 이동한다.
+        if (url && !url.includes('postwrite') && !url.includes('Redirect=Write')) {
+          publishedUrl = url;
+          break;
+        }
+        await this.page.waitForTimeout(POLL_INTERVAL_MS);
+      }
+
+      // 진단용 스크린샷 저장 (성공/실패 무관하게 발행 직후 화면을 남김)
+      let shotPath = null;
+      try {
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+        shotPath = await this.saveDiagnosticScreenshot(`publish_${publishedUrl ? 'ok' : 'fail'}_${stamp}.png`);
+      } catch (_) { /* 스크린샷 실패는 무시 */ }
+
+      if (publishedUrl) {
+        console.log(`✅ 포스트가 성공적으로 발행되었습니다 → ${publishedUrl}`);
         return {
           success: true,
-          url: currentUrl,
+          url: publishedUrl,
+          screenshot: shotPath,
           timestamp: Date.now()
         };
-      } else {
-        // 추가 대기 후 재확인
-        await this.page.waitForTimeout(3000);
-        const finalUrl = this.page.url();
-        const finalCheck = !finalUrl.includes('postwrite');
-        
-        if (finalCheck) {
-          console.log('✅ 포스트 발행 완료 (지연 확인)');
-          return {
-            success: true,
-            url: finalUrl,
-            timestamp: Date.now()
-          };
-        } else {
-          throw new Error('포스트 발행 확인 실패 - 설정을 다시 확인해주세요');
-        }
       }
+
+      // 실패: 발행이 확정되지 않음 (여전히 작성 화면). 가짜 성공 대신 정확히 실패 보고.
+      const stuckUrl = this.page.url();
+      const layerStillOpen = !!(await this.page.$('.layer_publish__vA9PX'));
+      throw new Error(
+        `포스트 발행 미확정(실제 게시 안 됨). 현재 URL이 작성화면(postwrite)에 머물러 있습니다. ` +
+        `네이버 보안문자(캡차)·추가 확인 팝업 또는 봇 차단 가능성이 있습니다. ` +
+        `[레이어 열림 여부: ${layerStillOpen}] [URL: ${stuckUrl}]` +
+        (shotPath ? ` 진단 스크린샷: ${shotPath}` : '')
+      );
     } catch (error) {
       console.error('❌ 포스트 발행 중 오류:', error);
+      // 오류 시점 화면도 남겨 진단에 활용
+      try {
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+        await this.saveDiagnosticScreenshot(`publish_error_${stamp}.png`);
+      } catch (_) { /* 무시 */ }
       throw error;
+    }
+  }
+
+  /**
+   * 진단용 스크린샷을 userData/diagnostics 폴더에 저장한다.
+   * @param {string} filename
+   * @returns {Promise<string|null>} 저장 경로
+   */
+  async saveDiagnosticScreenshot(filename) {
+    try {
+      if (!this.page) return null;
+      let baseDir;
+      try {
+        const { app } = require('electron');
+        baseDir = app && typeof app.getPath === 'function'
+          ? path.join(app.getPath('userData'), 'diagnostics')
+          : path.join(process.cwd(), 'diagnostics');
+      } catch (_) {
+        baseDir = path.join(process.cwd(), 'diagnostics');
+      }
+      await fs.mkdir(baseDir, { recursive: true });
+      const shotPath = path.join(baseDir, filename);
+      await this.page.screenshot({ path: shotPath, fullPage: true });
+      console.log(`📸 진단 스크린샷 저장: ${shotPath}`);
+      return shotPath;
+    } catch (error) {
+      console.error('진단 스크린샷 저장 실패:', error.message);
+      return null;
     }
   }
 
