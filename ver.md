@@ -1,6 +1,12 @@
 # 📦 Version History
 
 
+
+## v1.9.67 (2026-07-05)
+- **Description**: Fixed a critical CORS preflight failure that blocked the new fetch-based SSE stream on Android WebViews.
+- **Changes**:
+  - `src/main.js`: Added `ngrok-skip-browser-warning`, `bypass-tunnel-reminder`, and `accept` to the `Access-Control-Allow-Headers` list in the Express server. Previously, injecting these custom headers into the `fetch` request in v1.9.66 triggered an `OPTIONS` preflight request, which was immediately rejected by the PC server due to a strict CORS policy (`Content-Type` only). This caused the SSE connection to fail silently in the background.
+
 ## v1.9.66 (2026-07-05)
 - **Description**: Replaced native EventSource with a custom fetch-based stream reader to definitively bypass ngrok browser warning restrictions for SSE on Android WebView.
 - **Changes**:
