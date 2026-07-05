@@ -3567,8 +3567,8 @@ class MobileApiBridge {
         const log = (level, message) => { if (typeof onLog === 'function') onLog(level, message); };
 
         // health 1회 확인 헬퍼 (짧은 타임아웃)
-        const checkHealth = async (baseUrl) => {
-            if (!baseUrl) return false;
+        const checkHealthInfo = async (baseUrl) => {
+            if (!baseUrl) return null;
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 1500);
@@ -3579,19 +3579,36 @@ class MobileApiBridge {
                 clearTimeout(timeoutId);
                 if (res.ok) {
                     const data = await res.json();
-                    return !!(data && data.app === 'MyDays');
+                    if (data && data.app === 'MyDays') {
+                        return data;
+                    }
                 }
             } catch (e) {
-                // 연결 실패 → false
+                // 연결 실패
             }
-            return false;
+            return null;
         };
 
         const savedUrl = this.getApiBaseUrl(false);
 
-        // 1) 저장 주소가 살아있으면 그대로 사용 (가장 빠른 경로)
-        if (savedUrl && await checkHealth(savedUrl)) {
-            return savedUrl;
+        // 1) 저장 주소가 살아있으면 확인
+        if (savedUrl) {
+            const healthData = await checkHealthInfo(savedUrl);
+            if (healthData) {
+                // ngrok 등 외부망으로 접속 중인데, lanUrl이 제공되고 동일 Wi-Fi라면 LAN으로 업그레이드 시도
+                if (healthData.lanUrl && healthData.lanUrl !== savedUrl) {
+                    const lanHealth = await checkHealthInfo(healthData.lanUrl);
+                    if (lanHealth) {
+                        localStorage.setItem('mydays-server-url', healthData.lanUrl);
+                        log('success', `📡 더 빠르고 안정적인 로컬 네트워크(LAN) 연결로 자동 전환되었습니다: ${healthData.lanUrl}`);
+                        if (typeof PostingHistoryManager !== 'undefined') {
+                            PostingHistoryManager.connectSSE(true);
+                        }
+                        return healthData.lanUrl;
+                    }
+                }
+                return savedUrl;
+            }
         }
 
         // 2) 죽어있으면(또는 미설정) 자동탐색으로 갱신
@@ -3771,9 +3788,15 @@ class ErrorMessageHelper {
 
 // PHOTO 포스팅 이력 관리자
 class PostingHistoryManager {
-    static connectSSE() {
+    static connectSSE(forceReconnect = false) {
         if (window.electronAPI && window.electronAPI.onMainProcessLog) return;
-        if (this._eventSource) return;
+        
+        if (this._eventSource) {
+            if (!forceReconnect) return;
+            console.log('🔄 기존 SSE 연결을 종료하고 재연결합니다.');
+            this._eventSource.close();
+            this._eventSource = null;
+        }
 
         console.log('🌐 SSE 실시간 로그 스트림 연결 시도 (/api/logs)...');
         try {
@@ -4351,7 +4374,7 @@ class PhotoAutomationManager {
                 await MobileApiBridge.ensureServerReachable((level, message) => {
                     PostingHistoryManager.appendLog({ level, message });
                 });
-                PostingHistoryManager.connectSSE();
+                PostingHistoryManager.connectSSE(true);
             }
 
             // 백그라운드 비동기 비차단 실행 프로미스 정의 (await하지 않고 독립 실행)
