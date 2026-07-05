@@ -1,5 +1,10 @@
 # 📦 Version History
 
+## v1.4.2 (2026-07-05)
+- **Description**: Exported the built `MyDays.apk` file to the repository root to enable direct download via the GitHub raw link.
+- **Changes**:
+  - Copied `src/renderer/MyDays.apk` to `./MyDays.apk`.
+
 ## v1.4.1 (2026-07-05)
 - **Description**: Resolved Mac OS compatibility issues where Playwright publishing failed due to hardcoded Windows PowerShell clipboard commands and `Control+V` keyboard shortcuts.
 - **Changes**:
