@@ -3791,11 +3791,11 @@ class PostingHistoryManager {
     static connectSSE(forceReconnect = false) {
         if (window.electronAPI && window.electronAPI.onMainProcessLog) return;
         
-        if (this._eventSource) {
+        if (this._abortController) {
             if (!forceReconnect) return;
             console.log('🔄 기존 SSE 연결을 종료하고 재연결합니다.');
-            this._eventSource.close();
-            this._eventSource = null;
+            this._abortController.abort();
+            this._abortController = null;
         }
 
         console.log('🌐 SSE 실시간 로그 스트림 연결 시도 (/api/logs)...');
@@ -3805,20 +3805,54 @@ class PostingHistoryManager {
                 console.warn('모바일 앱 PC 서버 주소가 없어 SSE 로그 연결을 건너뜁니다.');
                 return;
             }
-            this._eventSource = new EventSource(logsUrl);
-            this._eventSource.onmessage = (event) => {
-                try {
-                    const logData = JSON.parse(event.data);
-                    this.appendLog(logData);
-                } catch (e) {
-                    console.error('SSE 로그 파싱 에러:', e);
+
+            this._abortController = new AbortController();
+            
+            fetch(logsUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'text/event-stream',
+                    'ngrok-skip-browser-warning': 'true',
+                    'Bypass-Tunnel-Reminder': 'true'
+                },
+                signal: this._abortController.signal
+            }).then(async (response) => {
+                if (!response.body) {
+                    console.error('SSE fetch response body is null');
+                    return;
                 }
-            };
-            this._eventSource.onerror = (err) => {
-                console.error('SSE 연결 오류:', err);
-                this._eventSource.close();
-                this._eventSource = null;
-            };
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // Keep incomplete line in buffer
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const dataStr = line.substring(6).trim();
+                            if (dataStr) {
+                                try {
+                                    const logData = JSON.parse(dataStr);
+                                    this.appendLog(logData);
+                                } catch (e) {
+                                    console.error('SSE 로그 파싱 에러:', e);
+                                }
+                            }
+                        }
+                    }
+                }
+            }).catch(err => {
+                if (err.name !== 'AbortError') {
+                    console.error('SSE fetch 연결 오류:', err);
+                }
+            });
+
         } catch (err) {
             console.error('SSE 초기화 오류:', err);
         }
