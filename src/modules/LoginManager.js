@@ -86,8 +86,24 @@ class LoginManager {
         try {
             console.log('📋 클립보드 복사 시작...');
             
-            // 방법 1: PowerShell을 사용한 클립보드 복사 (개선된 오류 처리)
             const { spawn } = require('child_process');
+            
+            if (process.platform === 'darwin') {
+                return new Promise((resolve, reject) => {
+                    const pbcopy = spawn('pbcopy');
+                    pbcopy.stdin.write(text, 'utf8');
+                    pbcopy.stdin.end();
+                    pbcopy.on('close', (code) => {
+                        if (code === 0) {
+                            console.log('✅ Mac pbcopy 클립보드 복사 성공');
+                            resolve();
+                        } else {
+                            reject(new Error(`pbcopy 종료 코드: ${code}`));
+                        }
+                    });
+                    pbcopy.on('error', (err) => reject(err));
+                });
+            }
             
             // Base64 인코딩을 사용한 안전한 텍스트 전달 (특수문자 문제 해결)
             const base64Text = Buffer.from(text, 'utf8').toString('base64');
@@ -167,9 +183,9 @@ class LoginManager {
         try {
             console.log('🔄 대체 클립보드 복사 방법 시도...');
             
-            // 방법 1: clip.exe 사용 (Windows 내장)
             const { spawn } = require('child_process');
-            const clipProcess = spawn('clip', [], {
+            const cmd = process.platform === 'darwin' ? 'pbcopy' : 'clip';
+            const clipProcess = spawn(cmd, [], {
                 windowsHide: true,
                 stdio: ['pipe', 'pipe', 'pipe']
             });
@@ -231,11 +247,13 @@ class LoginManager {
             
             // 입력 필드 클릭 및 기존 내용 지우기
             await this.page.click(selector);
-            await this.page.keyboard.press('Control+A');
+            const selectAllKey = process.platform === 'darwin' ? 'Meta+A' : 'Control+A';
+            await this.page.keyboard.press(selectAllKey);
             await this.page.waitForTimeout(100);
             
             // 클립보드에서 붙여넣기
-            await this.page.keyboard.press('Control+V');
+            const pasteKey = process.platform === 'darwin' ? 'Meta+V' : 'Control+V';
+            await this.page.keyboard.press(pasteKey);
             await this.page.waitForTimeout(500);
             
             console.log(`✅ 클립보드 붙여넣기 완료: ${selector}`);
