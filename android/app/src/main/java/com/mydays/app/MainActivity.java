@@ -79,15 +79,15 @@ public class MainActivity extends Activity {
                 filePathCallback = callback;
 
                 Intent intent;
-                intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setType("image/*");
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+
+                Intent chooserIntent = Intent.createChooser(intent, "사진 선택 앱을 선택하세요");
 
                 try {
-                    startActivityForResult(intent, FILE_CHOOSER_REQUEST);
+                    startActivityForResult(chooserIntent, FILE_CHOOSER_REQUEST);
                     return true;
                 } catch (Exception e) {
                     filePathCallback = null;
