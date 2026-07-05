@@ -3771,6 +3771,36 @@ class ErrorMessageHelper {
 
 // PHOTO 포스팅 이력 관리자
 class PostingHistoryManager {
+    static connectSSE() {
+        if (window.electronAPI && window.electronAPI.onMainProcessLog) return;
+        if (this._eventSource) return;
+
+        console.log('🌐 SSE 실시간 로그 스트림 연결 시도 (/api/logs)...');
+        try {
+            const logsUrl = MobileApiBridge.apiUrl('/api/logs');
+            if (!logsUrl || (window.location.protocol === 'file:' && logsUrl === '/api/logs')) {
+                console.warn('모바일 앱 PC 서버 주소가 없어 SSE 로그 연결을 건너뜁니다.');
+                return;
+            }
+            this._eventSource = new EventSource(logsUrl);
+            this._eventSource.onmessage = (event) => {
+                try {
+                    const logData = JSON.parse(event.data);
+                    this.appendLog(logData);
+                } catch (e) {
+                    console.error('SSE 로그 파싱 에러:', e);
+                }
+            };
+            this._eventSource.onerror = (err) => {
+                console.error('SSE 연결 오류:', err);
+                this._eventSource.close();
+                this._eventSource = null;
+            };
+        } catch (err) {
+            console.error('SSE 초기화 오류:', err);
+        }
+    }
+
     static init() {
         console.log('📋 PostingHistoryManager 초기화 중...');
         
@@ -3783,28 +3813,7 @@ class PostingHistoryManager {
                 this.appendLog(logData);
             });
         } else {
-            console.log('🌐 일반 브라우저 환경 감지. SSE 실시간 로그 스트림 연결 시작 (/api/logs)...');
-            try {
-                const logsUrl = MobileApiBridge.apiUrl('/api/logs');
-                if (!logsUrl || (window.location.protocol === 'file:' && logsUrl === '/api/logs')) {
-                    console.warn('모바일 앱 PC 서버 주소가 없어 SSE 로그 연결을 건너뜁니다.');
-                    return;
-                }
-                const eventSource = new EventSource(logsUrl);
-                eventSource.onmessage = (event) => {
-                    try {
-                        const logData = JSON.parse(event.data);
-                        this.appendLog(logData);
-                    } catch (e) {
-                        console.error('SSE 로그 파싱 에러:', e);
-                    }
-                };
-                eventSource.onerror = (err) => {
-                    console.error('SSE 연결 오류:', err);
-                };
-            } catch (err) {
-                console.error('SSE 초기화 오류:', err);
-            }
+            this.connectSSE();
         }
     }
     
@@ -4342,6 +4351,7 @@ class PhotoAutomationManager {
                 await MobileApiBridge.ensureServerReachable((level, message) => {
                     PostingHistoryManager.appendLog({ level, message });
                 });
+                PostingHistoryManager.connectSSE();
             }
 
             // 백그라운드 비동기 비차단 실행 프로미스 정의 (await하지 않고 독립 실행)

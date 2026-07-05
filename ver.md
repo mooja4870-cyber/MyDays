@@ -1,13 +1,13 @@
 # 📦 Version History
 
-## v1.4.3 (2026-07-05)
+## v1.9.64 (2026-07-05)
 - **Description**: 안드로이드 이미지 피커 호환성 개선 (구글 드라이브 외에 갤러리 및 파일 관리자 앱 호출 지원)
 - **Changes**:
   - `MainActivity.java`의 `ACTION_OPEN_DOCUMENT`를 `ACTION_GET_CONTENT`로 변경.
   - `Intent.createChooser` 로직을 추가하여 기본 파일 브라우저뿐만 아니라 모든 미디어 앱들이 선택 가능하도록 수정.
   - 신규 APK 빌드 후 덮어쓰기 완료.
 
-## v1.4.2 (2026-07-05)
+## v1.9.64 (2026-07-05)
 - **Description**: Exported the built `MyDays.apk` file to the repository root to enable direct download via the GitHub raw link.
 - **Changes**:
   - Copied `src/renderer/MyDays.apk` to `./MyDays.apk`.
@@ -616,7 +616,7 @@
   - Overhauled `:root` CSS variables in [src/renderer/styles.css](file:///d:/AI/project/my_days/src/renderer/styles.css) to deploy the multi-pink system.
   - Replaced inline mint shadows with premium rose shadows (`rgba(201, 24, 74, 0.25)`) in [src/renderer/index.html](file:///d:/AI/project/my_days/src/renderer/index.html).
 
-## v1.4.2 (2026-05-17)
+## v1.9.64 (2026-05-17)
 - **Description**: Converted all occurrences of the lowercase `photo` term to bold uppercase `PHOTO` throughout the application for higher visibility and consistency.
 
 ## v1.4.1 (2026-05-17)
