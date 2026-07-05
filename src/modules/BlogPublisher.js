@@ -1767,7 +1767,9 @@ class BlogPublisher extends EventEmitter {
         loginManager.browser = this.browser;
         loginManager.page = this.page;
         
-        const loginResult = await loginManager.loginNaver(userId, account.password);
+        const loginResult = await loginManager.loginNaver(userId, account.password, (stepMsg) => {
+            this.emit('publish-progress', { step: stepMsg });
+        });
         
         if (!loginResult.success) {
           throw new Error(`로그인 실패: ${loginResult.error}`);
@@ -1944,7 +1946,9 @@ class BlogPublisher extends EventEmitter {
             // 실제 네이버 ID 사용 (account.id는 시스템 내부 ID일 수 있음)
             const actualNaverId = account.username || account.naverId || account.id;
             console.log(`🔍 재로그인 시도 - 네이버 ID: ${actualNaverId}`);
-            const loginResult = await loginManager.loginNaver(actualNaverId, account.password);
+            const loginResult = await loginManager.loginNaver(actualNaverId, account.password, (stepMsg) => {
+                this.emit('publish-progress', { step: stepMsg });
+            });
             
             if (loginResult.success) {
               console.log('✅ 재로그인 성공! 새 세션으로 블로그 발행을 계속합니다.');
@@ -1998,7 +2002,9 @@ class BlogPublisher extends EventEmitter {
             // 실제 네이버 ID 사용 (account.id는 시스템 내부 ID일 수 있음)
             const actualNaverId = account.username || account.naverId || account.id;
             console.log(`🔍 재로그인 시도 - 네이버 ID: ${actualNaverId}`);
-            const loginResult = await loginManager.loginNaver(actualNaverId, account.password);
+            const loginResult = await loginManager.loginNaver(actualNaverId, account.password, (stepMsg) => {
+                this.emit('publish-progress', { step: stepMsg });
+            });
             
             if (loginResult.success) {
               console.log('✅ 재로그인 성공! 새 세션으로 블로그 발행을 계속합니다.');
@@ -2334,7 +2340,9 @@ class BlogPublisher extends EventEmitter {
             // 실제 네이버 ID 사용 (account.id는 시스템 내부 ID일 수 있음)
             const actualNaverId = account.username || account.naverId || account.id;
             console.log(`🔍 재로그인 시도 - 네이버 ID: ${actualNaverId}`);
-            const loginResult = await loginManager.loginNaver(actualNaverId, account.password);
+            const loginResult = await loginManager.loginNaver(actualNaverId, account.password, (stepMsg) => {
+                this.emit('publish-progress', { step: stepMsg });
+            });
             
             if (loginResult.success) {
               console.log('✅ 재로그인 성공! 새 세션으로 블로그 발행을 계속합니다.');
@@ -2382,7 +2390,9 @@ class BlogPublisher extends EventEmitter {
             // 실제 네이버 ID 사용 (account.id는 시스템 내부 ID일 수 있음)
             const actualNaverId = account.username || account.naverId || account.id;
             console.log(`🔍 재로그인 시도 - 네이버 ID: ${actualNaverId}`);
-            const loginResult = await loginManager.loginNaver(actualNaverId, account.password);
+            const loginResult = await loginManager.loginNaver(actualNaverId, account.password, (stepMsg) => {
+                this.emit('publish-progress', { step: stepMsg });
+            });
             
             if (loginResult.success) {
               console.log('✅ 재로그인 성공! 새 세션으로 블로그 발행을 계속합니다.');

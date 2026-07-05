@@ -288,7 +288,7 @@ class LoginManager {
      * @param {string} userPassword 네이버 비밀번호
      * @returns {Promise<Object>} 로그인 결과
      */
-    async loginNaver(userId, userPassword) {
+    async loginNaver(userId, userPassword, onProgress = null) {
         try {
             // 기존 세션 확인 및 복원 시도 (시간 제한 없음, 로그인 폼 기반 검증)
             if (await this.sessionManager.canUseSession(userId, 999999)) { // 시간 제한 없음
@@ -352,9 +352,11 @@ class LoginManager {
             }
 
             // 로그인 페이지로 이동
+            if (onProgress) onProgress('로그인 페이지 진입 중...');
             await this.goToSite(this.LOGIN_URL);
 
             // 아이디 입력 대기 및 입력
+            if (onProgress) onProgress('아이디 입력 중...');
             console.log(`📝 아이디 입력 중: ${userId}`);
             
             // 아이디 입력 필드 선택자들 (새로운 구조 대응)
@@ -390,6 +392,7 @@ class LoginManager {
             await this.page.waitForTimeout(500);
             
             // 비밀번호 입력 대기 및 입력
+            if (onProgress) onProgress('비밀번호 입력 중...');
             console.log('🔒 비밀번호 입력 중...');
             
             // 비밀번호 입력 필드 선택자들 (새로운 구조 대응)
@@ -429,6 +432,7 @@ class LoginManager {
             await BrowserUtils.checkKeepLoginCheckbox(this.page);
             
             // 로그인 버튼 클릭
+            if (onProgress) onProgress('로그인 수행 중...');
             console.log('🖱️ 로그인 버튼 클릭...');
             
             // 새로운 네이버 로그인 페이지 구조에 맞는 로그인 버튼 선택자들
