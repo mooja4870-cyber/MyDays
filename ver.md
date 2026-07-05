@@ -1,5 +1,11 @@
 # 📦 Version History
 
+
+## v1.9.66 (2026-07-05)
+- **Description**: Replaced native EventSource with a custom fetch-based stream reader to definitively bypass ngrok browser warning restrictions for SSE on Android WebView.
+- **Changes**:
+  - `src/renderer/app.js`: Replaced `new EventSource()` in `PostingHistoryManager.connectSSE` with a `fetch()` stream. This allows the injection of `ngrok-skip-browser-warning: true` and `Bypass-Tunnel-Reminder: true` headers, bypassing ngrok HTML intercepts that previously blocked SSE connections from outside networks.
+
 ## v1.9.65 (2026-07-05)
 - **Description**: Resolved issues with the Android APK where real-time SSE logs were not received during automation tasks.
 - **Changes**:
