@@ -39,20 +39,29 @@ moduleModule.prototype.require = function(id) {
             clipboard: {
                 writeImage: (image) => {
                     const imagePath = image._imagePath;
-                    console.log(`📋 [Electron Mock Clipboard] PowerShell을 사용하여 이미지를 클립보드에 복사 중: ${imagePath}`);
+                    console.log(`📋 [Electron Mock Clipboard] 이미지를 클립보드에 복사 중: ${imagePath}`);
                     try {
                         const { execSync } = require('child_process');
-                        const powershellCmd = `Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Clipboard]::SetImage([System.Drawing.Image]::FromFile('${imagePath.replace(/'/g, "''")}'))`;
-                        execSync(`powershell.exe -NoProfile -NonInteractive -Command "${powershellCmd}"`, { stdio: 'ignore' });
-                        console.log('✅ [Electron Mock Clipboard] PowerShell 클립보드 이미지 복사 성공!');
+                        if (process.platform === 'darwin') {
+                            execSync(`osascript -e 'set the clipboard to (read (POSIX file "${imagePath}") as JPEG picture)'`);
+                            console.log('✅ [Electron Mock Clipboard] Mac osascript 클립보드 이미지 복사 성공!');
+                        } else {
+                            const powershellCmd = `Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Clipboard]::SetImage([System.Drawing.Image]::FromFile('${imagePath.replace(/'/g, "''")}'))`;
+                            execSync(`powershell.exe -NoProfile -NonInteractive -Command "${powershellCmd}"`, { stdio: 'ignore' });
+                            console.log('✅ [Electron Mock Clipboard] PowerShell 클립보드 이미지 복사 성공!');
+                        }
                     } catch (err) {
-                        console.error('❌ [Electron Mock Clipboard] PowerShell 클립보드 이미지 복사 실패:', err.message);
+                        console.error('❌ [Electron Mock Clipboard] 클립보드 이미지 복사 실패:', err.message);
                     }
                 },
                 writeText: (text) => {
                     try {
-                        const { execSync } = require('child_process');
-                        execSync(`powershell.exe -NoProfile -NonInteractive -Command "Set-Clipboard -Value '${text.replace(/'/g, "''")}'"`, { stdio: 'ignore' });
+                        const { execSync, spawnSync } = require('child_process');
+                        if (process.platform === 'darwin') {
+                            spawnSync('pbcopy', [], { input: text });
+                        } else {
+                            execSync(`powershell.exe -NoProfile -NonInteractive -Command "Set-Clipboard -Value '${text.replace(/'/g, "''")}'"`, { stdio: 'ignore' });
+                        }
                     } catch (err) {
                         console.error('❌ [Electron Mock Clipboard] 클립보드 텍스트 복사 실패:', err.message);
                     }

@@ -1,5 +1,12 @@
 # 📦 Version History
 
+## v1.4.1 (2026-07-05)
+- **Description**: Resolved Mac OS compatibility issues where Playwright publishing failed due to hardcoded Windows PowerShell clipboard commands and `Control+V` keyboard shortcuts.
+- **Changes**:
+  - Modified [server.js](file:///Users/l/project/my_days/server.js) to route `clipboard.writeImage` and `clipboard.writeText` to `osascript` and `pbcopy` on macOS.
+  - Modified [src/modules/LoginManager.js](file:///Users/l/project/my_days/src/modules/LoginManager.js) to support Mac `pbcopy` for password clipboard transfers and `Meta+V` for pasting.
+  - Modified [src/modules/BlogPublisher.js](file:///Users/l/project/my_days/src/modules/BlogPublisher.js) to dynamically map `Control+V`/`Control+A` to `Meta+V`/`Meta+A` based on `process.platform`.
+
 ## v1.9.62 (2026-06-18)
 - **Description**: 네이버 블로그 발행 "가짜 성공" 판정 버그 수정. 실제 게시되지 않았는데 성공으로 보고되던 문제를 엄격 판정·진단 스크린샷·2차 팝업 처리로 해결.
 - **Changes** (`src/modules/BlogPublisher.js` `publishPost`):

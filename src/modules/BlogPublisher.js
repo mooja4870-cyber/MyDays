@@ -6,6 +6,8 @@ const path = require('path');
 const BrowserUtils = require('./BrowserUtils');
 const { spawn } = require('child_process');
 const ContentGenerator = require('./ContentGenerator'); // 의존성 추가
+const PASTE_KEY = process.platform === 'darwin' ? 'Meta+V' : 'Control+V';
+const SELECT_ALL_KEY = process.platform === 'darwin' ? 'Meta+A' : 'Control+A';
 // clipboardy는 dynamic import로 로드 (ES Module)
 
 /**
@@ -279,7 +281,7 @@ class BlogPublisher extends EventEmitter {
       // 기존 제목 지우고 새 제목 입력
       await titleInput.click();
       await this.page.waitForTimeout(500);
-      await this.page.keyboard.press('Control+A');
+      await this.page.keyboard.press(SELECT_ALL_KEY);
       await this.page.waitForTimeout(200);
       await this.page.keyboard.press('Backspace');
       await this.page.waitForTimeout(200);
@@ -287,7 +289,7 @@ class BlogPublisher extends EventEmitter {
       // 대제목 클립보드 복사 후 붙여넣기로 1초 만에 입력 완성 (중간 포커싱 이탈 완벽 방지)
       try {
         await this.copyTextToClipboard(title);
-        await this.page.keyboard.press('Control+V');
+        await this.page.keyboard.press(PASTE_KEY);
         console.log('✅ 제목 클립보드 복사 붙여넣기 완료');
       } catch (pasteError) {
         console.warn('⚠️ 제목 붙여넣기 실패, 직접 타이핑으로 백업:', pasteError.message);
@@ -494,7 +496,7 @@ class BlogPublisher extends EventEmitter {
       
       // 2단계: 에디터에 포커스 및 붙여넣기
       console.log('📝 에디터에 이미지 붙여넣기 중...');
-      await this.page.keyboard.press('Control+V');
+      await this.page.keyboard.press(PASTE_KEY);
       
       // 3단계: 이미지 업로드 완료 대기
       console.log('⏳ 이미지 업로드 완료 대기 중...');
@@ -602,7 +604,7 @@ class BlogPublisher extends EventEmitter {
           
           // 3단계: Ctrl+V로 붙여넣기
           console.log(`📝 3단계: 이미지 붙여넣기 중...`);
-          await this.page.keyboard.press('Control+V');
+          await this.page.keyboard.press(PASTE_KEY);
           console.log(`✅ 3단계: 이미지 붙여넣기 완료`);
           await this.page.waitForTimeout(2000); // 이미지 로딩 대기
 
@@ -674,7 +676,7 @@ class BlogPublisher extends EventEmitter {
         // 제휴마케팅 문구 입력 (클립보드 복사 후 붙여넣기, 실패 시 직접 타이핑)
         try {
           await this.copyTextToClipboard(partnershipNotice);
-          await this.page.keyboard.press('Control+V');
+          await this.page.keyboard.press(PASTE_KEY);
           console.log('✅ 클립보드를 통한 제휴마케팅 문구 입력 완료');
         } catch (clipboardError) {
           console.warn('⚠️ 클립보드 복사 실패, 직접 타이핑으로 전환:', clipboardError.message);
@@ -720,7 +722,7 @@ class BlogPublisher extends EventEmitter {
         // 제휴마케팅 문구 입력 (클립보드 복사 후 붙여넣기, 실패 시 직접 타이핑)
         try {
           await this.copyTextToClipboard(partnershipNotice);
-          await this.page.keyboard.press('Control+V');
+          await this.page.keyboard.press(PASTE_KEY);
           console.log('✅ 클립보드를 통한 제휴마케팅 문구 입력 완료');
         } catch (clipboardError) {
           console.warn('⚠️ 클립보드 복사 실패, 직접 타이핑으로 전환:', clipboardError.message);
@@ -790,7 +792,7 @@ class BlogPublisher extends EventEmitter {
         // 파트너스 문구 입력 (클립보드 복사 후 붙여넣기, 실패 시 직접 타이핑)
         try {
           await this.copyTextToClipboard(partnershipNotice);
-          await this.page.keyboard.press('Control+V');
+          await this.page.keyboard.press(PASTE_KEY);
           console.log('✅ 클립보드를 통한 파트너스 수수료 문구 입력 완료');
         } catch (clipboardError) {
           console.warn('⚠️ 클립보드 복사 실패, 직접 타이핑으로 전환:', clipboardError.message);
@@ -836,7 +838,7 @@ class BlogPublisher extends EventEmitter {
         // 파트너스 문구 입력 (클립보드 복사 후 붙여넣기, 실패 시 직접 타이핑)
         try {
           await this.copyTextToClipboard(partnershipNotice);
-          await this.page.keyboard.press('Control+V');
+          await this.page.keyboard.press(PASTE_KEY);
           console.log('✅ 클립보드를 통한 파트너스 수수료 문구 입력 완료');
         } catch (clipboardError) {
           console.warn('⚠️ 클립보드 복사 실패, 직접 타이핑으로 전환:', clipboardError.message);
@@ -912,7 +914,7 @@ class BlogPublisher extends EventEmitter {
       console.log(`🔹 3단계: 소제목 입력 중 (${subtitle})...`);
       try {
         await this.copyTextToClipboard(subtitle);
-        await this.page.keyboard.press('Control+v');
+        await this.page.keyboard.press(PASTE_KEY);
         console.log('✅ 3단계: 소제목 클립보드 입력 완료');
       } catch (clipboardError) {
         console.warn('⚠️ 소제목 클립보드 복사 실패, 직접 타이핑:', clipboardError.message);
@@ -1120,7 +1122,7 @@ class BlogPublisher extends EventEmitter {
           // 문단 내용 입력
           try {
             await this.copyTextToClipboard(paragraph);
-            await targetPage.keyboard.press('Control+V');
+            await targetPage.keyboard.press(PASTE_KEY);
           } catch (clipboardError) {
             console.warn(`⚠️ 문단 클립보드 복사 실패, 직접 타이핑:`, clipboardError.message);
             await targetPage.keyboard.type(paragraph, { delay: 40 });
@@ -1133,7 +1135,7 @@ class BlogPublisher extends EventEmitter {
           console.log(`🔹 [말풍선+설명문 비활성] 에디터 안정화 및 사진 구분을 위해 인덱스 문자 "${indexText}" 입력 중...`);
           try {
             await this.copyTextToClipboard(indexText);
-            await targetPage.keyboard.press('Control+V');
+            await targetPage.keyboard.press(PASTE_KEY);
           } catch (clipboardError) {
             await targetPage.keyboard.type(indexText, { delay: 40 });
           }
@@ -1240,12 +1242,12 @@ class BlogPublisher extends EventEmitter {
         
         // 기존 내용 지우고 URL 붙여넣기
         await oglinkInput.click();
-        await this.page.keyboard.press('Control+A');
+        await this.page.keyboard.press(SELECT_ALL_KEY);
         
         // 어필리에이트 URL 입력 (클립보드 복사 후 붙여넣기, 실패 시 직접 타이핑)
         try {
           await this.copyTextToClipboard(affiliateUrl);
-          await this.page.keyboard.press('Control+V');
+          await this.page.keyboard.press(PASTE_KEY);
           console.log('✅ 2단계: OG링크 입력창에 어필리에이트 URL 클립보드 붙여넣기 완료');
         } catch (clipboardError) {
           console.warn('⚠️ 어필리에이트 URL 클립보드 복사 실패, 직접 타이핑:', clipboardError.message);
