@@ -4505,7 +4505,7 @@ function startLocalHttpServer(port = 3333) {
     httpServer = http.createServer((req, res) => {
         // CORS headers
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, ngrok-skip-browser-warning, bypass-tunnel-reminder, accept');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
         
         if (req.method === 'OPTIONS') {
