@@ -2,6 +2,13 @@
 
 
 
+## v1.9.68 (2026-07-07)
+- **Description**: Added policy proposal PDF document (5 pages) and compiler scripts to advocate for tax equity for non-apartment rental landlords.
+- **Changes**:
+  - `document_template.html`: Created a structured HTML template with page breaks.
+  - `make_pdf.js`: Built a Node.js utility using Playwright to compile the HTML into a print-ready A4 PDF document.
+  - `정책의견서_비아파트_양도세_차별시정.pdf`: Generated the final 5-page policy document.
+
 ## v1.9.67 (2026-07-05)
 - **Description**: Fixed a critical CORS preflight failure that blocked the new fetch-based SSE stream on Android WebViews.
 - **Changes**:
