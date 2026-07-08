@@ -2,6 +2,13 @@
 
 
 
+## v1.9.69 (2026-07-08)
+- **Description**: Resolved an issue where real-time detailed logs during Naver blog postings were not displayed on Android APK.
+- **Changes**:
+  - `android/app/src/main/assets/www/`: Synchronized updated renderer source assets including `app.js` to ensure the custom fetch-based stream reader and pre-flight health checks run on Android.
+  - `build-android-apk.sh`: Created a shell script for Mac OS users to automatically synchronize web assets and compile the Android APK in a single command.
+  - `MyDays.apk`: Recompiled the final package with updated logic and published the binary.
+
 ## v1.9.68 (2026-07-07)
 - **Description**: Added policy proposal PDF document (5 pages) and compiler scripts to advocate for tax equity for non-apartment rental landlords.
 - **Changes**:

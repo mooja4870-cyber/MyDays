@@ -3557,47 +3557,136 @@ class MobileApiBridge {
         return baseUrl ? `${baseUrl}${path}` : path;
     }
 
+    /**
+     * 🛡️ 선검증(Pre-flight): 포스팅 시작 전 현재 저장된 PC 서버 주소가 살아있는지 확인하고,
+     * 죽어있으면 자동탐색으로 갱신한다. (장소 변경으로 인한 첫 시도 실패 메시지를 예방)
+     * @param {function} [onLog] 진행 상황 로그 콜백 (level, message)
+     * @returns {Promise<string|null>} 사용 가능한 서버 URL, 없으면 null
+     */
+    static async ensureServerReachable(onLog = null) {
+        const log = (level, message) => { if (typeof onLog === 'function') onLog(level, message); };
+
+        // health 1회 확인 헬퍼 (짧은 타임아웃)
+        const checkHealthInfo = async (baseUrl) => {
+            if (!baseUrl) return null;
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 1500);
+                const res = await fetch(`${baseUrl}/api/health`, {
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                clearTimeout(timeoutId);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.app === 'MyDays') {
+                        return data;
+                    }
+                }
+            } catch (e) {
+                // 연결 실패
+            }
+            return null;
+        };
+
+        const savedUrl = this.getApiBaseUrl(false);
+
+        // 1) 저장 주소가 살아있으면 확인
+        if (savedUrl) {
+            const healthData = await checkHealthInfo(savedUrl);
+            if (healthData) {
+                // ngrok 등 외부망으로 접속 중인데, lanUrl이 제공되고 동일 Wi-Fi라면 LAN으로 업그레이드 시도
+                if (healthData.lanUrl && healthData.lanUrl !== savedUrl) {
+                    const lanHealth = await checkHealthInfo(healthData.lanUrl);
+                    if (lanHealth) {
+                        localStorage.setItem('mydays-server-url', healthData.lanUrl);
+                        log('success', `📡 더 빠르고 안정적인 로컬 네트워크(LAN) 연결로 자동 전환되었습니다: ${healthData.lanUrl}`);
+                        if (typeof PostingHistoryManager !== 'undefined') {
+                            PostingHistoryManager.connectSSE(true);
+                        }
+                        return healthData.lanUrl;
+                    }
+                }
+                return savedUrl;
+            }
+        }
+
+        // 2) 죽어있으면(또는 미설정) 자동탐색으로 갱신
+        log('warn', '🛡️ [선검증] 저장된 PC 서버 주소에 연결되지 않아 자동 탐색으로 갱신합니다...');
+        try {
+            const foundUrl = await this.discoverPcServer();
+            if (foundUrl) {
+                localStorage.setItem('mydays-server-url', foundUrl);
+                this.serverUrl = foundUrl;
+                const serverUrlInput = document.getElementById('mobile-server-url');
+                if (serverUrlInput) serverUrlInput.value = foundUrl;
+                log('success', `🛡️ [선검증 완료] PC 서버(${foundUrl})를 확인하여 설정을 갱신했습니다.`);
+                return foundUrl;
+            }
+        } catch (e) {
+            console.error('선검증 자동탐색 오류:', e);
+        }
+
+        log('warn', '⚠️ [선검증] 연결 가능한 MyDays PC 서버를 찾지 못했습니다. (PC 프로그램 실행 및 동일 Wi-Fi 여부 확인)');
+        return null;
+    }
+
     // 🔍 동일 Wi-Fi 대역 내 PC 자동화 서버(MyDays) 탐색 기능
     static async discoverPcServer(onProgress = null) {
-        // 0순위: 현재 브라우저가 접속해 있는 호스트 주소(Origin) 검사 (이미 올바른 IP로 접속했을 수 있음)
+        // 🥇 최우선: 현재 페이지를 서빙하는 서버에게 상대경로 /api/health로 직접 물어본다.
+        //   - PC 자체 브라우저(localhost) 또는 LAN IP로 접속한 경우 모두 동작.
+        //   - 서버가 자신의 실제 LAN IP(localIps/lanUrl)를 알려주므로 무차별 스캔이 불필요.
         if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
-            const currentOrigin = window.location.origin;
-            if (currentOrigin && !currentOrigin.includes('localhost') && !currentOrigin.includes('127.0.0.1')) {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 350);
-                    const res = await fetch(`${currentOrigin}/api/health`, {
-                        signal: controller.signal,
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    clearTimeout(timeoutId);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data && data.app === 'MyDays') {
-                            console.log('🎯 브라우저 접속 Origin에서 서버 발견:', currentOrigin);
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 1500);
+                const res = await fetch(`/api/health`, {
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                clearTimeout(timeoutId);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.app === 'MyDays') {
+                        const currentOrigin = window.location.origin;
+                        const isLocal = currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1');
+                        // localhost로 접속했어도 서버가 알려준 LAN 주소를 우선 채택(모바일 공유용)
+                        if (data.lanUrl) {
+                            console.log('🎯 서버가 보고한 LAN 주소 채택:', data.lanUrl);
+                            return data.lanUrl;
+                        }
+                        if (!isLocal) {
+                            console.log('🎯 현재 접속 Origin에서 서버 확인:', currentOrigin);
                             return currentOrigin;
                         }
                     }
-                } catch (e) {
-                    // 무시
                 }
+            } catch (e) {
+                // 무시하고 아래 서브넷 스캔으로 진행
             }
         }
 
         const subnets = ['172.30.1', '192.168.0', '192.168.1', '192.168.8', '192.168.43', '192.168.137', '192.168.219', '192.168.35'];
-        
-        // 현재 설정되어 있는 주소가 있으면 그 서브넷을 1순위로 추가
+
+        // 서브넷을 목록 맨 앞(1순위)으로 끌어올리는 헬퍼
+        const promoteSubnet = (subnet) => {
+            if (!subnet) return;
+            const idx = subnets.indexOf(subnet);
+            if (idx >= 0) subnets.splice(idx, 1);
+            subnets.unshift(subnet);
+        };
+
+        // 1순위: 현재 브라우저가 접속해 있는 호스트의 서브넷(이 장소의 실제 대역)을 최우선 추가
+        const hostMatch = (window.location.hostname || '').match(/^(\d{1,3}\.\d{1,3}\.\d{1,3})\.\d{1,3}$/);
+        if (hostMatch) {
+            promoteSubnet(hostMatch[1]);
+        }
+
+        // 그 다음: 기존에 설정되어 있던 주소의 서브넷도 우선순위 상향
         const savedUrl = (localStorage.getItem('mydays-server-url') || '').trim();
         const ipMatch = savedUrl.match(/https?:\/\/(\d{1,3}\.\d{1,3}\.\d{1,3})\.\d{1,3}/);
         if (ipMatch) {
-            const currentSubnet = ipMatch[1];
-            if (!subnets.includes(currentSubnet)) {
-                subnets.unshift(currentSubnet);
-            } else {
-                const idx = subnets.indexOf(currentSubnet);
-                subnets.splice(idx, 1);
-                subnets.unshift(currentSubnet);
-            }
+            promoteSubnet(ipMatch[1]);
         }
 
         const port = 3333;
@@ -3699,6 +3788,76 @@ class ErrorMessageHelper {
 
 // PHOTO 포스팅 이력 관리자
 class PostingHistoryManager {
+    static connectSSE(forceReconnect = false) {
+        if (window.electronAPI && window.electronAPI.onMainProcessLog) return;
+        
+        if (this._abortController) {
+            if (!forceReconnect) return;
+            console.log('🔄 기존 SSE 연결을 종료하고 재연결합니다.');
+            this._abortController.abort();
+            this._abortController = null;
+        }
+
+        console.log('🌐 SSE 실시간 로그 스트림 연결 시도 (/api/logs)...');
+        try {
+            const logsUrl = MobileApiBridge.apiUrl('/api/logs');
+            if (!logsUrl || (window.location.protocol === 'file:' && logsUrl === '/api/logs')) {
+                console.warn('모바일 앱 PC 서버 주소가 없어 SSE 로그 연결을 건너뜁니다.');
+                return;
+            }
+
+            this._abortController = new AbortController();
+            
+            fetch(logsUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'text/event-stream',
+                    'ngrok-skip-browser-warning': 'true',
+                    'Bypass-Tunnel-Reminder': 'true'
+                },
+                signal: this._abortController.signal
+            }).then(async (response) => {
+                if (!response.body) {
+                    console.error('SSE fetch response body is null');
+                    return;
+                }
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // Keep incomplete line in buffer
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const dataStr = line.substring(6).trim();
+                            if (dataStr) {
+                                try {
+                                    const logData = JSON.parse(dataStr);
+                                    this.appendLog(logData);
+                                } catch (e) {
+                                    console.error('SSE 로그 파싱 에러:', e);
+                                }
+                            }
+                        }
+                    }
+                }
+            }).catch(err => {
+                if (err.name !== 'AbortError') {
+                    console.error('SSE fetch 연결 오류:', err);
+                }
+            });
+
+        } catch (err) {
+            console.error('SSE 초기화 오류:', err);
+        }
+    }
+
     static init() {
         console.log('📋 PostingHistoryManager 초기화 중...');
         
@@ -3711,28 +3870,7 @@ class PostingHistoryManager {
                 this.appendLog(logData);
             });
         } else {
-            console.log('🌐 일반 브라우저 환경 감지. SSE 실시간 로그 스트림 연결 시작 (/api/logs)...');
-            try {
-                const logsUrl = MobileApiBridge.apiUrl('/api/logs');
-                if (!logsUrl || (window.location.protocol === 'file:' && logsUrl === '/api/logs')) {
-                    console.warn('모바일 앱 PC 서버 주소가 없어 SSE 로그 연결을 건너뜁니다.');
-                    return;
-                }
-                const eventSource = new EventSource(logsUrl);
-                eventSource.onmessage = (event) => {
-                    try {
-                        const logData = JSON.parse(event.data);
-                        this.appendLog(logData);
-                    } catch (e) {
-                        console.error('SSE 로그 파싱 에러:', e);
-                    }
-                };
-                eventSource.onerror = (err) => {
-                    console.error('SSE 연결 오류:', err);
-                };
-            } catch (err) {
-                console.error('SSE 초기화 오류:', err);
-            }
+            this.connectSSE();
         }
     }
     
@@ -4262,6 +4400,20 @@ class PhotoAutomationManager {
             AppState.photoPublishing = true;
             Navigation.switchPanel('naver-test');
             PostingHistoryManager.appendLog({ level: 'info', message: '🚀 PHOTO 분석 및 네이버 블로그 자동 포스팅을 시작합니다...' });
+
+            // 🛡️ 선검증(Pre-flight): 브라우저(모바일) 모드에서만, POST 전에 서버 주소를 미리 확인·갱신
+            // (Electron 직접 IPC 모드는 네트워크 주소가 불필요하므로 건너뜀)
+            const isBrowserMode = !(window.electronAPI && typeof window.electronAPI.executeAutomationStep === 'function');
+            if (isBrowserMode) {
+                await MobileApiBridge.ensureServerReachable((level, message) => {
+                    PostingHistoryManager.appendLog({ level, message });
+                });
+                PostingHistoryManager.connectSSE(true);
+                
+                // WebView 네트워크 병목으로 인해 SSE 연결이 지연되는 것을 방지하기 위해
+                // 대규모 POST 요청을 전송하기 전에 1.5초 대기하여 SSE 스트림이 먼저 확립되도록 합니다.
+                await new Promise(resolve => setTimeout(resolve, 1500));
+            }
 
             // 백그라운드 비동기 비차단 실행 프로미스 정의 (await하지 않고 독립 실행)
             const executePromise = (async () => {
