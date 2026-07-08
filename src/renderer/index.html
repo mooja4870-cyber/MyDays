@@ -435,8 +435,33 @@
             <div class="content-panel" id="naver-test-panel">
                 <!-- 시스템 실시간 로그 -->
                 <div class="card" id="photo-log-card">
-                    <div class="card-title">
+                    <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
                         📋 실시간 시스템 로그
+                        <style>
+                            .log-tooltip { position: relative; display: inline-block; cursor: help; }
+                            .log-tooltip .tooltip-text {
+                                visibility: hidden; width: 340px; background-color: #282a36; color: #f8f8f2;
+                                text-align: left; border-radius: 6px; padding: 12px; position: absolute;
+                                z-index: 10; bottom: 125%; left: 50%; transform: translateX(-50%);
+                                opacity: 0; transition: opacity 0.3s; font-size: 0.8rem; font-weight: normal;
+                                line-height: 1.6; border: 1px solid #44475a; box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+                                word-break: keep-all; letter-spacing: -0.3px;
+                            }
+                            .log-tooltip .tooltip-text::after {
+                                content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+                                border-width: 5px; border-style: solid; border-color: #44475a transparent transparent transparent;
+                            }
+                            .log-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+                        </style>
+                        <div class="log-tooltip">
+                            <span style="font-size: 0.9em; opacity: 0.8;">ℹ️</span>
+                            <div class="tooltip-text">
+                                <strong style="color:#50fa7b;">✅ 성공:</strong> 단계 정상 완료 및 시스템 준비 완료<br>
+                                <strong style="color:#ff5555;">❌ 실패:</strong> 치명적 오류 발생, 프로세스 중단<br>
+                                <strong style="color:#8be9fd;">ℹ️ 정보:</strong> 진행 상태 알림, 재시도 안내<br>
+                                <strong style="color:#f1fa8c;">⚠️ 경고:</strong> 타임아웃 등 경미한 문제, 복구/무시 후 진행
+                            </div>
+                        </div>
                     </div>
                     <div class="update-log-container" id="test-log-container" style="background: #1e1e1e; color: #f8f8f2; font-family: monospace; padding: 1rem; border-radius: var(--radius-md); max-height: 250px; overflow-y: auto;">
                         <div style="color: #6272a4;">대기 중...</div>
@@ -876,6 +901,6 @@
         </button>
     </div>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=1968"></script>
 </body>
 </html>
