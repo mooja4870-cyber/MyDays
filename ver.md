@@ -1,6 +1,11 @@
 # 📦 Version History
 
-## v1.9.70 (2026-07-08)
+## v1.9.71 (2026-07-08)
+- **Description**: Fixed an issue where the real-time system log tooltip was cut off by changing its display direction to pop downwards.
+- **Changes**:
+  - `src/renderer/index.html`: Updated CSS for `.tooltip-text` to use `top: 130%` and repositioned the indicator arrow.
+
+
 - **Description**: Added a tooltip to the real-time system log UI to explain status symbols (✅, ❌, ℹ️, ⚠️).
 - **Changes**:
   - `src/renderer/index.html`: Added a tooltip component and embedded CSS next to the "📋 실시간 시스템 로그" header.

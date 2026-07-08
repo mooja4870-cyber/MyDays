@@ -442,14 +442,14 @@
                             .log-tooltip .tooltip-text {
                                 visibility: hidden; width: 340px; background-color: #282a36; color: #f8f8f2;
                                 text-align: left; border-radius: 6px; padding: 12px; position: absolute;
-                                z-index: 10; bottom: 125%; left: 50%; transform: translateX(-50%);
+                                z-index: 100; top: 130%; left: -10px; /* 아래쪽으로 팝업 */
                                 opacity: 0; transition: opacity 0.3s; font-size: 0.8rem; font-weight: normal;
                                 line-height: 1.6; border: 1px solid #44475a; box-shadow: 0 4px 6px rgba(0,0,0,0.5);
                                 word-break: keep-all; letter-spacing: -0.3px;
                             }
                             .log-tooltip .tooltip-text::after {
-                                content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
-                                border-width: 5px; border-style: solid; border-color: #44475a transparent transparent transparent;
+                                content: ""; position: absolute; bottom: 100%; left: 15px;
+                                border-width: 6px; border-style: solid; border-color: transparent transparent #44475a transparent;
                             }
                             .log-tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
                         </style>
