@@ -1,6 +1,9 @@
 # 📦 Version History
 
-
+## v1.9.70 (2026-07-08)
+- **Description**: Added a tooltip to the real-time system log UI to explain status symbols (✅, ❌, ℹ️, ⚠️).
+- **Changes**:
+  - `src/renderer/index.html`: Added a tooltip component and embedded CSS next to the "📋 실시간 시스템 로그" header.
 
 ## v1.9.69 (2026-07-08)
 - **Description**: Resolved an issue where real-time detailed logs during Naver blog postings were not displayed on Android APK.
